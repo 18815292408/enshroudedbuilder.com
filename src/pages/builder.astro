@@ -1,0 +1,96 @@
+---
+import Base from "../layouts/Base.astro";
+import { TREE, BIOMES, MAX_POINTS, REGION_LABEL } from "../lib/tree";
+import { BUILDS } from "../data/builds";
+import { planBuild } from "../lib/plan";
+import { SITE, SOURCES } from "../lib/site";
+
+const presets = BUILDS.map((b) => ({ slug: b.slug, name: b.name, code: planBuild(b).at(-1)!.code }));
+const payload = { tree: TREE, biomes: BIOMES, regionLabel: REGION_LABEL, presets };
+const jsonLd = {
+  "@context": "https://schema.org", "@type": "WebApplication", name: "Enshrouded Skill Tree Planner", url: `${SITE.url}/builder/`,
+  applicationCategory: "GameApplication", operatingSystem: "Any", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Interactive Enshrouded 1.0 skill tree planner with exact skill costs, point budget by level and shareable build links.",
+};
+---
+<Base title="Enshrouded Skill Tree Planner (1.0) – Build Calculator & Share Links" description={`Free Enshrouded 1.0 skill tree planner: all ${Object.keys(TREE.nodes).length} nodes with exact costs from the game data, a level 1–50 point budget, attribute totals and one-click build sharing.`} jsonLd={jsonLd}>
+  <section class="wrap pt-8 pb-4">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="eyebrow mb-1">Free tool · Enshrouded 1.0</p>
+        <h1 class="text-3xl md:text-4xl">Enshrouded Skill Tree Planner</h1>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <label class="sr-only" for="preset">Load a build</label>
+        <select id="preset" class="panel !rounded-md px-3 py-2 text-sm text-parchment bg-night-3">
+          <option value="">Load a build…</option>
+          {presets.map((p) => <option value={p.code}>{p.name} (level 50)</option>)}
+        </select>
+        <button id="share" type="button" class="btn btn-flame !py-2 !text-xs">Copy share link</button>
+        <button id="reset" type="button" class="btn btn-ghost !py-2 !text-xs">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap grid lg:grid-cols-[1fr_20rem] gap-4">
+    <div class="panel relative overflow-hidden h-[70vh] min-h-[28rem] select-none touch-none" id="stage">
+      <svg id="tree" class="w-full h-full cursor-grab" role="application" aria-label="Enshrouded skill tree. Click a node to add a level, right-click or long-press to remove."></svg>
+      <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+        <button type="button" data-zoom="1.25" class="btn btn-ghost !p-0 w-9 h-9 justify-center" aria-label="Zoom in">+</button>
+        <button type="button" data-zoom="0.8" class="btn btn-ghost !p-0 w-9 h-9 justify-center" aria-label="Zoom out">−</button>
+        <button type="button" data-zoom="0" class="btn btn-ghost !p-0 w-9 h-9 justify-center text-[0.6rem]" aria-label="Fit tree">Fit</button>
+      </div>
+      <div class="absolute top-3 right-3 left-16 sm:left-auto sm:w-64">
+        <label class="sr-only" for="search">Search skills</label>
+        <input id="search" type="search" placeholder="Search skills…" autocomplete="off" class="w-full panel !rounded-md px-3 py-2 text-sm bg-night-3 text-parchment placeholder:text-mist" />
+      </div>
+      <div id="tip" class="pointer-events-none absolute z-10 hidden max-w-xs panel panel-ornate p-3 text-sm"></div>
+      <p class="absolute bottom-2 left-3 right-3 text-[0.72rem] text-mist">Click: add level · Right-click / long-press / Shift-click: remove · Drag: pan · Wheel or pinch: zoom</p>
+    </div>
+
+    <aside class="flex flex-col gap-4">
+      <div class="panel panel-ornate p-5">
+        <div class="flex items-baseline justify-between">
+          <p class="eyebrow">Skill points</p>
+          <p class="font-display text-2xl"><span id="used" class="text-flame">0</span><span class="text-mist text-lg"> / <span id="avail">{MAX_POINTS}</span></span></p>
+        </div>
+        <div class="h-2 rounded bg-night mt-3 overflow-hidden"><div id="bar" class="h-full bg-gradient-to-r from-flame to-ember" style="width:0%"></div></div>
+        <p id="over" class="hidden text-ember text-sm mt-2">Over budget for this level.</p>
+        <label class="block mt-4 text-sm text-ash" for="level">Player level: <strong id="levelOut" class="text-parchment">50</strong></label>
+        <input id="level" type="range" min="1" max={TREE.leveling.playerLevelCap} value={TREE.leveling.playerLevelCap} class="w-full accent-[#f3a73b]" />
+        <fieldset class="mt-3">
+          <legend class="text-sm text-ash mb-1">Shroud Roots & Elixir Wells collected</legend>
+          <div class="grid grid-cols-1 gap-1 text-sm">
+            {BIOMES.map((b) => <label class="flex items-center justify-between gap-2 text-ash"><span class="flex items-center gap-2"><input type="checkbox" class="biome accent-[#f3a73b]" value={b.id} checked />{b.name}</span><span class="text-mist">+{b.points}</span></label>)}
+          </div>
+        </fieldset>
+      </div>
+      <div class="panel p-5">
+        <p class="eyebrow mb-3">Attributes from skills</p>
+        <dl id="attrs" class="grid grid-cols-2 gap-2 text-sm"></dl>
+      </div>
+      <div class="panel p-5 max-h-[22rem] overflow-y-auto">
+        <p class="eyebrow mb-3">Selected skills <span id="count" class="text-mist"></span></p>
+        <ul id="list" class="space-y-1.5 text-sm"></ul>
+      </div>
+    </aside>
+  </section>
+
+  <section class="wrap mt-12 prose-game max-w-3xl">
+    <h2>How to use the Enshrouded skill planner</h2>
+    <ul>
+      <li>Start from any node on the inner ring. A skill can only be taken if it connects to a skill you already have, just like in game.</li>
+      <li>Click a node to add a level, and click again for skills with up to 3 levels. Right-click, Shift-click or long-press removes a level. You cannot remove a node that other selected skills depend on.</li>
+      <li>Set your <strong>player level</strong> and the biomes you have explored to see your real point budget: 2 points per level after level 1, plus each biome's Shroud Roots (1 point) and Elixir Wells (3 points).</li>
+      <li>The link updates as you plan. Use <strong>Copy share link</strong> to send the build to friends on Discord or Reddit.</li>
+    </ul>
+    <h2>Where the data comes from</h2>
+    <p>Node layout, links, costs, max levels and effect text come from the Enshrouded 1.0 game files (build {TREE.source.gameBuild}), via the open-source <a href={SOURCES.gameData.url} rel="noopener">enshrouded-skill-tree</a> export (GPL-3.0). Colors show the three trees: <span class="text-tree-mage">Mage</span>, <span class="text-tree-warrior">Warrior</span>, <span class="text-tree-ranger">Ranger</span> and the <span class="text-tree-core">Core</span>. Want a ready-made build? Browse the <a href="/builds/">1.0 build guides</a>.</p>
+  </section>
+
+  <script type="application/json" id="planner-data" set:html={JSON.stringify(payload)} />
+  <script>
+    import { initPlanner } from "../lib/planner-client";
+    initPlanner();
+  </script>
+</Base>

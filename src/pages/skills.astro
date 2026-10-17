@@ -1,0 +1,48 @@
+---
+import Base from "../layouts/Base.astro";
+import { TREE, REGION_LABEL, regionOf, treeOf } from "../lib/tree";
+import { SITE, SOURCES } from "../lib/site";
+const trees = [
+  { id: "mage", name: "Mage tree (magic)", regions: ["trickster", "wizard", "healer", "battlemage"] },
+  { id: "warrior", name: "Warrior tree (melee)", regions: ["tank", "warrior", "barbarian", "athlete"] },
+  { id: "ranger", name: "Ranger tree (ranged & survival)", regions: ["survivor", "beastmaster", "ranger", "assassin"] },
+  { id: "core", name: "Core (center of the tree)", regions: ["core"] },
+];
+const NEW = new Set(["AERIAL_WAND_ATTACK", "WAND_EVASION_ATTACK", "ADVANCED_NECROMANCY", "TOTEM_MASTERY", "BLAST_AND_CAST", "PUNCTURE", "BARRAGE", "SURVIVAL_INSTINCT", "AIRBORNE_ARCHITECT"]);
+const byRegion: Record<string, string[]> = {};
+for (const t of Object.keys(TREE.types)) { const r = regionOf(t); (byRegion[r] ??= []).push(t); }
+for (const r of Object.keys(byRegion)) byRegion[r].sort((a, b) => TREE.types[a].name.localeCompare(TREE.types[b].name));
+const count = Object.keys(TREE.types).length;
+---
+<Base title={`Enshrouded 1.0 Skills List – All ${count} Skills, Costs & Effects`} description={`Every Enshrouded 1.0 skill with its exact point cost, max level and effect, grouped by archetype. Taken from the 1.0 game data, including the 9 skills new in 1.0.`}>
+  <section class="wrap pt-14 prose-game max-w-4xl">
+    <p class="eyebrow">Reference</p>
+    <h1 class="text-4xl md:text-5xl !mt-2">Enshrouded 1.0 Skills List</h1>
+    <p class="text-lg">All {count} skill types in the 1.0 skill tree, with the in-game cost per level, max level and effect at max level. Data comes from game build {TREE.source.gameBuild} ({TREE.source.branch.replace("^/game38/branches/", "")}), last verified {SITE.lastVerified}. Skills marked <span class="chip !text-flame">New in 1.0</span> were added in the full release.</p>
+    <p>Skills are grouped by the archetype region they sit closest to. Some sit between two regions, and any character can take any skill as long as it connects to the tree. Plan a full build in the <a href="/builder/">skill planner</a>.</p>
+    <nav class="flex flex-wrap gap-2 not-prose mt-4" aria-label="Archetypes">{trees.flatMap((t) => t.regions).map((r) => <a href={`#${r}`} class="chip hover:text-flame no-underline">{REGION_LABEL[r]}</a>)}</nav>
+  </section>
+  {trees.map((tree) => (
+    <section class="wrap mt-12">
+      <h2 class="text-2xl mb-2">{tree.name}</h2>
+      {tree.regions.map((r) => (
+        <div id={r} class="mt-6 scroll-mt-20">
+          <h3 class="font-display text-lg text-flame mb-3">{REGION_LABEL[r]}</h3>
+          <div class="panel overflow-x-auto">
+            <table class="table-game min-w-[40rem]">
+              <thead><tr><th class="w-56">Skill</th><th class="w-28">Cost</th><th>Effect (max level)</th></tr></thead>
+              <tbody>
+                {(byRegion[r] ?? []).map((t) => { const s = TREE.types[t]; return (
+                  <tr><td class="text-parchment">{s.name}{NEW.has(t) && <span class="chip !text-flame ml-2 !text-[0.7rem]">New in 1.0</span>}</td><td class="whitespace-nowrap">{s.cost} pt{s.maxLevel > 1 ? ` × ${s.maxLevel} lv` : ""}</td><td>{s.levels[s.levels.length - 1]}</td></tr>
+                ); })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </section>
+  ))}
+  <section class="wrap mt-12 prose-game max-w-4xl text-sm">
+    <p>Sources: <a href={SOURCES.gameData.url} rel="noopener">{SOURCES.gameData.label}</a>; new-skill list from <a href={SOURCES.changelog.url} rel="noopener">{SOURCES.changelog.label}</a>.</p>
+  </section>
+</Base>

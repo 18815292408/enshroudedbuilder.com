@@ -1,0 +1,98 @@
+---
+import "../styles/global.css";
+import { SITE, DISCLAIMER, NAV } from "../lib/site";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: "website" | "article";
+  jsonLd?: object | object[];
+  noindex?: boolean;
+}
+const { title, description, image = "/img/og-default.jpg", type = "website", jsonLd, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogImage = new URL(image, SITE.url).href;
+const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const path = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#0c0a10" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Cinzel:wght@600;700;900&display=swap" rel="stylesheet" />
+    <slot name="head" />
+    {ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 btn btn-flame">Skip to content</a>
+    <header class="sticky top-0 z-40 border-b border-flame/15 bg-night/85 backdrop-blur-md">
+      <div class="wrap flex items-center justify-between gap-4 h-16">
+        <a href="/" class="flex items-center gap-2.5 no-underline group" aria-label="Enshrouded Builder home">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#e0661e"/></linearGradient></defs><path d="M16 2c2 6 8 8 8 16a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 5 3 5-1-5 1-9 1-13z" fill="url(#fl)"/><path d="M16 30a4 4 0 0 1-4-4c0-3 4-5 4-8 0 3 4 5 4 8a4 4 0 0 1-4 4z" fill="#fff3d6" opacity=".85"/></svg>
+          <span class="font-display font-bold text-[1.05rem] tracking-wide text-parchment group-hover:text-flame transition-colors">Enshrouded<span class="text-flame">Builder</span></span>
+        </a>
+        <nav aria-label="Main" class="hidden md:flex items-center gap-1">
+          {NAV.map((n) => (
+            <a href={n.href} class:list={["px-3 py-2 rounded font-display text-[0.82rem] tracking-[0.12em] uppercase no-underline transition-colors", path.startsWith(n.href) ? "text-flame" : "text-ash hover:text-parchment"]}>{n.label}</a>
+          ))}
+        </nav>
+        <details class="md:hidden relative">
+          <summary class="list-none cursor-pointer btn btn-ghost !py-2 !px-3" aria-label="Open menu">Menu</summary>
+          <div class="absolute right-0 mt-2 w-56 panel p-2 flex flex-col">
+            {NAV.map((n) => <a href={n.href} class="px-3 py-2.5 rounded no-underline text-parchment hover:bg-night-3 font-display text-sm tracking-wider uppercase">{n.label}</a>)}
+          </div>
+        </details>
+      </div>
+    </header>
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <footer class="mt-20 border-t border-flame/15 bg-night-2/80">
+      <div class="wrap py-10 grid gap-8 md:grid-cols-[1.4fr_1fr_1fr] text-sm">
+        <div>
+          <p class="font-display text-parchment text-base mb-2">Enshrouded<span class="text-flame">Builder</span></p>
+          <p class="text-mist leading-relaxed">{DISCLAIMER}</p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Guides</p>
+          <ul class="space-y-1.5 text-ash">
+            <li><a class="hover:text-flame no-underline" href="/builds/">All 1.0 builds</a></li>
+            <li><a class="hover:text-flame no-underline" href="/builder/">Skill tree planner</a></li>
+            <li><a class="hover:text-flame no-underline" href="/skills/">1.0 skills list</a></li>
+            <li><a class="hover:text-flame no-underline" href="/enshrouded-1-0-changes/">What changed in 1.0</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Site</p>
+          <ul class="space-y-1.5 text-ash">
+            <li><a class="hover:text-flame no-underline" href="/about/">About &amp; sources</a></li>
+            <li><a class="hover:text-flame no-underline" href="/privacy/">Privacy</a></li>
+            <li><a class="hover:text-flame no-underline" href="/contact/">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="wrap pb-8 text-xs text-mist">
+        Game data last verified {SITE.lastVerified} against Enshrouded {SITE.gameVersion}. Item and food details adapted from the <a class="underline hover:text-flame" href="https://enshrouded.wiki.gg/" rel="noopener">Enshrouded Wiki</a> (CC BY-SA 4.0).
+      </div>
+    </footer>
+  </body>
+</html>

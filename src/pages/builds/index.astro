@@ -1,0 +1,35 @@
+---
+import Base from "../../layouts/Base.astro";
+import BuildCard from "../../components/BuildCard.astro";
+import { BUILDS } from "../../data/builds";
+import { SITE } from "../../lib/site";
+const jsonLd = {
+  "@context": "https://schema.org", "@type": "CollectionPage", name: "Enshrouded 1.0 builds", url: `${SITE.url}/builds/`,
+  hasPart: BUILDS.map((b) => ({ "@type": "Article", headline: b.title, url: `${SITE.url}/builds/${b.slug}/` })),
+};
+const rows = BUILDS.map((b) => ({ b, solo: b.modes.includes("Solo") }));
+---
+<Base title="All Enshrouded 1.0 Builds – Mage, Ranger, Warrior, Tank, Healer & More" description="Every Enshrouded 1.0 build on one page: Battlemage, Wizard, Summoner, Ranger, Tank, Two-Handed Warrior, Healer and Assassin, with level 50 skill orders from real game data." jsonLd={jsonLd}>
+  <section class="wrap pt-14">
+    <p class="eyebrow mb-2">Build library</p>
+    <h1 class="text-4xl md:text-5xl">Enshrouded 1.0 Builds</h1>
+    <p class="text-ash mt-4 max-w-3xl text-lg">Eight level 50 builds covering every combat style in the 1.0 skill tree. Each guide has an exact skill order, gear, food and a link that opens the build in the planner.</p>
+  </section>
+  <section class="wrap mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    {BUILDS.map((b, i) => <BuildCard build={b} eager={i < 3} />)}
+  </section>
+  <section class="wrap mt-16">
+    <h2 class="text-2xl mb-4">Compare builds</h2>
+    <div class="panel overflow-x-auto">
+      <table class="table-game min-w-[44rem]">
+        <thead><tr><th>Build</th><th>Tier</th><th>Difficulty</th><th>Solo</th><th>Weapons</th><th>Attributes</th></tr></thead>
+        <tbody>
+          {rows.map(({ b, solo }) => (
+            <tr><td><a href={`/builds/${b.slug}/`} class="text-parchment hover:text-flame">{b.name}</a></td><td>{b.tier}</td><td>{b.difficulty}</td><td>{solo ? "Yes" : "Co-op focus"}</td><td>{b.weapons}</td><td>{b.stats}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-sm text-mist mt-3">Looking for a solo build? The Battlemage and Summoner are the safest picks. Their summons, ward and self-sustain cover for not having a group.</p>
+  </section>
+</Base>

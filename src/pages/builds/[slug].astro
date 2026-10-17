@@ -1,0 +1,168 @@
+---
+import Base from "../../layouts/Base.astro";
+import BuildCard from "../../components/BuildCard.astro";
+import SkillName from "../../components/SkillName.astro";
+import { BUILDS, buildBySlug, type Build } from "../../data/builds";
+import { NEW_FOODS } from "../../data/gear";
+import { planBuild } from "../../lib/plan";
+import { skill, MAX_POINTS, REGION_LABEL, TREE } from "../../lib/tree";
+import { SITE, SOURCES } from "../../lib/site";
+
+export function getStaticPaths() {
+  return BUILDS.map((b) => ({ params: { slug: b.slug } }));
+}
+const b: Build = buildBySlug(Astro.params.slug!);
+const stages = planBuild(b);
+const final = stages[stages.length - 1];
+const flex = MAX_POINTS - final.pointsUsed;
+const related = b.related.map(buildBySlug);
+const url = `${SITE.url}/builds/${b.slug}/`;
+const toc = [
+  ["overview", "Overview"], ["how-to-play", "How to play"], ["core-skills", "Core skills"], ["skill-order", "Skill order (1–50)"],
+  ["gear", "Gear & weapons"], ["food", "Food & buffs"], ["pros-cons", "Pros & cons"], ["faq", "FAQ"],
+];
+const jsonLd = [
+  {
+    "@context": "https://schema.org", "@type": "Article", headline: b.title, description: b.description,
+    image: `${SITE.url}/img/og-${b.slug}.jpg`, datePublished: "2026-10-17", dateModified: SITE.lastVerified,
+    author: { "@type": "Organization", name: SITE.name, url: SITE.url }, publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    mainEntityOfPage: url, about: { "@type": "VideoGame", name: "Enshrouded" },
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: b.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/` },
+      { "@type": "ListItem", position: 2, name: "Builds", item: `${SITE.url}/builds/` },
+      { "@type": "ListItem", position: 3, name: `${b.name} Build`, item: url },
+    ],
+  },
+];
+---
+<Base title={b.title} description={b.description} image={`/img/og-${b.slug}.jpg`} type="article" jsonLd={jsonLd}>
+  <section class="relative overflow-hidden border-b border-flame/15">
+    <img src={`/img/${b.slug}-960.webp`} srcset={`/img/${b.slug}-480.webp 480w, /img/${b.slug}-960.webp 960w`} sizes="100vw" alt="" width="960" height="640" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-right opacity-80" />
+    <div class="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-night/0"></div>
+    <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-night to-transparent"></div>
+    <div class="wrap relative py-14 md:py-20">
+      <nav aria-label="Breadcrumb" class="text-sm text-mist mb-5"><a href="/" class="hover:text-flame no-underline">Home</a> <span aria-hidden="true">/</span> <a href="/builds/" class="hover:text-flame no-underline">Builds</a> <span aria-hidden="true">/</span> <span class="text-ash">{b.name}</span></nav>
+      <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${b.tier}`}>{b.tier}</span><span class="eyebrow">Enshrouded 1.0 · Level 50 build</span></div>
+      <h1 class="text-3xl md:text-5xl font-bold text-parchment max-w-3xl">Enshrouded {b.name} Build <span class="text-flame">for 1.0</span></h1>
+      <p class="mt-4 text-lg text-ash max-w-2xl">{b.short}</p>
+      <dl class="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl text-sm">
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Difficulty</dt><dd class="text-parchment mt-1">{b.difficulty}</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Best for</dt><dd class="text-parchment mt-1">{b.modes.join(" · ")}</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Weapons</dt><dd class="text-parchment mt-1">{b.weapons}</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Attributes</dt><dd class="text-parchment mt-1">{b.stats}</dd></div>
+      </dl>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a class="btn btn-flame" href={`/builder/?b=${final.code}`}>Open level 50 build in planner</a>
+        <a class="btn btn-ghost" href="#skill-order">Skill order</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-10">
+    <article class="prose-game min-w-0">
+      <p class="text-sm text-mist !mt-0">Verified {SITE.lastVerified} against Enshrouded {SITE.gameVersion}. Skill costs and effects come from the 1.0 game data (build {TREE.source.gameBuild}).</p>
+
+      <h2 id="overview">Overview</h2>
+      {b.intro.map((p) => <p>{p}</p>)}
+
+      <h2 id="how-to-play">How to play the {b.name}</h2>
+      <ul>{b.playstyle.map((p) => <li>{p}</li>)}</ul>
+
+      <h2 id="core-skills">Core skills</h2>
+      <p>These are the skills the build depends on. Values are the in-game numbers at max level.</p>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game min-w-[36rem]">
+          <thead><tr><th>Skill</th><th>Cost</th><th>Effect at max level</th></tr></thead>
+          <tbody>
+            {b.core.map((t) => { const s = skill(t); return (
+              <tr><td class="whitespace-nowrap"><SkillName type={t} name={s.name} /></td><td class="whitespace-nowrap">{s.cost} pt{s.cost > 1 ? "s" : ""}{s.maxLevel > 1 ? ` × ${s.maxLevel}` : ""}</td><td>{s.levels[s.levels.length - 1]}</td></tr>
+            ); })}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="skill-order">Skill order: level 1 to 50</h2>
+      <p>Each stage builds on the one before it, and every skill is connected to the tree. The point totals are exact. "Points available" assumes you have collected the Shroud Roots (1 point) and Elixir Wells (3 points) in the biomes you have finished at that level, on top of the 2 points you get per level.</p>
+      {stages.map((st, i) => (
+        <section class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="font-display text-lg text-flame">{st.label}</h3>
+            <span class="text-sm text-ash">{st.pointsUsed} / {st.pointsAvailable} points</span>
+          </div>
+          <p class="text-ash mt-1 mb-4">{st.summary}</p>
+          <ol class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-[0.95rem]">
+            {st.added.map((a) => (
+              <li class="flex items-center justify-between gap-3 border-b border-parchment/5 pb-1.5">
+                <SkillName type={a.type} name={a.name} />
+                <span class="text-mist whitespace-nowrap text-sm">{skill(a.type).maxLevel > 1 ? `Lv ${a.from ? `${a.from}→` : ""}${a.to}` : a.to > 1 ? `×${a.to}` : ""} · {a.cost} pt</span>
+              </li>
+            ))}
+          </ol>
+          <a href={`/builder/?b=${st.code}`} class="inline-block mt-4 text-sm font-display tracking-wider uppercase text-flame no-underline hover:underline">View stage {i + 1} in the planner →</a>
+        </section>
+      ))}
+      {flex > 0 && <p>The level 50 plan spends {final.pointsUsed} of {MAX_POINTS} points. That leaves <strong>{flex} flexible points</strong> for quality-of-life skills such as Double Jump, Dessert Stomach or the gathering nodes, or for a second weapon style. Attribute nodes give a flat +1 each.</p>}
+
+      <h2 id="gear">Best gear & weapons</h2>
+      <p>Item facts below come from the wiki pages updated for 1.0. Set bonuses for the new level 45 sets are not documented yet, so check them in game before you commit materials.</p>
+      {[["Weapons", b.gear.weapons], ["Armor & off-hand", b.gear.armor], [b.gear.extrasLabel, b.gear.extras]].map(([label, list]) => (list as typeof b.gear.weapons).length > 0 && (
+        <>
+          <h3>{label as string}</h3>
+          <div class="grid sm:grid-cols-2 gap-3 not-prose">
+            {(list as typeof b.gear.weapons).map((g) => (
+              <div class="panel p-4">
+                <p class="font-display text-parchment">{g.name}</p>
+                <p class="text-xs text-flame tracking-wide uppercase mt-0.5">{g.kind}</p>
+                <p class="text-sm text-ash mt-2 leading-snug">{g.facts}</p>
+                <a href={g.wiki} rel="noopener" class="text-xs text-mist hover:text-flame mt-2 inline-block">Wiki source ↗</a>
+              </div>
+            ))}
+          </div>
+        </>
+      ))}
+
+      <h2 id="food">Food & buffs</h2>
+      <p>You start with 3 food slots and can only have one food of each type active. The Survivor skill Dessert Stomach adds a 4th slot. {b.foodNote}</p>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game">
+          <thead><tr><th>Food</th><th>Buff</th></tr></thead>
+          <tbody>{b.food.map((f) => <tr><td class="whitespace-nowrap text-parchment">{f.name}</td><td>{f.effect}</td></tr>)}</tbody>
+        </table>
+      </div>
+      <p class="text-sm text-mist">These values come from the wiki's food tables, which were last edited before 1.0 and may have been rebalanced. New 1.0 foods such as {NEW_FOODS.slice(0, 4).join(", ")} don't have documented buff values yet.</p>
+
+      <h2 id="pros-cons">Pros & cons</h2>
+      <div class="grid md:grid-cols-2 gap-4 not-prose">
+        <div class="panel p-5"><p class="eyebrow !text-spirit mb-2">Strengths</p><ul class="space-y-2 text-ash">{b.pros.map((p) => <li class="flex gap-2"><span class="text-spirit">+</span>{p}</li>)}</ul></div>
+        <div class="panel p-5"><p class="eyebrow !text-ember mb-2">Weaknesses</p><ul class="space-y-2 text-ash">{b.cons.map((p) => <li class="flex gap-2"><span class="text-ember">−</span>{p}</li>)}</ul></div>
+      </div>
+
+      <h2 id="faq">FAQ</h2>
+      {b.faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
+
+      <h2>Sources</h2>
+      <ul class="text-sm">
+        {[SOURCES.changelog, SOURCES.combat, SOURCES.gameData, SOURCES.wiki].map((s) => <li><a href={s.url} rel="noopener">{s.label}</a></li>)}
+      </ul>
+      <p class="text-sm text-mist">Found something wrong after a patch? See <a href="/contact/">contact</a>. We update builds when Keen Games changes the numbers.</p>
+    </article>
+
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 panel p-5">
+        <p class="eyebrow mb-3">On this page</p>
+        <ul class="space-y-1.5 text-sm">{toc.map(([id, l]) => <li><a href={`#${id}`} class="text-ash hover:text-flame no-underline">{l}</a></li>)}</ul>
+        <hr class="divider my-4" />
+        <p class="text-xs text-mist">Main regions: {b.regions.map((r) => REGION_LABEL[r]).join(", ")}</p>
+        <a class="btn btn-flame w-full justify-center mt-4 !text-xs" href={`/builder/?b=${final.code}`}>Open in planner</a>
+      </div>
+    </aside>
+  </div>
+
+  <section class="wrap mt-16">
+    <h2 class="text-2xl mb-5">Related builds</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">{related.map((r) => <BuildCard build={r} />)}</div>
+  </section>
+</Base>

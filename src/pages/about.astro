@@ -1,0 +1,25 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE, SOURCES, DISCLAIMER } from "../lib/site";
+import { TREE } from "../lib/tree";
+---
+<Base title="About Enshrouded Builder – Sources & Methodology" description="How EnshroudedBuilder.com makes its Enshrouded 1.0 build guides: data sources, how skill orders are checked, licenses and update policy.">
+  <article class="wrap pt-14 prose-game max-w-3xl">
+    <p class="eyebrow">About</p>
+    <h1 class="text-4xl !mt-2">About Enshrouded Builder</h1>
+    <p>Enshrouded Builder is a fan-made site with Enshrouded 1.0 build guides and a free skill tree planner. We started it in the first days after the full release because most build guides still had Early Access numbers.</p>
+    <h2>Where the data comes from</h2>
+    <ul>
+      <li><strong>Skill tree:</strong> node positions, links, costs, max levels and effect text come from a data export of the 1.0 game files (build {TREE.source.gameBuild}, exported {TREE.source.exportedAtUtc.slice(0, 10)}), published by the open-source <a href={SOURCES.gameData.url} rel="noopener">enshrouded-skill-tree</a> project under GPL-3.0. Build 1267041 is hotfix 1.0.0.1. Hotfix 1.0.0.2 (build 1269579) fixed crashes and skill text translations and made no balance changes. Our planner uses this data under the same license, and our source code is public.</li>
+      <li><strong>Patch facts:</strong> quoted or summarized from Keen Games' official Steam announcements, including the 1.0 changelog, the "1.0 Combat" preview and the hotfix notes.</li>
+      <li><strong>Items, spells and food:</strong> adapted from the <a href={SOURCES.wiki.url} rel="noopener">Enshrouded Wiki</a> on wiki.gg, licensed CC BY-SA 4.0. We only list values that appear on those pages, and we say so when a value predates 1.0.</li>
+    </ul>
+    <h2>How build guides are checked</h2>
+    <p>Each build's skill order is defined as a list of target skills. A script finds the cheapest connected path to each skill through the real tree, and the site build fails if a stage costs more points than a player can have at that level. Tier rankings are editorial opinion and are labeled that way.</p>
+    <h2>Art</h2>
+    <p>The illustrations on this site are original artwork made for Enshrouded Builder with AI image tools. They are not official game assets or screenshots.</p>
+    <h2>Disclaimer</h2>
+    <p>{DISCLAIMER}</p>
+    <p>Spotted an error? Please tell us on the <a href="/contact/">contact page</a>.</p>
+  </article>
+</Base>

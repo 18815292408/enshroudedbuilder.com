@@ -1,0 +1,109 @@
+---
+import Base from "../layouts/Base.astro";
+import BuildCard from "../components/BuildCard.astro";
+import { BUILDS } from "../data/builds";
+import { MAX_POINTS, TREE } from "../lib/tree";
+import { SITE } from "../lib/site";
+
+const tiers = (["S", "A", "B"] as const).map((t) => ({ tier: t, builds: BUILDS.filter((b) => b.tier === t) }));
+const tierText = {
+  S: "Strongest and easiest to get value from in 1.0",
+  A: "Excellent, with a small trade-off in safety or setup",
+  B: "Strong in the right group or in skilled hands",
+};
+const jsonLd = [
+  { "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: `${SITE.url}/` },
+  {
+    "@context": "https://schema.org", "@type": "ItemList", name: "Enshrouded 1.0 build tier list",
+    itemListElement: BUILDS.map((b, i) => ({ "@type": "ListItem", position: i + 1, name: `${b.name} build`, url: `${SITE.url}/builds/${b.slug}/` })),
+  },
+];
+const embers = Array.from({ length: 18 }, (_, i) => ({ left: (i * 53) % 100, delay: (i * 0.7) % 9, dur: 7 + (i % 5) * 1.6 }));
+---
+<Base title="Enshrouded 1.0 Builds – Best Class Tier List & Level 50 Guides" description="Discover the best Enshrouded 1.0 builds for the full release. Level 50 guides for Mage, Ranger, Warrior and Battlemage with skill orders from real 1.0 game data, gear, food and a free skill planner." jsonLd={jsonLd}>
+  <section class="relative min-h-[34rem] md:min-h-[40rem] flex items-end overflow-hidden">
+    <picture>
+      <source media="(min-width: 800px)" srcset="/img/hero-1920.webp" />
+      <img src="/img/hero-960.webp" alt="An adventurer beside a flame altar overlooking a valley swallowed by the Shroud" width="1920" height="1080" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-[30%_center]" />
+    </picture>
+    <div class="absolute inset-0 bg-gradient-to-t from-night via-night/55 to-night/10"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-night/80 via-transparent to-transparent"></div>
+    <div class="embers" aria-hidden="true">{embers.map((e) => <span style={`left:${e.left}%;animation-delay:${e.delay}s;animation-duration:${e.dur}s`} />)}</div>
+    <div class="wrap relative pb-14 md:pb-20 pt-32">
+      <p class="eyebrow mb-4">Updated for the 1.0 full release · {SITE.lastVerified}</p>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-parchment max-w-3xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]">Enshrouded 1.0 Builds <span class="text-flame">&amp;</span> Class Guides</h1>
+      <p class="mt-5 text-lg md:text-xl text-ash max-w-2xl">Level 50 builds for every playstyle. Every skill order is checked against the real 1.0 skill tree data, and you can open any build in the free planner and change it.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="#tier-list" class="btn btn-flame">See the tier list</a>
+        <a href="/builder/" class="btn btn-ghost">Open the skill planner</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap mt-14" aria-labelledby="whats-new">
+    <div class="flex items-end justify-between gap-4 mb-6">
+      <div><p class="eyebrow mb-2">Patch overview</p><h2 id="whats-new" class="text-3xl">What changed in Enshrouded 1.0</h2></div>
+      <a href="/enshrouded-1-0-changes/" class="hidden sm:inline text-sm text-flame font-display tracking-wider uppercase no-underline hover:underline">All build-relevant changes →</a>
+    </div>
+    <div class="grid md:grid-cols-3 gap-5">
+      <div class="panel panel-ornate p-6">
+        <p class="font-display text-4xl text-flame">50</p>
+        <h3 class="text-lg mt-2">New level cap</h3>
+        <p class="text-ash mt-2 text-[0.97rem]">The player level cap is now 50 and gear goes up to level 55. With 2 points per level plus Shroud Roots and Elixir Wells, a fully explored level 50 character has <strong class="text-parchment">{MAX_POINTS} skill points</strong>.</p>
+      </div>
+      <div class="panel panel-ornate p-6">
+        <p class="font-display text-4xl text-flame">Reset</p>
+        <h3 class="text-lg mt-2">Skill tree reset & rebalance</h3>
+        <p class="text-ash mt-2 text-[0.97rem]">Existing characters get a full refund. Many skills got cheaper or stronger, dagger skills moved to the Assassin area, and 8 new combat skills were added, among them Blast and Cast, Advanced Necromancy and Puncture.</p>
+      </div>
+      <div class="panel panel-ornate p-6">
+        <p class="font-display text-4xl text-flame">9</p>
+        <h3 class="text-lg mt-2">New spell types</h3>
+        <p class="text-ash mt-2 text-[0.97rem]">Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, three elemental totems and a Hollow summon. Every spell now has an upgradeable Eternal version, and wands got heavy attacks.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="tier-list" class="wrap mt-20 scroll-mt-20" aria-labelledby="tier-heading">
+    <p class="eyebrow mb-2">Tier list</p>
+    <h2 id="tier-heading" class="text-3xl">Best Enshrouded 1.0 builds, ranked</h2>
+    <p class="text-ash mt-3 max-w-3xl">These are our editorial picks. They are based on the 1.0 skill data (what each build can stack), how much each build relies on aim and timing, and early community consensus from the first days after launch. A B-tier build is still fully viable. The tiers are about how much value you get for the effort.</p>
+    <div class="mt-8 space-y-10">
+      {tiers.map(({ tier, builds }) => (
+        <div>
+          <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${tier}`}>{tier}</span><p class="text-ash">{tierText[tier]}</p></div>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">{builds.map((b, i) => <BuildCard build={b} eager={tier === "S" && i < 2} />)}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap mt-20">
+    <div class="panel panel-ornate p-7 md:p-10 grid md:grid-cols-[1.3fr_1fr] gap-8 items-center overflow-hidden relative">
+      <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-shroud/20 blur-3xl" aria-hidden="true"></div>
+      <div class="relative">
+        <p class="eyebrow mb-2">Free tool</p>
+        <h2 class="text-3xl">Enshrouded skill tree planner</h2>
+        <p class="text-ash mt-3">Plan your build on the full 1.0 skill tree: {Object.keys(TREE.nodes).length} nodes and {Object.keys(TREE.types).length} skills, with costs taken from the game files. Set your level and explored biomes, see your attributes, and share the build with one link.</p>
+        <a href="/builder/" class="btn btn-flame mt-6">Start planning</a>
+      </div>
+      <ul class="relative grid grid-cols-2 gap-3 text-sm">
+        <li class="panel p-4"><p class="font-display text-2xl text-flame">{MAX_POINTS}</p><p class="text-ash">max skill points at 50</p></li>
+        <li class="panel p-4"><p class="font-display text-2xl text-flame">{TREE.edges.length}</p><p class="text-ash">node links checked</p></li>
+        <li class="panel p-4"><p class="font-display text-2xl text-flame">12</p><p class="text-ash">archetype regions</p></li>
+        <li class="panel p-4"><p class="font-display text-2xl text-flame">1 link</p><p class="text-ash">to share a build</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap mt-20 prose-game max-w-3xl">
+    <h2>How we build these guides</h2>
+    <p>Enshrouded 1.0 launched on October 15, 2026 and reset every skill tree. Many guides you will find online were written for Early Access numbers. For every build on this site:</p>
+    <ul>
+      <li>Skill names, costs, max levels and effects come from the <strong>1.0 game data export</strong> (game build {TREE.source.gameBuild}), not from memory.</li>
+      <li>Skill orders are generated as <strong>connected paths</strong> through the real tree, and their point totals are checked against what you can earn at that level.</li>
+      <li>Patch facts are quoted from <strong>Keen Games' official 1.0 changelog</strong>. Item facts come from the community wiki (CC BY-SA). Anything we could not verify is marked as unverified.</li>
+    </ul>
+    <p>Read more on the <a href="/about/">about &amp; sources</a> page.</p>
+  </section>
+</Base>

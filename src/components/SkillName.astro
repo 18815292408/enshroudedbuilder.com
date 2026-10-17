@@ -1,0 +1,9 @@
+---
+import { REGION_LABEL, regionOf, treeOf } from "../lib/tree";
+interface Props { type: string; name: string }
+const { type, name } = Astro.props;
+const region = regionOf(type);
+const tree = treeOf(region);
+const color = { mage: "bg-tree-mage", warrior: "bg-tree-warrior", ranger: "bg-tree-ranger", core: "bg-tree-core" }[tree] ?? "bg-tree-core";
+---
+<span class="inline-flex items-center gap-2"><span class={`inline-block w-2.5 h-2.5 rotate-45 ${color}`} aria-hidden="true"></span><strong class="text-parchment font-medium">{name}</strong><span class="text-mist text-xs">{REGION_LABEL[region]}</span></span>

@@ -1,0 +1,68 @@
+---
+import Base from "../layouts/Base.astro";
+import { skill, MAX_POINTS, BIOMES, levelPoints } from "../lib/tree";
+import { SITE, SOURCES } from "../lib/site";
+const newSkills = ["AERIAL_WAND_ATTACK", "WAND_EVASION_ATTACK", "ADVANCED_NECROMANCY", "TOTEM_MASTERY", "BLAST_AND_CAST", "PUNCTURE", "BARRAGE", "SURVIVAL_INSTINCT", "AIRBORNE_ARCHITECT"];
+const faq = [
+  { q: "When did Enshrouded 1.0 release?", a: "Enshrouded left Early Access with version 1.0 on October 15, 2026. Hotfixes 1.0.0.1 and 1.0.0.2 followed on October 15 and 16." },
+  { q: "Does Enshrouded 1.0 reset my skill tree?", a: "Yes. Keen Games' changelog says the skill tree is reset the first time you play 1.0 with an existing save, so you need to spend your points again." },
+  { q: "What is the max level in Enshrouded 1.0?", a: "The player level cap is 50 and equipment can be upgraded to level 55." },
+  { q: "How many skill points do you get at level 50?", a: `${MAX_POINTS} if you collect every Shroud Root and Elixir Well. That is ${levelPoints(50)} points from levels (2 per level after level 1) plus ${MAX_POINTS - levelPoints(50)} from exploration.` },
+];
+---
+<Base title="Enshrouded 1.0 Changes – Level 50 Cap, Skill Reset, New Spells & Skills" description="Every build-relevant change in Enshrouded 1.0: level 50 cap, skill tree reset, 9 new spells, Eternal spells and arrows, wand heavy attacks and the 9 new skills with exact values." jsonLd={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }}>
+  <article class="wrap pt-14 prose-game max-w-3xl">
+    <p class="eyebrow">Patch notes for builders</p>
+    <h1 class="text-4xl md:text-5xl !mt-2">Enshrouded 1.0 changes that affect your build</h1>
+    <p class="text-lg">Enshrouded 1.0 launched on October 15, 2026. This page collects the changes from Keen Games' official changelog that matter for builds, and adds the exact skill values from the 1.0 game data. Last verified {SITE.lastVerified}.</p>
+
+    <h2>Level cap and skill points</h2>
+    <ul>
+      <li>Max player level is now <strong>50</strong>. Gear can be upgraded to <strong>level 55</strong>.</li>
+      <li>A new biome, <strong>Cinder's Cradle</strong>, adds a new tier of crafting progression.</li>
+      <li>You get 2 skill points per level, plus Shroud Roots and Elixir Wells. New Shroud Roots were added in the expanded areas of Springlands, Blackmire and Kindlewastes.</li>
+      <li>The skill tree is <strong>reset</strong> the first time you load an existing save in 1.0.</li>
+    </ul>
+    <div class="panel overflow-x-auto not-prose my-5">
+      <table class="table-game">
+        <thead><tr><th>Biome</th><th>Level range</th><th>Exploration skill points</th></tr></thead>
+        <tbody>{BIOMES.map((b) => <tr><td class="text-parchment">{b.name}</td><td>{b.minLevel}–{b.maxLevel}</td><td>{b.points}</td></tr>)}</tbody>
+      </table>
+    </div>
+    <p class="text-sm text-mist">Exploration points per biome come from the 1.0 game data export. The level ranges are approximate.</p>
+
+    <h2>New skills in 1.0 (exact values)</h2>
+    <div class="panel overflow-x-auto not-prose">
+      <table class="table-game min-w-[36rem]">
+        <thead><tr><th>Skill</th><th>Cost</th><th>Effect at max level</th></tr></thead>
+        <tbody>{newSkills.map((t) => { const s = skill(t); return <tr><td class="text-parchment whitespace-nowrap">{s.name}</td><td class="whitespace-nowrap">{s.cost} pt{s.maxLevel > 1 ? ` × ${s.maxLevel}` : ""}</td><td>{s.levels[s.levels.length - 1]}</td></tr>; })}</tbody>
+      </table>
+    </div>
+    <p>Keen Games also reduced the costs and buffed the effects of "many skills" based on community feedback, moved the dagger skills from the warrior area to the Assassin area, and changed the position and cost of skills such as Veteran, One-Handed Specialization, Inner Fires and Snap. Check our <a href="/skills/">full 1.0 skills list</a> for current numbers.</p>
+
+    <h2>Magic: new spells, Eternal spells, wands</h2>
+    <ul>
+      <li><strong>9 new spell types</strong>: Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Fire Totem, Ice Totem, Shock Totem and a Hollow skeleton summon.</li>
+      <li>Every spell has an <strong>Eternal</strong> version that uses no charges, and Eternal spells can now be upgraded like weapons.</li>
+      <li>The game now caps the creatures each player has summoned and replaces the oldest when you go over.</li>
+      <li>Wands got a <strong>heavy attack</strong>, better target selection and an optional free-aim mode. Wand special abilities are no longer interrupted by enemy attacks.</li>
+      <li>The Gem of Lesser Necromancy now limits how many companions it raises, and gem-raised companions lose health out of combat. New Gems of Necromancy were added.</li>
+      <li>The Gem of Battle Mania and Gem of Obsession were toned down. The Gem of Toxic Reaction was buffed.</li>
+    </ul>
+    <p>Builds that use these changes: <a href="/builds/battlemage/">Battlemage</a>, <a href="/builds/wizard/">Wizard</a>, <a href="/builds/summoner/">Summoner</a>, <a href="/builds/healer/">Healer</a>.</p>
+
+    <h2>Ranged and Shroud changes</h2>
+    <ul>
+      <li>Arrow costs and effectiveness were rebalanced. New <strong>Eternal Ember and Eternal Voltaic arrows</strong> come in several tiers, and Eternal arrows are upgradeable.</li>
+      <li>Shroud time extensions stack less effectively than before. To make up for it, many more Hourglass capsules appear in shrouded areas, and large Fell enemies drop them.</li>
+      <li>Hard-lock target switching is faster for bows and wands, and ranged and melee have separate auto-target settings.</li>
+    </ul>
+    <p>Builds that use these changes: <a href="/builds/ranger/">Ranger</a>, <a href="/builds/assassin/">Assassin</a>.</p>
+
+    <h2>FAQ</h2>
+    {faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
+
+    <h2>Sources</h2>
+    <ul class="text-sm">{[SOURCES.changelog, SOURCES.combat, SOURCES.hotfix, SOURCES.gameData].map((s) => <li><a href={s.url} rel="noopener">{s.label}</a></li>)}</ul>
+  </article>
+</Base>
