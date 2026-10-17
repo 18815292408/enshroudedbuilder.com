@@ -5,6 +5,8 @@ export type Stage = { label: string; level: number; summary: string; steps: Step
 export type Build = {
   slug: string;
   name: string;
+  /** Common player term searched instead of the in-game name (used in the H1). */
+  alias?: string;
   short: string;
   title: string;
   description: string;
@@ -78,6 +80,7 @@ export const BUILDS: Build[] = [
   {
     slug: "wizard",
     name: "Wizard",
+    alias: "Mage Guide & Skill Tree",
     short: "Staff caster built around elemental damage, crits and area spells.",
     title: "Enshrouded 1.0 Wizard Build – Best Mage Skill Tree, Spells & Gear",
     description: "Enshrouded 1.0 Wizard (mage) build: staff skills, elemental damage nodes, the new Blizzard, Ball Lightning and Pillar of Flames spells, level 1–50 skill order, armor and food.",
@@ -124,8 +127,9 @@ export const BUILDS: Build[] = [
   {
     slug: "summoner",
     name: "Summoner",
+    alias: "Necromancer & Minion Guide",
     short: "Necromancer-style caster that fights with Hollow allies and totems.",
-    title: "Enshrouded 1.0 Summoner Build – Necromancer Skills, Totems & Hollow Allies",
+    title: "Enshrouded 1.0 Summoner Build – Necromancer & Minion Guide",
     description: "Enshrouded 1.0 Summoner / Necromancer build: Advanced Necromancy, Totem Mastery, Hollow Wretch summons and Fire, Ice and Shock Totems, with a level 1–50 skill order and gear.",
     tier: "S",
     difficulty: "Easy",

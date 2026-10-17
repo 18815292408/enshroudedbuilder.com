@@ -25,7 +25,7 @@ const jsonLd = [
   {
     "@context": "https://schema.org", "@type": "Article", headline: b.title, description: b.description,
     image: `${SITE.url}/img/og-${b.slug}.jpg`, datePublished: "2026-10-17", dateModified: SITE.lastVerified,
-    author: { "@type": "Organization", name: SITE.name, url: SITE.url }, publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    author: { "@type": "Organization", name: SITE.name, url: SITE.url, publishingPrinciples: `${SITE.url}/about/` }, publisher: { "@type": "Organization", name: SITE.name, url: SITE.url, publishingPrinciples: `${SITE.url}/about/` },
     mainEntityOfPage: url, about: { "@type": "VideoGame", name: "Enshrouded" },
   },
   { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: b.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
@@ -46,7 +46,7 @@ const jsonLd = [
     <div class="wrap relative py-14 md:py-20">
       <nav aria-label="Breadcrumb" class="text-sm text-mist mb-5"><a href="/" class="hover:text-flame no-underline">Home</a> <span aria-hidden="true">/</span> <a href="/builds/" class="hover:text-flame no-underline">Builds</a> <span aria-hidden="true">/</span> <span class="text-ash">{b.name}</span></nav>
       <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${b.tier}`}>{b.tier}</span><span class="eyebrow">Enshrouded 1.0 · Level 50 build</span></div>
-      <h1 class="text-3xl md:text-5xl font-bold text-parchment max-w-3xl">Enshrouded {b.name} Build <span class="text-flame">for 1.0</span></h1>
+      <h1 class="text-3xl md:text-5xl font-bold text-parchment max-w-3xl">{b.alias ? <>Enshrouded 1.0 {b.name} Build <span class="text-flame block text-2xl md:text-3xl mt-2">({b.alias})</span></> : <>Enshrouded {b.name} Build <span class="text-flame">for 1.0</span></>}</h1>
       <p class="mt-4 text-lg text-ash max-w-2xl">{b.short}</p>
       <dl class="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl text-sm">
         <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Difficulty</dt><dd class="text-parchment mt-1">{b.difficulty}</dd></div>
@@ -55,7 +55,7 @@ const jsonLd = [
         <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Attributes</dt><dd class="text-parchment mt-1">{b.stats}</dd></div>
       </dl>
       <div class="mt-7 flex flex-wrap gap-3">
-        <a class="btn btn-flame" href={`/builder/?b=${final.code}`}>Open level 50 build in planner</a>
+        <a class="btn btn-flame" href={`/builder/?b=${final.code}&g=${b.slug}`}>Open level 50 build in planner</a>
         <a class="btn btn-ghost" href="#skill-order">Skill order</a>
       </div>
     </div>
@@ -63,7 +63,7 @@ const jsonLd = [
 
   <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-10">
     <article class="prose-game min-w-0">
-      <p class="text-sm text-mist !mt-0">Verified {SITE.lastVerified} against Enshrouded {SITE.gameVersion}. Skill costs and effects come from the 1.0 game data (build {TREE.source.gameBuild}).</p>
+      <p class="not-prose inline-flex flex-wrap items-center gap-2 rounded-md border border-spirit/40 bg-spirit/10 px-3 py-2 text-sm text-parchment"><span class="font-display text-spirit tracking-wider uppercase text-xs">✔ Updated {SITE.lastVerified}</span><span>Verified against <strong>Enshrouded {SITE.gameVersion}</strong>. Skill costs and effects come from the 1.0 game data (build {TREE.source.gameBuild}).</span></p>
 
       <h2 id="overview">Overview</h2>
       {b.intro.map((p) => <p>{p}</p>)}
@@ -101,7 +101,7 @@ const jsonLd = [
               </li>
             ))}
           </ol>
-          <a href={`/builder/?b=${st.code}`} class="inline-block mt-4 text-sm font-display tracking-wider uppercase text-flame no-underline hover:underline">View stage {i + 1} in the planner →</a>
+          <a href={`/builder/?b=${st.code}&g=${b.slug}`} class="inline-block mt-4 text-sm font-display tracking-wider uppercase text-flame no-underline hover:underline">View stage {i + 1} in the planner →</a>
         </section>
       ))}
       {flex > 0 && <p>The level 50 plan spends {final.pointsUsed} of {MAX_POINTS} points. That leaves <strong>{flex} flexible points</strong> for quality-of-life skills such as Double Jump, Dessert Stomach or the gathering nodes, or for a second weapon style. Attribute nodes give a flat +1 each.</p>}
@@ -156,7 +156,7 @@ const jsonLd = [
         <ul class="space-y-1.5 text-sm">{toc.map(([id, l]) => <li><a href={`#${id}`} class="text-ash hover:text-flame no-underline">{l}</a></li>)}</ul>
         <hr class="divider my-4" />
         <p class="text-xs text-mist">Main regions: {b.regions.map((r) => REGION_LABEL[r]).join(", ")}</p>
-        <a class="btn btn-flame w-full justify-center mt-4 !text-xs" href={`/builder/?b=${final.code}`}>Open in planner</a>
+        <a class="btn btn-flame w-full justify-center mt-4 !text-xs" href={`/builder/?b=${final.code}&g=${b.slug}`}>Open in planner</a>
       </div>
     </aside>
   </div>

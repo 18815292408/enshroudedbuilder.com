@@ -234,6 +234,7 @@ export function initPlanner() {
     const code = encode();
     const url = new URL(location.href);
     if (code) url.searchParams.set("b", code); else url.searchParams.delete("b");
+    if (guide) url.searchParams.set("g", guide); else url.searchParams.delete("g");
     history.replaceState(null, "", url);
     try { localStorage.setItem(STORAGE_KEY, code); } catch { /* storage may be unavailable */ }
   };
@@ -282,9 +283,9 @@ export function initPlanner() {
   levelInput.addEventListener("input", () => { level = Number(levelInput.value); render(); });
   biomeChecks.forEach((c) => c.addEventListener("change", render));
   search.addEventListener("input", render);
-  document.getElementById("reset")!.addEventListener("click", () => { sel = {}; render(); });
+  document.getElementById("reset")!.addEventListener("click", () => { sel = {}; guide = ""; showGuide(); render(); });
   const preset = document.getElementById("preset") as HTMLSelectElement;
-  preset.addEventListener("change", () => { if (preset.value) { sel = decode(preset.value); level = tree.leveling.playerLevelCap; levelInput.value = String(level); biomeChecks.forEach((c) => (c.checked = true)); render(); } preset.value = ""; });
+  preset.addEventListener("change", () => { if (preset.value) { guide = data.presets.find((p) => p.code === preset.value)?.slug ?? ""; showGuide(); sel = decode(preset.value); level = tree.leveling.playerLevelCap; levelInput.value = String(level); biomeChecks.forEach((c) => (c.checked = true)); render(); } preset.value = ""; });
   const shareBtn = document.getElementById("share") as HTMLButtonElement;
   shareBtn.addEventListener("click", async () => {
     persist();
@@ -293,11 +294,21 @@ export function initPlanner() {
     setTimeout(() => (shareBtn.textContent = "Copy share link"), 1800);
   });
 
+  // ---------- link back to the guide a build came from ----------
+  let guide = new URL(location.href).searchParams.get("g") ?? "";
+  const backlink = document.getElementById("backlink") as HTMLAnchorElement;
+  const showGuide = () => {
+    const p = data.presets.find((x) => x.slug === guide);
+    backlink.classList.toggle("hidden", !p);
+    if (p) { backlink.href = `/builds/${p.slug}/`; backlink.textContent = `← Back to the ${p.name} build guide`; }
+  };
+
   // ---------- boot ----------
   const fromUrl = new URL(location.href).searchParams.get("b");
   let saved = "";
   try { saved = localStorage.getItem(STORAGE_KEY) ?? ""; } catch { /* ignore */ }
   sel = decode(fromUrl ?? saved);
+  showGuide();
   fit();
   window.addEventListener("resize", fit);
   render();

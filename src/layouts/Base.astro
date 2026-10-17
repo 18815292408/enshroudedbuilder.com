@@ -38,7 +38,7 @@ const path = Astro.url.pathname;
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Cinzel:wght@600;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Cinzel:wght@600;700;900&display=optional" rel="stylesheet" />
     <slot name="head" />
     {ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
   </head>
@@ -46,7 +46,7 @@ const path = Astro.url.pathname;
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 btn btn-flame">Skip to content</a>
     <header class="sticky top-0 z-40 border-b border-flame/15 bg-night/85 backdrop-blur-md">
       <div class="wrap flex items-center justify-between gap-4 h-16">
-        <a href="/" class="flex items-center gap-2.5 no-underline group" aria-label="Enshrouded Builder home">
+        <a href="/" class="flex items-center gap-2.5 no-underline group">
           <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#e0661e"/></linearGradient></defs><path d="M16 2c2 6 8 8 8 16a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 5 3 5-1-5 1-9 1-13z" fill="url(#fl)"/><path d="M16 30a4 4 0 0 1-4-4c0-3 4-5 4-8 0 3 4 5 4 8a4 4 0 0 1-4 4z" fill="#fff3d6" opacity=".85"/></svg>
           <span class="font-display font-bold text-[1.05rem] tracking-wide text-parchment group-hover:text-flame transition-colors">Enshrouded<span class="text-flame">Builder</span></span>
         </a>
