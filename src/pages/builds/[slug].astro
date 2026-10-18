@@ -65,13 +65,13 @@ const jsonLd = [
     <article class="prose-game min-w-0">
       <p class="not-prose inline-flex flex-wrap items-center gap-2 rounded-md border border-spirit/40 bg-spirit/10 px-3 py-2 text-sm text-parchment"><span class="font-display text-spirit tracking-wider uppercase text-xs">✔ Updated {SITE.lastVerified}</span><span>Verified against <strong>Enshrouded {SITE.gameVersion}</strong>. Skill costs and effects come from the 1.0 game data (build {TREE.source.gameBuild}).</span></p>
 
-      <h2 id="overview">Overview</h2>
+      <h2 id="overview">{b.name} build overview</h2>
       {b.intro.map((p) => <p>{p}</p>)}
 
       <h2 id="how-to-play">How to play the {b.name}</h2>
       <ul>{b.playstyle.map((p) => <li>{p}</li>)}</ul>
 
-      <h2 id="core-skills">Core skills</h2>
+      <h2 id="core-skills">Core {b.name} skills in 1.0</h2>
       <p>These are the skills the build depends on. Values are the in-game numbers at max level.</p>
       <div class="panel overflow-x-auto not-prose">
         <table class="table-game min-w-[36rem]">
@@ -84,7 +84,7 @@ const jsonLd = [
         </table>
       </div>
 
-      <h2 id="skill-order">Skill order: level 1 to 50</h2>
+      <h2 id="skill-order">{b.name} 1.0 skill tree progression: level 1 to 50</h2>
       <p>Each stage builds on the one before it, and every skill is connected to the tree. The point totals are exact. "Points available" assumes you have collected the Shroud Roots (1 point) and Elixir Wells (3 points) in the biomes you have finished at that level, on top of the 2 points you get per level.</p>
       {stages.map((st, i) => (
         <section class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
@@ -106,7 +106,7 @@ const jsonLd = [
       ))}
       {flex > 0 && <p>The level 50 plan spends {final.pointsUsed} of {MAX_POINTS} points. That leaves <strong>{flex} flexible points</strong> for quality-of-life skills such as Double Jump, Dessert Stomach or the gathering nodes, or for a second weapon style. Attribute nodes give a flat +1 each.</p>}
 
-      <h2 id="gear">Best gear & weapons</h2>
+      <h2 id="gear">Best {b.name} gear & level 50 weapons</h2>
       <p>Item facts below come from the wiki pages updated for 1.0. Set bonuses for the new level 45 sets are not documented yet, so check them in game before you commit materials.</p>
       {[["Weapons", b.gear.weapons], ["Armor & off-hand", b.gear.armor], [b.gear.extrasLabel, b.gear.extras]].map(([label, list]) => (list as typeof b.gear.weapons).length > 0 && (
         <>
@@ -124,7 +124,7 @@ const jsonLd = [
         </>
       ))}
 
-      <h2 id="food">Food & buffs</h2>
+      <h2 id="food">Best food & buffs for the {b.name}</h2>
       <p>You start with 3 food slots and can only have one food of each type active. The Survivor skill Dessert Stomach adds a 4th slot. {b.foodNote}</p>
       <div class="panel overflow-x-auto not-prose">
         <table class="table-game">
@@ -134,13 +134,13 @@ const jsonLd = [
       </div>
       <p class="text-sm text-mist">These values come from the wiki's food tables, which were last edited before 1.0 and may have been rebalanced. New 1.0 foods such as {NEW_FOODS.slice(0, 4).join(", ")} don't have documented buff values yet.</p>
 
-      <h2 id="pros-cons">Pros & cons</h2>
+      <h2 id="pros-cons">{b.name} build pros & cons</h2>
       <div class="grid md:grid-cols-2 gap-4 not-prose">
         <div class="panel p-5"><p class="eyebrow !text-spirit mb-2">Strengths</p><ul class="space-y-2 text-ash">{b.pros.map((p) => <li class="flex gap-2"><span class="text-spirit">+</span>{p}</li>)}</ul></div>
         <div class="panel p-5"><p class="eyebrow !text-ember mb-2">Weaknesses</p><ul class="space-y-2 text-ash">{b.cons.map((p) => <li class="flex gap-2"><span class="text-ember">−</span>{p}</li>)}</ul></div>
       </div>
 
-      <h2 id="faq">FAQ</h2>
+      <h2 id="faq">{b.name} build FAQ</h2>
       {b.faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
 
       <h2>Sources</h2>

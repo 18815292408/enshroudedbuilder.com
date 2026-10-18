@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import BuildCard from "../components/BuildCard.astro";
 import { BUILDS } from "../data/builds";
-import { MAX_POINTS, TREE } from "../lib/tree";
+import { MAX_POINTS, TREE, levelPoints } from "../lib/tree";
 import { SITE } from "../lib/site";
 
 const tiers = (["S", "A", "B"] as const).map((t) => ({ tier: t, builds: BUILDS.filter((b) => b.tier === t) }));
@@ -11,8 +11,17 @@ const tierText = {
   A: "Excellent, with a small trade-off in safety or setup",
   B: "Strong in the right group or in skilled hands",
 };
+const homeFaq = [
+  { q: "What is the best build in Enshrouded 1.0?", a: "Our S-tier picks are the Battlemage (wand and ward) and the Summoner. Both are safe, self-sufficient and get the most from the new 1.0 skills, such as Blast and Cast, Wand Evasion Attack, Advanced Necromancy and Totem Mastery. Every build on this site is viable at level 50. The tier list ranks how much value you get for the effort." },
+  { q: "What is the best solo build in Enshrouded 1.0?", a: "The Battlemage and the Summoner. The Battlemage can block and parry with a ward while dealing ranged magic damage, and the Summoner lets Hollow allies and totems take the hits. The Healer and Tank are strongest in co-op, because skills like Earth Aura, Nemesis and Martyr help a group." },
+  { q: "Did Enshrouded 1.0 reset the skill tree?", a: "Yes. Keen Games' 1.0 changelog says the skill tree is reset the first time you load an existing save in 1.0, so every character gets all of its points back to spend again." },
+  { q: `How many skill points do you get at level 50?`, a: `${MAX_POINTS} in total if you collect every Shroud Root and Elixir Well: 2 points per level after level 1 (${levelPoints(50)} points), plus ${MAX_POINTS - levelPoints(50)} points from exploring all seven biomes.` },
+  { q: "Can I mix skills from different classes?", a: "Yes. Enshrouded has one shared skill tree. Any character can take any skill as long as it connects to a skill they already have, so hybrid builds such as a Battlemage with Healer nodes are normal." },
+  { q: "Which attribute should I level?", a: "Match it to your weapon. Each point of Intelligence adds 5% magic damage, Strength adds 5% melee damage and Dexterity adds 5% bow and dagger damage. Constitution adds 50 health, Spirit adds 20 mana and Endurance adds 10 stamina per point." },
+];
 const jsonLd = [
   { "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: `${SITE.url}/` },
+  { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: homeFaq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
   {
     "@context": "https://schema.org", "@type": "ItemList", name: "Enshrouded 1.0 build tier list",
     itemListElement: BUILDS.map((b, i) => ({ "@type": "ListItem", position: i + 1, name: `${b.name} build`, url: `${SITE.url}/builds/${b.slug}/` })),
@@ -20,7 +29,7 @@ const jsonLd = [
 ];
 const embers = Array.from({ length: 18 }, (_, i) => ({ left: (i * 53) % 100, delay: (i * 0.7) % 9, dur: 7 + (i % 5) * 1.6 }));
 ---
-<Base title="Enshrouded 1.0 Builds – Best Class Tier List & Level 50 Guides" description="Discover the best Enshrouded 1.0 builds for the full release. Level 50 guides for Mage, Ranger, Warrior and Battlemage with skill orders from real 1.0 game data, gear, food and a free skill planner." jsonLd={jsonLd}>
+<Base title="Enshrouded 1.0 Builds – Best Class Tier List & Level 50 Guides" description="Best Enshrouded 1.0 builds for every class: level 50 skill orders from real game data, gear, food, a tier list and a free skill tree planner." jsonLd={jsonLd}>
   <section class="relative min-h-[34rem] md:min-h-[40rem] flex items-end overflow-hidden">
     <picture>
       <source media="(min-width: 800px)" srcset="/img/hero-1920.webp" />
@@ -94,6 +103,26 @@ const embers = Array.from({ length: 18 }, (_, i) => ({ left: (i * 53) % 100, del
         <li class="panel p-4"><p class="font-display text-2xl text-flame">1 link</p><p class="text-ash">to share a build</p></li>
       </ul>
     </div>
+  </section>
+
+  <section class="wrap mt-20 prose-game max-w-3xl" aria-labelledby="choose">
+    <p class="eyebrow">Build guide</p>
+    <h2 id="choose" class="!mt-2">How to choose your Enshrouded 1.0 build</h2>
+    <p>Enshrouded has no fixed classes. Every character shares one skill tree with three branches: the <strong>Mage</strong> tree (Wizard, Battlemage, Healer, Trickster), the <strong>Warrior</strong> tree (Tank, Warrior, Barbarian, Athlete) and the <strong>Ranger</strong> tree (Ranger, Assassin, Beastmaster, Survivor). A "build" is the path you take through it. These questions will get you to the right Enshrouded 1.0 build quickly.</p>
+    <h3>1. Do you play solo or in co-op?</h3>
+    <p>Solo players want builds that can take a hit and heal themselves. The <a href="/builds/battlemage/">Battlemage</a> blocks with a ward while casting, and the <a href="/builds/summoner/">Summoner</a> lets minions and totems hold enemies. In a group, a dedicated <a href="/builds/healer/">Healer</a> or <a href="/builds/tank/">Tank</a> is worth far more, because skills like Water Aura, Earth Aura, Nemesis and Martyr affect everyone nearby.</p>
+    <h3>2. Melee, ranged or magic?</h3>
+    <ul>
+      <li><strong>Magic</strong> scales with Intelligence (+5% magic damage per point). Choose the <a href="/builds/wizard/">Wizard</a> for big staff spells, the Battlemage for wand-and-ward fighting, or the Summoner for the new 1.0 Hollow allies and totems.</li>
+      <li><strong>Melee</strong> scales with Strength (+5% melee damage per point). Choose the <a href="/builds/warrior/">two-handed Warrior</a> for heavy hits or the Tank for shields, parries and Merciless Attacks.</li>
+      <li><strong>Ranged</strong> scales with Dexterity (+5% bow and dagger damage per point). Choose the <a href="/builds/ranger/">Ranger</a> for bows and headshots or the <a href="/builds/assassin/">Assassin</a> for daggers, sneak attacks and poison.</li>
+    </ul>
+    <h3>3. How much do you want to practice?</h3>
+    <p>The Battlemage, Summoner, Tank and Healer are rated <em>Easy</em>: forgiving and strong without perfect timing. The Wizard, Ranger and Warrior are <em>Medium</em>, and they reward good positioning, aim or attack timing. The Assassin is <em>Hard</em>: it has the biggest opener in the game (Sneak Attack deals +900% damage) but little armor.</p>
+    <h3>4. Plan your points before you spend them</h3>
+    <p>1.0 reset everyone's tree, and a fully explored level 50 character has {MAX_POINTS} points. That is roughly a third of the 675 points the whole tree would cost. Every guide links to the <a href="/builder/">skill tree planner</a> with the build already loaded, so you can see where the points go and change any skill before you commit.</p>
+    <h2 id="faq">Enshrouded 1.0 builds FAQ</h2>
+    {homeFaq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
   </section>
 
   <section class="wrap mt-20 prose-game max-w-3xl">
