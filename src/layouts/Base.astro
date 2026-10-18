@@ -39,6 +39,16 @@ const path = Astro.url.pathname;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Cinzel:wght@600;700;900&display=optional" rel="stylesheet" />
+    <script is:inline define:vars={{ ga4Id: SITE.ga4Id }}>
+      // Consent Mode v2: everything denied until the visitor allows analytics.
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { dataLayer.push(arguments); };
+      gtag("consent", "default", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied", analytics_storage: "denied" });
+      try { if (localStorage.getItem("eb-consent") === "granted") gtag("consent", "update", { analytics_storage: "granted" }); } catch (e) {}
+      gtag("js", new Date());
+      gtag("config", ga4Id);
+    </script>
+    <script async src={`https://www.googletagmanager.com/gtag/js?id=${SITE.ga4Id}`}></script>
     <slot name="head" />
     {ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
   </head>
@@ -86,6 +96,7 @@ const path = Astro.url.pathname;
           <ul class="space-y-1.5 text-ash">
             <li><a class="hover:text-flame no-underline" href="/about/">About &amp; sources</a></li>
             <li><a class="hover:text-flame no-underline" href="/privacy/">Privacy</a></li>
+            <li><button type="button" data-consent-open class="hover:text-flame cursor-pointer">Analytics settings</button></li>
             <li><a class="hover:text-flame no-underline" href="/contact/">Contact</a></li>
           </ul>
         </div>
@@ -94,5 +105,34 @@ const path = Astro.url.pathname;
         Game data last verified {SITE.lastVerified} against Enshrouded {SITE.gameVersion}. Item and food details adapted from the <a class="underline hover:text-flame" href="https://enshrouded.wiki.gg/" rel="noopener">Enshrouded Wiki</a> (CC BY-SA 4.0).
       </div>
     </footer>
+    <div id="consent" role="dialog" aria-live="polite" aria-label="Analytics consent" hidden class="fixed inset-x-3 bottom-3 z-50 sm:left-auto sm:right-4 sm:bottom-4 sm:max-w-sm panel panel-ornate p-4 text-sm">
+      <p class="text-parchment">We use Google Analytics and Microsoft Clarity for anonymous, aggregated statistics on how the site is used, so we know which builds to improve. Not used for ads.</p>
+      <p class="mt-1 text-mist"><a href="/privacy/" class="underline hover:text-flame">Privacy policy</a></p>
+      <div class="mt-3 flex gap-2">
+        <button type="button" data-consent="granted" class="btn btn-flame !py-2 !px-3 !text-xs">Allow analytics</button>
+        <button type="button" data-consent="denied" class="btn btn-ghost !py-2 !px-3 !text-xs">Decline</button>
+      </div>
+    </div>
+    <script is:inline define:vars={{ clarityId: SITE.clarityId }}>
+      (function () {
+        var box = document.getElementById("consent");
+        var read = function () { try { return localStorage.getItem("eb-consent"); } catch (e) { return null; } };
+        var loadClarity = function () {
+          if (window.clarity) return;
+          (function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); }; t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, "clarity", "script", clarityId);
+        };
+        var apply = function (choice) {
+          try { localStorage.setItem("eb-consent", choice); } catch (e) {}
+          gtag("consent", "update", { analytics_storage: choice });
+          if (choice === "granted") { loadClarity(); gtag("event", "page_view"); }
+          box.hidden = true;
+        };
+        var state = read();
+        if (state === "granted") loadClarity();
+        if (!state) box.hidden = false;
+        box.addEventListener("click", function (e) { var c = e.target.closest("[data-consent]"); if (c) apply(c.getAttribute("data-consent")); });
+        document.querySelectorAll("[data-consent-open]").forEach(function (b) { b.addEventListener("click", function () { box.hidden = false; }); });
+      })();
+    </script>
   </body>
 </html>

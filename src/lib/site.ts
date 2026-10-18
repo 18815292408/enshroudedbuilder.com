@@ -5,6 +5,8 @@ export const SITE = {
   lastVerified: "2026-10-17",
   gameVersion: "1.0 (hotfix 1.0.0.2)",
   repo: "https://github.com/18815292408/enshroudedbuilder.com",
+  ga4Id: "G-CE08NNE2Y6",
+  clarityId: "yzf3hs2qms",
 };
 
 export const DISCLAIMER =
