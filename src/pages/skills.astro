@@ -29,7 +29,7 @@ const count = Object.keys(TREE.types).length;
         <div id={r} class="mt-6 scroll-mt-20">
           <h3 class="font-display text-lg text-flame mb-3">{REGION_LABEL[r]}</h3>
           <div class="panel overflow-x-auto">
-            <table class="table-game min-w-[40rem]">
+            <table class="table-game table-cards">
               <thead><tr><th class="w-56">Skill</th><th class="w-28">Cost</th><th>Effect (max level)</th></tr></thead>
               <tbody>
                 {(byRegion[r] ?? []).map((t) => { const s = TREE.types[t]; return (

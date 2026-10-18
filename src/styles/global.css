@@ -93,6 +93,18 @@
   .table-game th { text-align: left; font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-flame); padding: 0.6rem 0.7rem; border-bottom: 1px solid rgb(243 167 59 / 0.3); }
   .table-game td { padding: 0.6rem 0.7rem; border-bottom: 1px solid rgb(236 227 207 / 0.08); vertical-align: top; color: #ddd3bf; }
   .table-game tr:hover td { background: rgb(243 167 59 / 0.04); }
+  /* Phones: wide skill tables restack into cards instead of scrolling sideways. */
+  .table-cards { min-width: 40rem; }
+  @media (max-width: 639px) {
+    .table-cards { min-width: 0; display: block; }
+    .table-cards thead { display: none; }
+    .table-cards tbody, .table-cards tr, .table-cards td { display: block; }
+    .table-cards tr { padding: 0.7rem 0.8rem; border-bottom: 1px solid rgb(236 227 207 / 0.08); }
+    .table-cards tr:last-child { border-bottom: 0; }
+    .table-cards td { padding: 0; border-bottom: 0; }
+    .table-cards td:nth-child(2) { margin-top: 0.2rem; font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-flame); }
+    .table-cards td:nth-child(3) { margin-top: 0.35rem; font-size: 0.9rem; }
+  }
 }
 
 .embers { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
