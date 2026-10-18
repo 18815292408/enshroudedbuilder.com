@@ -90,3 +90,36 @@ window.__ADS.setConfig({ enabled: false }); window.__ADS.unloadSocialBar();
 
 Or set `enabled: false` in `public/assets/ads-config.json`, bump `?v=` in **both** `src/layouts/Base.astro` and the `CONFIG_URL` inside `assets/ads.js`, then deploy. Cloudflare Pages caches static assets for 4h, so the `?v=` bump is what busts it.
 
+
+## 11. 内容站广告建议对齐（2026-10-19 整改）
+
+对照社群里的静态资讯站广告建议逐条核过，整改后状态如下。
+
+| 规则 | 状态 | 证据 |
+| --- | --- | --- |
+| 禁用 Popunder / Interstitial / Direct Link | 遵守 | 只建了 Native(49) + Social(29) 两个 unit，站点 `ad_units [29,49]`，没有其余格式 |
+| Social Bar 关掉插页 | 待经理确认 | 配置 `interstitialEnabled:false`；Adsterra 后台该项需要经理/后台关掉 |
+| Native 强制 1×1 | 遵守 | `PATCH /api/placement/31801393/template` → 200，`template_values` ROWS=1 COLUMNS=1 |
+| 单页 ≤3 个广告位 | 遵守 | 每页 1 个 |
+| 404 / 搜索 / 分页 2 页以后 0 位 | 遵守 | 404 用 `ads={false}`；实测请求不存在的路径 → 404 页 slots=0 |
+| 首屏不放 | 遵守 | 首页广告在第 3 张卡之后；文章页在正文约 30% |
+| 列表页第 3～5 条之间 | 遵守 | 首页与 `/builds/` 都在第 3 张卡之后 |
+| 文章页正文约 1/3 处 | 遵守 | build 页放在核心技能表之后、技能顺序之前（HTML 30%） |
+| 容器预留固定高度 | 遵守 | `.ad-slot{min-height:100px}`，手机 90px；E2E 里 slot 高度加载前后都是 100 |
+| 不给广告位懒加载 | 遵守 | 已移除 IntersectionObserver；E2E 允许后不滚动即 `nativeScripts 1` |
+| `data-cfasync="false"` | 遵守 | `makeScript()` 统一设置 |
+| 一个 unit 一个位置 | 遵守 | 每页只出现一次；同一 unit 在各页同一相对位置复用 |
+| Social 脚本在 `</body>` 前 | 遵守 | 注入到 `document.body` 末尾，每页一次 |
+| Banner 标准尺寸（728×90 / 300×250 / 320×50 / 160×600） | 未接 | 目前只有 Native + Social；要按矩阵上 Banner 需要新建 banner unit |
+| 屏蔽约会/赌博/成人/假下载/假杀毒 | 待经理 | 配置里声明了 `adult`、`dating`；其余分类需要在 Adsterra 后台或找经理加 |
+
+### 与 AdSense 的关系
+
+站点刚上线，离 AdSense 的域龄、原创篇数、UV 门槛都还远。按建议把 Adsterra 当过渡：AdSense 通过后只留 Native 或整体撤掉，不要两套混跑。
+
+### 上线后 14 天的迭代口径
+
+1. 按 unit 分开看 RPM / CTR，两周后砍掉最差的，只留最好的两个。
+2. Clarity 盯性能评分与 CLS；评分掉了先查广告位高度是否被改动。
+3. GSC 与 Bing 盯收录（Bing 的 API 密钥当前失效，需要换新 key）。
+4. 跳出率突然上涨，先怀疑广告插进了阅读节奏。

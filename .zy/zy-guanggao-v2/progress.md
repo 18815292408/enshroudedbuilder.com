@@ -14,3 +14,19 @@ Task 1: complete (commits a709a47..a802403 — 2026-10-19)
 - 双态 E2E：DENIED `{should:false, nativeScripts:0, socialScripts:0, bannerVisible:true, errs:0}`；ALLOW `{should:true, cfg:true, nativeScripts:1, nativeDur:969ms|864ms, socialScripts:1, holderHidden:false, errs:0}`（300–3000ms 区间内）
 - 待 Adsterra 审批：两条单元 `active=3`，对照在跑的 deepseek-harness.io 6022813 为 `active=4`；故容器 `children 0` 暂无填充 —— 按 skill 口径「填充出图=加分项，不判失败」，审批通过后自动开始
 - 回滚：`window.__ADS.setConfig({enabled:false}); window.__ADS.unloadSocialBar();` 或 config `enabled:false` + 双处 `?v=` 递增后部署
+@@
+ Task 1: complete (commits a709a47..a802403 — 2026-10-19)
+@@
+ - 待 Adsterra 审批：两条单元 `active=3`，对照在跑的 deepseek-harness.io 6022813 为 `active=4`；故容器 `children 0` 暂无填充 —— 按 skill 口径「填充出图=加分项，不判失败」，审批通过后自动开始
++
++Task 2: complete (commits a802403..75addb3 — 2026-10-19)
++
++- 触发：对照社群「静态资讯站广告建议」审计，发现 3 条硬规则未遵守 + 位置偏离矩阵
++- 整改 1 禁懒加载：ads.js 移除 IntersectionObserver，允许后脚本 async 随页面发出（E2E：不滚动即 nativeScripts 1，1122ms）
++- 整改 2 预留高度：`.ad-slot{min-height:100px}`（手机 90px），E2E 里 slot 高度加载前后都是 100px
++- 整改 3 404 无位：Base 增加 `ads` 开关，404 传 `ads={false}`；线上实测 404 页 slots=0
++- 整改 4 位置：新增 src/components/AdSlot.astro；build 页放核心技能之后（HTML 30%），首页与 /builds/ 放第 3 张卡之后；每页仍为 1 个 unit 实例
++- 整改 5 Social 脚本：注入到 document.body 末尾（原为 head）
++- 门禁扩展：verify-ads.sh 增加 9 禁懒加载 / 10 预留高度 / 11 404 无位；verify-site-build 16 passed 0 failed
++- 未接：Banner 标准尺寸（需新建 banner unit）、更多屏蔽类目与插页开关（需经理）
+
