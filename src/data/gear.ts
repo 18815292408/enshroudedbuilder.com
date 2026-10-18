@@ -2,6 +2,9 @@
 // for the 1.0 release. Only values stated on those pages are listed here.
 export type Gear = { name: string; kind: string; facts: string; wiki: string };
 
+/** When the wiki pages behind the item facts were last edited (see the header note). */
+export const WIKI_EDITED = "Oct 15–16 2026";
+
 const w = (title: string) => `https://enshrouded.wiki.gg/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 const g = (name: string, kind: string, facts: string): Gear => ({ name, kind, facts, wiki: w(name) });
 

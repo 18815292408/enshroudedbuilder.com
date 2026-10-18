@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import BuildCard from "../../components/BuildCard.astro";
 import SkillName from "../../components/SkillName.astro";
 import { BUILDS, buildBySlug, type Build } from "../../data/builds";
-import { NEW_FOODS } from "../../data/gear";
+import { NEW_FOODS, WIKI_EDITED } from "../../data/gear";
 import { planBuild } from "../../lib/plan";
 import { skill, MAX_POINTS, REGION_LABEL, TREE } from "../../lib/tree";
 import { SITE, SOURCES } from "../../lib/site";
@@ -15,6 +15,8 @@ const b: Build = buildBySlug(Astro.params.slug!);
 const stages = planBuild(b);
 const final = stages[stages.length - 1];
 const flex = MAX_POINTS - final.pointsUsed;
+// "Intelligence, then Spirit" already reads as a sentence; other lists get an "and".
+const statsText = b.stats.includes(" then ") ? b.stats : b.stats.replace(/, ([^,]+)$/, " and $1");
 const related = b.related.map(buildBySlug);
 const url = `${SITE.url}/builds/${b.slug}/`;
 const toc = [
@@ -45,7 +47,7 @@ const jsonLd = [
     <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-night to-transparent"></div>
     <div class="wrap relative py-14 md:py-20">
       <nav aria-label="Breadcrumb" class="text-sm text-mist mb-5"><a href="/" class="hover:text-flame no-underline">Home</a> <span aria-hidden="true">/</span> <a href="/builds/" class="hover:text-flame no-underline">Builds</a> <span aria-hidden="true">/</span> <span class="text-ash">{b.name}</span></nav>
-      <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${b.tier}`}>{b.tier}</span><span class="eyebrow">Enshrouded 1.0 · Level 50 build</span></div>
+      <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${b.tier}`} title="Editorial tier ranking">{b.tier}</span><span class="eyebrow">Enshrouded 1.0 · Level 50 build · editorial tier</span></div>
       <h1 class="text-3xl md:text-5xl font-bold text-parchment max-w-3xl">{b.alias ? <>Enshrouded 1.0 {b.name} Build <span class="text-flame block text-2xl md:text-3xl mt-2">({b.alias})</span></> : <>Enshrouded {b.name} Build <span class="text-flame">for 1.0</span></>}</h1>
       <p class="mt-4 text-lg text-ash max-w-2xl">{b.short}</p>
       <dl class="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl text-sm">
@@ -64,6 +66,22 @@ const jsonLd = [
   <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-10">
     <article class="prose-game min-w-0">
       <p class="not-prose inline-flex flex-wrap items-center gap-2 rounded-md border border-spirit/40 bg-spirit/10 px-3 py-2 text-sm text-parchment"><span class="font-display text-spirit tracking-wider uppercase text-xs">✔ Updated {SITE.lastVerified}</span><span>Verified against <strong>Enshrouded {SITE.gameVersion}</strong>. Skill costs and effects come from the 1.0 game data (build {TREE.source.gameBuild}).</span></p>
+
+      <div class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
+        <p class="eyebrow !text-flame mb-2">Quick answer</p>
+        <p class="text-lg text-parchment leading-relaxed">{b.name} — {b.tier}-tier, {b.difficulty} difficulty, best for {b.modes.map((m) => m.toLowerCase()).join(" and ")}. It scales with {statsText}. The level 50 skill order spends {final.pointsUsed} of {MAX_POINTS} points on the core skills below.</p>
+        <dl class="mt-5 grid gap-5 sm:grid-cols-[2fr_1fr] text-sm">
+          <div>
+            <dt class="eyebrow !text-[0.66rem] mb-2">Core skills</dt>
+            <dd class="flex flex-wrap gap-1.5">{b.core.slice(0, 8).map((t) => <span class="chip !text-[0.72rem]">{skill(t).name}</span>)}{b.core.length > 8 && <span class="text-mist self-center text-xs">+{b.core.length - 8} more</span>}</dd>
+          </div>
+          <div>
+            <dt class="eyebrow !text-ember !text-[0.66rem] mb-2">Main weakness</dt>
+            <dd class="text-ash">{b.cons[0]}</dd>
+          </div>
+        </dl>
+        <p class="text-xs text-mist mt-4">Skill order generated from the 1.0 game data (build {TREE.source.gameBuild}) and checked against the point budget for each level — see <a href="/about/" class="underline hover:text-flame">how builds are checked</a>. Tier, strengths and weaknesses are editorial opinion.</p>
+      </div>
 
       <h2 id="overview">{b.name} build overview</h2>
       {b.intro.map((p) => <p>{p}</p>)}
@@ -107,7 +125,7 @@ const jsonLd = [
       {flex > 0 && <p>The level 50 plan spends {final.pointsUsed} of {MAX_POINTS} points. That leaves <strong>{flex} flexible points</strong> for quality-of-life skills such as Double Jump, Dessert Stomach or the gathering nodes, or for a second weapon style. Attribute nodes give a flat +1 each.</p>}
 
       <h2 id="gear">Best {b.name} gear & level 50 weapons</h2>
-      <p>Item facts below come from the wiki pages updated for 1.0. Set bonuses for the new level 45 sets are not documented yet, so check them in game before you commit materials.</p>
+      <p>Item facts below come from the <a href={SOURCES.wiki.url} rel="noopener">Enshrouded Wiki</a>, from the pages updated for 1.0 (last edited {WIKI_EDITED}); we checked them on {SITE.lastVerified}. Set bonuses for the new level 45 sets are not documented yet, so check them in game before you commit materials.</p>
       {[["Weapons", b.gear.weapons], ["Armor & off-hand", b.gear.armor], [b.gear.extrasLabel, b.gear.extras]].map(([label, list]) => (list as typeof b.gear.weapons).length > 0 && (
         <>
           <h3>{label as string}</h3>
@@ -132,9 +150,10 @@ const jsonLd = [
           <tbody>{b.food.map((f) => <tr><td class="whitespace-nowrap text-parchment">{f.name}</td><td>{f.effect}</td></tr>)}</tbody>
         </table>
       </div>
-      <p class="text-sm text-mist">These values come from the wiki's food tables, which were last edited before 1.0 and may have been rebalanced. New 1.0 foods such as {NEW_FOODS.slice(0, 4).join(", ")} don't have documented buff values yet.</p>
+      <p class="text-sm text-mist">These values come from the wiki's food tables, which were last edited before 1.0 and may have been rebalanced; we last checked them on {SITE.lastVerified}. New 1.0 foods such as {NEW_FOODS.slice(0, 4).join(", ")} don't have documented buff values yet.</p>
 
       <h2 id="pros-cons">{b.name} build pros & cons</h2>
+      <p class="text-sm text-mist">Editorial judgement, not game data: what the build does well and where it struggles in practice.</p>
       <div class="grid md:grid-cols-2 gap-4 not-prose">
         <div class="panel p-5"><p class="eyebrow !text-spirit mb-2">Strengths</p><ul class="space-y-2 text-ash">{b.pros.map((p) => <li class="flex gap-2"><span class="text-spirit">+</span>{p}</li>)}</ul></div>
         <div class="panel p-5"><p class="eyebrow !text-ember mb-2">Weaknesses</p><ul class="space-y-2 text-ash">{b.cons.map((p) => <li class="flex gap-2"><span class="text-ember">−</span>{p}</li>)}</ul></div>
