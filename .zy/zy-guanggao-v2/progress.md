@@ -30,3 +30,11 @@ Task 1: complete (commits a709a47..a802403 — 2026-10-19)
 +- 门禁扩展：verify-ads.sh 增加 9 禁懒加载 / 10 预留高度 / 11 404 无位；verify-site-build 16 passed 0 failed
 +- 未接：Banner 标准尺寸（需新建 banner unit）、更多屏蔽类目与插页开关（需经理）
 
+
+Task 3: complete (commits 6cff653..HEAD — 2026-10-19)
+
+- 复核（T+约2h）：站点 status=2 Approved、2 Ad Units、has_pending_ad_unit=false；两条 placement 仍 active=3（在跑的 6022813 为 4）
+- 统计页：切 Today（2026/10/19）按 DOMAIN 分组 = No data（当日统计未落库）；10/14–18 全站 173 展示 / 13 点击 / $4.72 属既有站点，余额 $19.03
+- 本机复测：代理拦广告域（TLS tlsv1 alert / resource status 0 / 0 bytes / fetch Failed）；直连 + Referer + 移动 UA → 200 / 51983 字节；block_anonym_ip=true 使 VPN 出口不投素材
+- skill zy-guanggao 升 2.3.0：Stage 1 增复核时点（T+15min 基线 → T+2h → T+24h 期望 active=4 且有曝光 → T+48h 找经理），Stage 5 增「注入≠加载」与代理假阴性判定，Pitfalls 增审批误判
+- 下一步：T+24h 复核当日 impressions；本机要验证填充需手机蜂窝网络或给广告域加 DIRECT 规则
