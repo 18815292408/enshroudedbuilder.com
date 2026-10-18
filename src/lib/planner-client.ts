@@ -205,12 +205,17 @@ export function initPlanner() {
     const id = (e.target as Element).closest(".pl-node")?.getAttribute("data-id"); if (id) showTip(id, (e as PointerEvent).clientX, (e as PointerEvent).clientY);
   });
   nodeLayer.addEventListener("pointerout", (e) => { if ((e as PointerEvent).pointerType === "mouse") tip.classList.add("hidden"); });
-  stage.addEventListener("pointerdown", (e) => { if (!(e.target as Element).closest(".pl-node")) tip.classList.add("hidden"); });
+  stage.addEventListener("pointerdown", (e) => {
+    const el = e.target as Element;
+    if (!el.closest(".pl-node")) tip.classList.add("hidden");
+    if (!el.closest("#searchResults") && el.id !== "search") searchResults.classList.add("hidden");
+  });
 
   // ---------- actions ----------
   let flashTimer = 0;
+  const pointNodes = (name: string) => [...document.querySelectorAll<HTMLElement>(`[data-points=${name}]`)];
   const flash = (msg: string) => {
-    const over = document.getElementById("over")!; over.textContent = msg; over.classList.remove("hidden");
+    for (const el of pointNodes("msg")) { el.textContent = msg; el.classList.remove("hidden"); }
     clearTimeout(flashTimer); flashTimer = window.setTimeout(render, 1800);
   };
   function addLevel(id: string) {
@@ -258,10 +263,12 @@ export function initPlanner() {
       el.setAttribute("stroke", on ? color : "#3a3042"); el.setAttribute("stroke-opacity", on ? "0.95" : "0.6");
     }
     const u = used(); const av = available();
-    document.getElementById("used")!.textContent = String(u);
-    document.getElementById("avail")!.textContent = String(av);
-    (document.getElementById("bar") as HTMLElement).style.width = `${Math.min(100, av ? (u / av) * 100 : 0)}%`;
-    const over = document.getElementById("over")!; over.textContent = `Over budget by ${u - av} points for this level.`; over.classList.toggle("hidden", u <= av);
+    for (const el of pointNodes("used")) el.textContent = String(u);
+    for (const el of pointNodes("avail")) el.textContent = String(av);
+    const pct = `${Math.min(100, av ? (u / av) * 100 : 0)}%`;
+    for (const el of pointNodes("bar")) el.style.width = pct;
+    const overText = u > av ? `Over budget by ${u - av} points for this level.` : "";
+    for (const el of pointNodes("msg")) { el.textContent = overText; el.classList.toggle("hidden", !overText); }
     document.getElementById("levelOut")!.textContent = String(level);
 
     const stats: Record<string, number> = {};
@@ -276,7 +283,54 @@ export function initPlanner() {
       ? rows.map(([k, e]) => `<li class="flex justify-between gap-2"><span><span style="color:${TREE_COLOR[treeOf(e.id)]}">◆</span> ${escapeHtml(tree.types[k].name)}${tree.types[k].stats ? ` ×${e.lvl}` : tree.types[k].maxLevel > 1 ? ` <span class="text-mist">${e.lvl}/${tree.types[k].maxLevel}</span>` : ""}</span><span class="text-mist">${e.cost} pt</span></li>`).join("")
       : `<li class="text-mist">Nothing yet. Click a node on the inner ring to start.</li>`;
     persist();
+    renderSearchResults();
   }
+
+  // ---------- search that adds ----------
+  const searchResults = document.getElementById("searchResults") as HTMLUListElement;
+  const matchIds = (q: string) => {
+    if (!q) return [];
+    const hits = ids.filter((id) => {
+      const t = typeOf(id);
+      return t.name.toLowerCase().includes(q) || t.levels.some((l) => l.toLowerCase().includes(q));
+    });
+    return hits.sort((a, b) => {
+      const an = typeOf(a).name.toLowerCase(); const bn = typeOf(b).name.toLowerCase();
+      const ai = an.includes(q) ? an.indexOf(q) : 99; const bi = bn.includes(q) ? bn.indexOf(q) : 99;
+      return ai - bi || an.localeCompare(bn);
+    }).slice(0, 8);
+  };
+  const renderSearchResults = () => {
+    const q = search.value.trim().toLowerCase();
+    if (!q) { searchResults.classList.add("hidden"); searchResults.innerHTML = ""; return; }
+    const hits = matchIds(q);
+    searchResults.innerHTML = hits.length
+      ? hits.map((id) => {
+        const t = typeOf(id); const lvl = sel[id] ?? 0;
+        const state = lvl >= t.maxLevel ? "max" : lvl ? `${lvl}/${t.maxLevel}` : canTake(id) ? "add" : "locked";
+        const tone = state === "locked" ? "text-mist" : state === "add" ? "text-spirit" : "text-flame";
+        return `<li data-add="${id}" class="flex cursor-pointer items-center justify-between gap-3 border-b border-parchment/5 px-3 py-2 last:border-0 hover:bg-night-3"><span class="min-w-0 text-parchment">${escapeHtml(t.name)} <span class="text-mist text-xs">${t.cost} pt${t.maxLevel > 1 ? ` ×${t.maxLevel}` : ""}</span></span><span class="${tone} text-xs whitespace-nowrap">${state}</span></li>`;
+      }).join("")
+      : `<li class="px-3 py-2 text-mist">No skill matches “${escapeHtml(q)}”.</li>`;
+    searchResults.classList.remove("hidden");
+  };
+  const focusNode = (id: string) => {
+    const n = tree.nodes[id]; const rect = svg.getBoundingClientRect();
+    const aspect = rect.width / Math.max(1, rect.height);
+    view.w = rect.width < 640 ? 420 : 760; view.h = view.w / aspect;
+    view.x = n.x - view.w / 2; view.y = n.y - view.h / 2; applyView();
+  };
+  searchResults.addEventListener("click", (e) => {
+    const li = (e.target as Element).closest("[data-add]"); if (!li) return;
+    const id = li.getAttribute("data-add")!;
+    addLevel(id); focusNode(id);
+  });
+  search.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const first = matchIds(search.value.trim().toLowerCase())[0];
+    if (first) { addLevel(first); focusNode(first); }
+  });
 
   // ---------- controls ----------
   const levelInput = document.getElementById("level") as HTMLInputElement;
@@ -310,6 +364,8 @@ export function initPlanner() {
   sel = decode(fromUrl ?? saved);
   showGuide();
   fit();
+  // Phones: open zoomed in far enough that a single skill is a realistic tap target; "Fit" still shows the whole tree.
+  if (window.innerWidth <= 640) zoomAt(1900 / 720, 0, 0);
   window.addEventListener("resize", fit);
   render();
 }

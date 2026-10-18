@@ -45,19 +45,29 @@ const jsonLd = {
       <div class="absolute top-3 right-3 left-16 sm:left-auto sm:w-64">
         <label class="sr-only" for="search">Search skills</label>
         <input id="search" type="search" placeholder="Search skills…" autocomplete="off" class="w-full panel !rounded-md px-3 py-2 text-sm bg-night-3 text-parchment placeholder:text-mist" />
+        <ul id="searchResults" role="listbox" aria-label="Matching skills" class="mt-1 hidden max-h-56 touch-auto select-auto overflow-y-auto panel panel-ornate text-sm"></ul>
       </div>
       <div id="tip" class="pointer-events-none absolute z-10 hidden max-w-xs panel panel-ornate p-3 text-sm"></div>
-      <p class="absolute bottom-2 left-3 right-3 text-[0.72rem] text-mist">Click: add level · Right-click / long-press / Shift-click: remove · Drag: pan · Wheel or pinch: zoom</p>
+      <p class="absolute bottom-2 left-3 right-3 text-[0.72rem] text-mist">Search a skill to add it · Tap a node: add level · Long-press / right-click: remove · Drag to pan · Pinch or wheel to zoom</p>
+    </div>
+
+    <div class="lg:hidden sticky bottom-0 z-30 flex flex-col gap-1 border-t border-flame/15 bg-night/90 px-4 py-2 backdrop-blur">
+      <div class="flex items-baseline justify-between gap-3 text-sm">
+        <span class="text-ash">Skill points</span>
+        <span class="font-display text-lg"><span data-points="used" class="text-flame">0</span><span class="text-mist text-sm"> / <span data-points="avail">{MAX_POINTS}</span></span></span>
+      </div>
+      <div class="h-1.5 rounded bg-night overflow-hidden"><div data-points="bar" class="h-full bg-gradient-to-r from-flame to-ember" style="width:0%"></div></div>
+      <p data-points="msg" class="hidden text-xs text-ember">Over budget for this level.</p>
     </div>
 
     <aside class="flex flex-col gap-4">
       <div class="panel panel-ornate p-5">
         <div class="flex items-baseline justify-between">
           <p class="eyebrow">Skill points</p>
-          <p class="font-display text-2xl"><span id="used" class="text-flame">0</span><span class="text-mist text-lg"> / <span id="avail">{MAX_POINTS}</span></span></p>
+          <p class="font-display text-2xl"><span data-points="used" class="text-flame">0</span><span class="text-mist text-lg"> / <span data-points="avail">{MAX_POINTS}</span></span></p>
         </div>
-        <div class="h-2 rounded bg-night mt-3 overflow-hidden"><div id="bar" class="h-full bg-gradient-to-r from-flame to-ember" style="width:0%"></div></div>
-        <p id="over" class="hidden text-ember text-sm mt-2">Over budget for this level.</p>
+        <div class="h-2 rounded bg-night mt-3 overflow-hidden"><div data-points="bar" class="h-full bg-gradient-to-r from-flame to-ember" style="width:0%"></div></div>
+        <p data-points="msg" class="hidden text-ember text-sm mt-2">Over budget for this level.</p>
         <label class="block mt-4 text-sm text-ash" for="level">Player level: <strong id="levelOut" class="text-parchment">50</strong></label>
         <input id="level" type="range" min="1" max={TREE.leveling.playerLevelCap} value={TREE.leveling.playerLevelCap} class="w-full accent-[#f3a73b]" />
         <fieldset class="mt-3">

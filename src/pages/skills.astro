@@ -33,7 +33,7 @@ const count = Object.keys(TREE.types).length;
               <thead><tr><th class="w-56">Skill</th><th class="w-28">Cost</th><th>Effect (max level)</th></tr></thead>
               <tbody>
                 {(byRegion[r] ?? []).map((t) => { const s = TREE.types[t]; return (
-                  <tr><td class="text-parchment">{s.name}{NEW.has(t) && <span class="chip !text-flame ml-2 !text-[0.7rem]">New in 1.0</span>}</td><td class="whitespace-nowrap">{s.cost} pt{s.maxLevel > 1 ? ` × ${s.maxLevel} lv` : ""}</td><td>{s.levels[s.levels.length - 1]}</td></tr>
+                  <tr id={t} class="scroll-mt-24"><td class="text-parchment">{s.name}{NEW.has(t) && <span class="chip !text-flame ml-2 !text-[0.7rem]">New in 1.0</span>}</td><td class="whitespace-nowrap">{s.cost} pt{s.maxLevel > 1 ? ` × ${s.maxLevel} lv` : ""}</td><td>{s.levels[s.levels.length - 1]}</td></tr>
                 ); })}
               </tbody>
             </table>
