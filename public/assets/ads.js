@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var CONFIG_URL = '/assets/ads-config.json?v=20261018-1';
+  var CONFIG_URL = '/assets/ads-config.json?v=20261019-1';
   var CONSENT_KEY = 'dh-ga-consent';
   var NATIVE_ATTR = 'data-ads-native';
   var SOCIAL_ATTR = 'data-adsterra-social';
@@ -62,13 +62,12 @@
     holder.style.bottom = lift > 0 ? lift + 'px' : '0px';
   }
 
-  function injectScript(src, marker) {
+  function makeScript(src, marker) {
     var el = document.createElement('script');
     el.async = true;
     el.setAttribute('data-cfasync', 'false');
     el.setAttribute(marker, '1');
     el.src = src;
-    document.head.appendChild(el);
     return el;
   }
 
@@ -82,25 +81,18 @@
     return configPromise;
   }
 
-  /* Native Banner: one unit per page, injected lazily when the container nears the viewport. */
+  /* Native Banner: one unit per page, loaded with the page (async, never deferred).
+     Deferred ad scripts measurably hurt timings on content sites, so the slot reserves its
+     height instead and the script goes out as soon as consent allows. */
   function loadNative() {
     if (nativeLoaded) return false;
     if (!shouldShow()) return false;
     var container = document.getElementById(config.native.containerId);
     if (!container) return false;
-    var start = function () {
-      if (nativeLoaded) return;
-      nativeLoaded = true;
-      injectScript(config.native.invokeJs, NATIVE_ATTR);
-    };
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        for (var i = 0; i < entries.length; i += 1) {
-          if (entries[i].isIntersecting) { io.disconnect(); start(); return; }
-        }
-      }, { rootMargin: '300px 0px' });
-      io.observe(container);
-    } else { start(); }
+    nativeLoaded = true;
+    var el = makeScript(config.native.invokeJs, NATIVE_ATTR);
+    if (container.parentNode) container.parentNode.insertBefore(el, container);
+    else document.body.appendChild(el);
     return true;
   }
 
@@ -120,7 +112,8 @@
     var holder = document.getElementById(SOCIAL_HOLDER_ID);
     if (holder) holder.removeAttribute('hidden');
     socialLoaded = true;
-    injectScript(config.socialBar.invokeJs, SOCIAL_ATTR);
+    /* Social Bar lives just before </body>, once per page. */
+    document.body.appendChild(makeScript(config.socialBar.invokeJs, SOCIAL_ATTR));
     avoidOverlap();
     return true;
   }

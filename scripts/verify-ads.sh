@@ -10,6 +10,7 @@ if [ -d "$ROOT/public/$ADS_DIR" ]; then SRC_DIR="$ROOT/public/$ADS_DIR"; else SR
 CONFIG="$SRC_DIR/ads-config.json"
 ADS_JS="$SRC_DIR/ads.js"
 LAYOUT="$ROOT/src/layouts/Base.astro"
+SLOT="$ROOT/src/components/AdSlot.astro"
 FAILED=0
 PASSED=0
 pass(){ echo "PASS: $1"; PASSED=$((PASSED+1)); }
@@ -20,10 +21,10 @@ echo "ADS_DIR=$ADS_DIR SRC_DIR=$SRC_DIR"
 echo ""
 
 # 1. native 计数
-if [ -f "$CONFIG" ] && grep -q '"native"' "$CONFIG" && grep -q 'class="ads-native"' "$LAYOUT"; then
-  pass "native 计数：config 含 native 且模板层含 div.ads-native 容器"
+if [ -f "$CONFIG" ] && grep -q '"native"' "$CONFIG" && grep -q 'class="ad-slot ads-native"' "$SLOT"; then
+  pass "native 计数：config 含 native 且 AdSlot 组件含预留高度的容器"
 else
-  fail "native 计数：config 或模板层容器缺失"
+  fail "native 计数：config 或 AdSlot 容器缺失"
 fi
 
 # 2. social 计数
@@ -68,10 +69,31 @@ if [ -f "$ROOT/docs/ads-adsterra-runbook.md" ]; then pass "runbook 存在：docs
 
 # 8. 容器就绪：containerId 三处一致
 CID="$(python3 -c "import json;print(json.load(open('$CONFIG'))['native']['containerId'])" 2>/dev/null)"
-if [ -n "${CID:-}" ] && grep -q "$CID" "$ROOT/docs/ads-adsterra-runbook.md" && grep -q "$CID" "$LAYOUT"; then
-  pass "容器就绪：containerId 在 config、模板层、runbook 三处一致"
+if [ -n "${CID:-}" ] && grep -q "$CID" "$ROOT/docs/ads-adsterra-runbook.md" && grep -q "$CID" "$SLOT"; then
+  pass "容器就绪：containerId 在 config、AdSlot、runbook 三处一致"
 else
   fail "容器就绪：containerId 三处不一致（CID=${CID:-none}）"
+fi
+
+# 9. 禁懒加载：广告脚本必须随页面 async 发出，不得用 IntersectionObserver 延迟
+if grep -q 'IntersectionObserver' "$ADS_JS" 2>/dev/null; then
+  fail "懒加载：ads.js 仍含 IntersectionObserver（广告位禁止懒加载/延迟加载）"
+else
+  pass "懒加载：ads.js 无 IntersectionObserver，脚本 async 随页面发出"
+fi
+
+# 10. 预留固定高度：CLS 保护
+if grep -q '\.ad-slot' "$ROOT/src/styles/global.css" && grep -q 'min-height' "$ROOT/src/styles/global.css"; then
+  pass "预留高度：.ad-slot 声明 min-height"
+else
+  fail "预留高度：global.css 缺少 .ad-slot 的 min-height"
+fi
+
+# 11. 404 等低质页不放广告位
+if grep -q 'ads={false}' "$ROOT/src/pages/404.astro" && ! grep -q 'AdSlot' "$ROOT/src/pages/404.astro"; then
+  pass "低质页：404 无广告位"
+else
+  fail "低质页：404 仍带广告位（或未显式关闭）"
 fi
 
 echo ""

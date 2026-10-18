@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { SITE, DISCLAIMER, NAV } from "../lib/site";
+import AdSlot from "../components/AdSlot.astro";
 
 interface Props {
   title: string;
@@ -9,8 +10,10 @@ interface Props {
   type?: "website" | "article";
   jsonLd?: object | object[];
   noindex?: boolean;
+  /** false when the page places its own slot (or should carry none, like 404). */
+  ads?: boolean;
 }
-const { title, description, image = "/img/og-default.jpg", type = "website", jsonLd, noindex = false } = Astro.props;
+const { title, description, image = "/img/og-default.jpg", type = "website", jsonLd, noindex = false, ads = true } = Astro.props;
 const canonical = new URL(Astro.url.pathname, SITE.url).href;
 const ogImage = new URL(image, SITE.url).href;
 const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
@@ -75,9 +78,7 @@ const path = Astro.url.pathname;
     </header>
     <main id="main" class="flex-1">
       <slot />
-      <div class="wrap mt-14">
-        <div class="ads-native" id="container-64a94719d402cdba4d7c834a89e3fb5f"></div>
-      </div>
+      {ads && <div class="wrap"><AdSlot /></div>}
     </main>
     <div id="ads-social-holder" hidden class="fixed inset-x-0 bottom-0 z-50"></div>
     <footer class="mt-20 border-t border-flame/15 bg-night-2/80">
@@ -144,6 +145,6 @@ const path = Astro.url.pathname;
         document.querySelectorAll("[data-consent-open]").forEach(function (b) { b.addEventListener("click", function () { box.hidden = false; }); });
       })();
     </script>
-    <script is:inline src="/assets/ads.js?v=20261018-1" defer></script>
+    <script is:inline src="/assets/ads.js?v=20261019-1" defer></script>
   </body>
 </html>
