@@ -131,6 +131,7 @@
 | ADS-PRIV-01 | Fail | Pass | `/privacy/` 新增 Google AdSense 披露、第三方供应商 Cookie 说明、Ads Settings 与 aboutads.info 退出链接、partner-sites 链接 |
 | ADS-PRIV-02 | Fail | Pass | 同上 |
 | ADS-ELIG-03 | Fail | Pass | 站内已无第三方广告网络 |
+| ADS-UX-05 | Fail | Pass | 新增 `contact@enshroudedbuilder.com`（Cloudflare Email Routing 转发到业主邮箱，MX/SPF/DKIM 已锁定生效），页脚、联系页、隐私页均可见；关闭了 Cloudflare 邮箱混淆以免地址显示为 `[email protected]` |
 
 仍然开放、且**只能在拿到 publisher ID 之后处理**：
 
