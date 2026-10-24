@@ -39,6 +39,15 @@ for needle in 'Google AdSense' 'Third-party vendors, including Google' 'google.c
   if grep -qF "$needle" src/pages/privacy.astro; then pass "隐私披露：$needle"; else fail "隐私披露缺失：$needle"; fi
 done
 
+# 5b. AdSense 接入：ads.txt 与 head 代码必须一致
+if [ -f public/ads.txt ] && grep -q '^google.com, pub-9919512237426779, DIRECT, f08c47fec0942fa0$' public/ads.txt; then
+  pass "ads.txt：google 授权行正确"
+else
+  fail "ads.txt：缺失或授权行不匹配"
+fi
+if grep -q 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' "$LAYOUT"; then pass "AdSense 代码：已在 head 注入"; else fail "AdSense 代码：未注入"; fi
+if grep -q 'ca-pub-9919512237426779' src/lib/site.ts; then pass "AdSense 代码：client id 来自 SITE"; else fail "AdSense 代码：client id 未集中配置"; fi
+
 # 6. 同意横幅必须仍在（分析用途），且不得承诺不存在的广告
 if grep -q 'id="consent"' "$LAYOUT"; then pass "同意横幅：仍在位"; else fail "同意横幅：缺失"; fi
 if grep -q 'ad_storage: "denied"' "$LAYOUT"; then pass "Consent Mode：广告信号默认拒绝"; else fail "Consent Mode：缺少广告信号默认拒绝"; fi

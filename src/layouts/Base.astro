@@ -61,6 +61,8 @@ const path = Astro.url.pathname;
       gtag("config", ga4Id);
     </script>
     <script async src={`https://www.googletagmanager.com/gtag/js?id=${SITE.ga4Id}`}></script>
+    {/* AdSense site verification and ad serving. Consent Mode v2 above keeps ad signals denied until the visitor allows them. */}
+    <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SITE.adsenseClient}`} crossorigin="anonymous"></script>
     <slot name="head" />
     {ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
   </head>

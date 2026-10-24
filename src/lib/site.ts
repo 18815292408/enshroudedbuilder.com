@@ -6,6 +6,7 @@ export const SITE = {
   gameVersion: "1.0 (hotfix 1.0.0.2)",
   repo: "https://github.com/18815292408/enshroudedbuilder.com",
   email: "contact@enshroudedbuilder.com",
+  adsenseClient: "ca-pub-9919512237426779",
   ga4Id: "G-CE08NNE2Y6",
   clarityId: "yzf3hs2qms",
 };
