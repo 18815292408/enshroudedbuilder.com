@@ -1,6 +1,5 @@
 ---
 import Base from "../../layouts/Base.astro";
-import AdSlot from "../../components/AdSlot.astro";
 import { BUILDS } from "../../data/builds";
 import { SITE, SOURCES } from "../../lib/site";
 import { BIOMES, MAX_POINTS, REGION_LABEL, TREE, levelPoints, pointsAtLevel } from "../../lib/tree";
@@ -85,7 +84,7 @@ const jsonLd = [
   description="L'arbre de compétences Enshrouded 1.0 en français : 231 nœuds, 3 arbres, 212 points au niveau 50, d'où viennent les points et par où commencer."
   type="article"
   jsonLd={jsonLd}
-  ads={false}
+ 
 >
   <section class="wrap pt-14">
     <nav aria-label="Fil d'Ariane" class="text-sm text-mist mb-5"><a href="/fr/" class="hover:text-flame no-underline">Accueil</a> <span aria-hidden="true">/</span> <span class="text-ash">Arbre de compétences</span></nav>
@@ -171,8 +170,6 @@ const jsonLd = [
           <tbody>{atLevels.map((x) => <tr><td class="text-parchment">Niveau {x.l}</td><td>{x.p}</td></tr>)}</tbody>
         </table>
       </div>
-
-      <AdSlot />
 
       <h2 id="commencer">Par où commencer</h2>
       <p>

@@ -38,3 +38,14 @@ Task 3: complete (commits 6cff653..HEAD — 2026-10-19)
 - 本机复测：代理拦广告域（TLS tlsv1 alert / resource status 0 / 0 bytes / fetch Failed）；直连 + Referer + 移动 UA → 200 / 51983 字节；block_anonym_ip=true 使 VPN 出口不投素材
 - skill zy-guanggao 升 2.3.0：Stage 1 增复核时点（T+15min 基线 → T+2h → T+24h 期望 active=4 且有曝光 → T+48h 找经理），Stage 5 增「注入≠加载」与代理假阴性判定，Pitfalls 增审批误判
 - 下一步：T+24h 复核当日 impressions；本机要验证填充需手机蜂窝网络或给广告域加 DIRECT 规则
+
+
+Task 4: complete (2026-10-24) — 全部广告撤下，转 AdSense 申请
+
+- 触发：YouTube 引流视频下出现公开指控「点进去是病毒」（@Solaei08），本地复现确认 Social Bar 脚本同意后即注入；同时决定改走 AdSense
+- 撤销范围：删除 `public/assets/ads.js`、`public/assets/ads-config.json`、`src/components/AdSlot.astro`、`scripts/verify-ads.sh`；Base 移除 AdSlot 渲染、`ads` 开关、`#ads-social-holder`、`ads.js` 脚本标签；9 个页面移除 `<AdSlot />` 与 `ads={false}`；global.css 移除 `.ad-slot` 预留高度规则
+- 同意横幅：文案去掉「ad partner」，`apply()` 不再写 `dh-ga-consent`，Consent Mode 广告信号固定 denied（审核期间无广告网络）
+- 隐私政策：Advertising 章节改写为 Google AdSense 披露（第三方供应商 Cookie、Google 广告 Cookie 说明、Ads Settings 与 aboutads.info 退出链接、partner-sites 数据说明）
+- 门禁重写：`scripts/verify-site-build.sh` 由「广告基座校验」改为「广告必须不存在 + AdSense 隐私披露校验」→ **16 passed, 0 failed**
+- 线上验收：dist 内 0 处 `ads.js`/`ad-slot`/`profitableratecpmnetwork`/`Adsterra`；23 页全部 200
+- 待办（只能拿到 publisher ID 后做）：`ads.txt`、Funding Choices（EEA 认证 CMP）、AdSense 代码注入 `<head>`

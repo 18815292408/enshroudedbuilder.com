@@ -1,6 +1,5 @@
 ---
 import Base from "../../../layouts/Base.astro";
-import AdSlot from "../../../components/AdSlot.astro";
 import { BUILDS, type Build } from "../../../data/builds";
 import { SITE } from "../../../lib/site";
 import { MAX_POINTS } from "../../../lib/tree";
@@ -53,7 +52,6 @@ const jsonLd = {
   title="Builds Enshrouded 1.0 : mage, guerrier, archer et tank"
   description="Les builds Enshrouded 1.0 en français : mage, guerrier et archer, avec l'ordre exact des points et l'équipement niveau 50."
   jsonLd={jsonLd}
-  ads={false}
 >
   <section class="wrap pt-14">
     <nav aria-label="Fil d'Ariane" class="text-sm text-mist mb-5"><a href="/fr/" class="hover:text-flame no-underline">Accueil</a> <span aria-hidden="true">/</span> <span class="text-ash">Builds</span></nav>
@@ -76,8 +74,6 @@ const jsonLd = {
       </a>
     ))}
   </section>
-
-  <AdSlot />
 
   <section class="wrap mt-14">
     <h2 class="text-2xl mb-3">Les huit builds de la 1.0</h2>

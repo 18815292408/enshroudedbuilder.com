@@ -1,6 +1,5 @@
 ---
 import Base from "../../../layouts/Base.astro";
-import AdSlot from "../../../components/AdSlot.astro";
 import FrSkillOrder from "../../../components/FrSkillOrder.astro";
 import { buildBySlug } from "../../../data/builds";
 import { planBuild } from "../../../lib/plan";
@@ -72,7 +71,7 @@ const jsonLd = [
   type="article"
   image="/img/warrior-960.webp"
   jsonLd={jsonLd}
-  ads={false}
+ 
 >
   <section class="relative overflow-hidden border-b border-flame/15">
     <img src="/img/warrior-960.webp" srcset="/img/warrior-480.webp 480w, /img/warrior-960.webp 960w" sizes="100vw" alt="" width="960" height="640" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-right opacity-80" />
@@ -150,8 +149,6 @@ const jsonLd = [
         <li><strong>Steadfast</strong> répare votre arme à chaque kill, et <strong>Battle Heal</strong> vous soigne sur les coups critiques de mêlée : ce sont vos deux sources de survie, pas les potions.</li>
         <li>Les armes à deux mains peuvent parer. Sur un ennemi <em>Overpowered</em>, <strong>Breach</strong> ajoute +100 % de dégâts physiques de mêlée : c'est votre fenêtre de burst.</li>
       </ul>
-
-      <AdSlot />
 
       <FrSkillOrder build={b} headings={{ core: "Compétences clés du guerrier", order: "Ordre des points, niveau 1 à 50", gear: "Équipement et armes niveau 50", food: "Nourriture et buffs" }} />
 

@@ -1,7 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
 import BuildCard from "../../components/BuildCard.astro";
-import AdSlot from "../../components/AdSlot.astro";
 import { BUILDS } from "../../data/builds";
 import { SITE } from "../../lib/site";
 const jsonLd = {
@@ -10,14 +9,14 @@ const jsonLd = {
 };
 const rows = BUILDS.map((b) => ({ b, solo: b.modes.includes("Solo") }));
 ---
-<Base title="All Enshrouded 1.0 Builds – Mage, Ranger, Warrior, Tank, Healer & More" description="Every Enshrouded 1.0 build on one page: Battlemage, Wizard, Summoner, Ranger, Tank, Two-Handed Warrior, Healer and Assassin, with level 50 skill orders from real game data." jsonLd={jsonLd} ads={false} altPath="/fr/builds/">
+<Base title="All Enshrouded 1.0 Builds – Mage, Ranger, Warrior, Tank, Healer & More" description="Every Enshrouded 1.0 build on one page: Battlemage, Wizard, Summoner, Ranger, Tank, Two-Handed Warrior, Healer and Assassin, with level 50 skill orders from real game data." jsonLd={jsonLd} altPath="/fr/builds/">
   <section class="wrap pt-14">
     <p class="eyebrow mb-2">Build library</p>
     <h1 class="text-4xl md:text-5xl">Enshrouded 1.0 Builds</h1>
     <p class="text-ash mt-4 max-w-3xl text-lg">Eight level 50 builds covering every combat style in the 1.0 skill tree. Each guide has an exact skill order, gear, food and a link that opens the build in the planner.</p>
   </section>
   <section class="wrap mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-    {BUILDS.map((b, i) => <><BuildCard build={b} eager={i < 3} />{i === 2 && <div class="sm:col-span-2 lg:col-span-3"><AdSlot /></div>}</>)}
+    {BUILDS.map((b, i) => <><BuildCard build={b} eager={i < 3} />{i === 2 && <div class="sm:col-span-2 lg:col-span-3"></div>}</>)}
   </section>
   <section class="wrap mt-16">
     <h2 class="text-2xl mb-4">Compare builds</h2>

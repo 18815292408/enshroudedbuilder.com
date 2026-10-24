@@ -2,7 +2,6 @@
 import Base from "../../layouts/Base.astro";
 import BuildCard from "../../components/BuildCard.astro";
 import SkillName from "../../components/SkillName.astro";
-import AdSlot from "../../components/AdSlot.astro";
 import { BUILDS, buildBySlug, type Build } from "../../data/builds";
 import { NEW_FOODS, WIKI_EDITED } from "../../data/gear";
 import { planBuild } from "../../lib/plan";
@@ -41,7 +40,7 @@ const jsonLd = [
   },
 ];
 ---
-<Base title={b.title} description={b.description} image={`/img/og-${b.slug}.jpg`} type="article" jsonLd={jsonLd} ads={false}>
+<Base title={b.title} description={b.description} image={`/img/og-${b.slug}.jpg`} type="article" jsonLd={jsonLd}>
   <section class="relative overflow-hidden border-b border-flame/15">
     <img src={`/img/${b.slug}-960.webp`} srcset={`/img/${b.slug}-480.webp 480w, /img/${b.slug}-960.webp 960w`} sizes="100vw" alt="" width="960" height="640" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-right opacity-80" />
     <div class="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-night/0"></div>
@@ -109,8 +108,6 @@ const jsonLd = [
           </tbody>
         </table>
       </div>
-
-      <AdSlot />
 
       <h2 id="skill-order">{b.name} 1.0 skill tree progression: level 1 to 50</h2>
       <p>Each stage builds on the one before it, and every skill is connected to the tree. The point totals are exact. "Points available" assumes you have collected the Shroud Roots (1 point) and Elixir Wells (3 points) in the biomes you have finished at that level, on top of the 2 points you get per level.</p>

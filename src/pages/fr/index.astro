@@ -1,6 +1,5 @@
 ---
 import Base from "../../layouts/Base.astro";
-import AdSlot from "../../components/AdSlot.astro";
 import { BUILDS, type Build } from "../../data/builds";
 import { SITE, SOURCES } from "../../lib/site";
 import { BIOMES, MAX_POINTS, TREE, pointsAtLevel } from "../../lib/tree";
@@ -67,7 +66,7 @@ const jsonLd = [
   title="Builds Enshrouded 1.0 en français : quel build choisir ?"
   description="Les 8 builds Enshrouded 1.0 expliqués en français : ordre exact des 212 points de compétence, équipement niveau 50, tier list et conseils solo ou coop."
   jsonLd={jsonLd}
-  ads={false}
+ 
 >
   <section class="wrap pt-14">
     <p class="eyebrow mb-2">Guides en français</p>
@@ -138,8 +137,6 @@ const jsonLd = [
       </table>
     </div>
   </section>
-
-  <AdSlot />
 
   <section class="wrap mt-14">
     <h2 class="text-2xl mb-3">Quel build pour quel joueur ?</h2>

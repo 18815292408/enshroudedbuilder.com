@@ -1,7 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
 import BuildCard from "../components/BuildCard.astro";
-import AdSlot from "../components/AdSlot.astro";
 import { BUILDS } from "../data/builds";
 import { MAX_POINTS, TREE, levelPoints } from "../lib/tree";
 import { SITE } from "../lib/site";
@@ -31,7 +30,7 @@ const jsonLd = [
 ];
 const embers = Array.from({ length: 18 }, (_, i) => ({ left: (i * 53) % 100, delay: (i * 0.7) % 9, dur: 7 + (i % 5) * 1.6 }));
 ---
-<Base title="Enshrouded 1.0 Builds – Best Class Tier List & Level 50 Guides" description="Best Enshrouded 1.0 builds for every class: level 50 skill orders from real game data, gear, food, a tier list and a free skill tree planner." jsonLd={jsonLd} ads={false} altPath="/fr/">
+<Base title="Enshrouded 1.0 Builds – Best Class Tier List & Level 50 Guides" description="Best Enshrouded 1.0 builds for every class: level 50 skill orders from real game data, gear, food, a tier list and a free skill tree planner." jsonLd={jsonLd} altPath="/fr/">
   <section class="relative min-h-[34rem] md:min-h-[40rem] flex items-end overflow-hidden">
     <picture>
       <source media="(min-width: 800px)" srcset="/img/hero-1920.webp" />
@@ -83,7 +82,7 @@ const embers = Array.from({ length: 18 }, (_, i) => ({ left: (i * 53) % 100, del
       {tiers.map(({ tier, builds }) => (
         <div>
           <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${tier}`}>{tier}</span><p class="text-ash">{tierText[tier]}</p></div>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">{builds.map((b, i) => <><BuildCard build={b} eager={tier === "S" && i < 2} />{tier === firstListTier && i === 2 && <div class="sm:col-span-2 lg:col-span-3"><AdSlot /></div>}</>)}</div>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">{builds.map((b, i) => <><BuildCard build={b} eager={tier === "S" && i < 2} />{tier === firstListTier && i === 2 && <div class="sm:col-span-2 lg:col-span-3"></div>}</>)}</div>
         </div>
       ))}
     </div>

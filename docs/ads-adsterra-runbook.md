@@ -1,3 +1,8 @@
+> **状态：已停用（2026-10-24）。** 站内 Adsterra 全部撤下，等待 Google AdSense 审核：
+> `ads.js`、`ads-config.json`、`AdSlot.astro` 已删除，模板层与所有页面的广告引用已移除。
+> 本文档仅作为历史记录保留，用于说明当时的接入方式与坑位。恢复任何第三方广告网络前，
+> 请先确认 AdSense 政策（尤其 Ads by Google 同页混排与 CMP 要求），并重建门禁。
+
 # Adsterra runbook — enshroudedbuilder.com
 
 Adsterra site **6132818** (domain enshroudedbuilder.com, category `Other`, adult ads off).

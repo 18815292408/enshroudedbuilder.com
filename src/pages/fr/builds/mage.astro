@@ -1,6 +1,5 @@
 ---
 import Base from "../../../layouts/Base.astro";
-import AdSlot from "../../../components/AdSlot.astro";
 import FrSkillOrder from "../../../components/FrSkillOrder.astro";
 import { buildBySlug } from "../../../data/builds";
 import { planBuild } from "../../../lib/plan";
@@ -71,7 +70,7 @@ const jsonLd = [
   type="article"
   image="/img/battlemage-960.webp"
   jsonLd={jsonLd}
-  ads={false}
+ 
 >
   <section class="relative overflow-hidden border-b border-flame/15">
     <img src="/img/battlemage-960.webp" srcset="/img/battlemage-480.webp 480w, /img/battlemage-960.webp 960w" sizes="100vw" alt="" width="960" height="640" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-right opacity-80" />
@@ -153,8 +152,6 @@ const jsonLd = [
         <li>Parez avec le ward. Chaque parade réussie rend de la mana, ce qui alimente les sorts du bâton.</li>
         <li>Après un coup critique à la baguette, passez au bâton dans les 10 secondes : Blast and Cast ajoute 50 % aux dégâts de base du sort.</li>
       </ul>
-
-      <AdSlot />
 
       <FrSkillOrder build={b} headings={{ core: "Compétences clés du mage de bataille", order: "Ordre des points, niveau 1 à 50", gear: "Équipement et armes niveau 50", food: "Nourriture et buffs" }} />
 

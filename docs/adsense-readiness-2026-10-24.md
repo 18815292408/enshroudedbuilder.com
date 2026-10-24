@@ -115,3 +115,28 @@
 - 参考清单 ID 数：73
 - 本报告 ID 数：73
 - 缺失：无
+
+## 整改记录（2026-10-24 晚）
+
+已按本报告执行，站点进入"零广告待审核"状态：
+
+| 原 ID | 原状态 | 现状态 | 处置 |
+| --- | --- | --- | --- |
+| ADS-UX-04 | Fail | Pass | 删除 Adsterra 全部素材与加载器（`ads.js`、`ads-config.json`、`AdSlot.astro`），模板与 9 个页面的引用全部移除 |
+| ADS-PUB-10 | Fail | Pass | Social Bar 浮层随广告一并移除 |
+| ADS-PUB-11 | Fail | Pass | 所有页面不再展示广告 |
+| ADS-CONTENT-05 | Fail | Pass | 同上 |
+| ADS-UX-06 | Fail | Pass | 同上 |
+| ADS-REST-08 | Fail | Pass | 同上 |
+| ADS-PRIV-01 | Fail | Pass | `/privacy/` 新增 Google AdSense 披露、第三方供应商 Cookie 说明、Ads Settings 与 aboutads.info 退出链接、partner-sites 链接 |
+| ADS-PRIV-02 | Fail | Pass | 同上 |
+| ADS-ELIG-03 | Fail | Pass | 站内已无第三方广告网络 |
+
+仍然开放、且**只能在拿到 publisher ID 之后处理**：
+
+- `ADS-TXT-01` / `ADS-TXT-02`：发布 `ads.txt`（需 `pub-XXXX`）
+- `ADS-PRIV-04` / `ADS-PRIV-10`：接入 Funding Choices（EEA/UK/CH 认证 CMP）
+- `ADS-SITE-01`：在 AdSense 后台添加站点并验证所有权
+- `ADS-ELIG-01` / `ADS-ELIG-02` / `ADS-PROG-01` / `ADS-PUB-09`：需账号主体确认
+
+门禁：`bash scripts/verify-site-build.sh` → 16 passed, 0 failed（断言广告素材与引用彻底不存在 + 隐私披露齐全）。
