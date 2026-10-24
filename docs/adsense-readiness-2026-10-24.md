@@ -133,7 +133,19 @@
 | ADS-ELIG-03 | Fail | Pass | 站内已无第三方广告网络 |
 | ADS-UX-05 | Fail | Pass | 新增 `contact@enshroudedbuilder.com`（Cloudflare Email Routing 转发到业主邮箱，MX/SPF/DKIM 已锁定生效），页脚、联系页、隐私页均可见；关闭了 Cloudflare 邮箱混淆以免地址显示为 `[email protected]` |
 
-仍然开放、且**只能在拿到 publisher ID 之后处理**：
+### 2026-10-24 21:31 追加：已提交 AdSense 审核
+
+业主的 Google 账号已有一个 AdSense 账号 **`pub-9919512237426779`**（账号内已有 gptlives.com），
+因此这不是新申请，而是把本站加入既有账号：
+
+- 站点已添加 → 用 AdSense 代码段完成所有权验证（通过）→ **已请求审核**，状态「正在准备」
+- 站点侧：`<head>` 注入 `adsbygoogle.js?client=ca-pub-9919512237426779`（取自 `SITE.adsenseClient`），
+  发布 `public/ads.txt` → `google.com, pub-9919512237426779, DIRECT, f08c47fec0942fa0`
+- 门禁扩展至 19 项，断言 ads.txt 与 head 代码保持一致
+
+已关闭：`ADS-SITE-01`、`ADS-SITE-02`、`ADS-TXT-01`、`ADS-TXT-02`。
+
+仍开放：
 
 - `ADS-TXT-01` / `ADS-TXT-02`：发布 `ads.txt`（需 `pub-XXXX`）
 - `ADS-PRIV-04` / `ADS-PRIV-10`：接入 Funding Choices（EEA/UK/CH 认证 CMP）

@@ -49,3 +49,11 @@ Task 4: complete (2026-10-24) — 全部广告撤下，转 AdSense 申请
 - 门禁重写：`scripts/verify-site-build.sh` 由「广告基座校验」改为「广告必须不存在 + AdSense 隐私披露校验」→ **16 passed, 0 failed**
 - 线上验收：dist 内 0 处 `ads.js`/`ad-slot`/`profitableratecpmnetwork`/`Adsterra`；23 页全部 200
 - 待办（只能拿到 publisher ID 后做）：`ads.txt`、Funding Choices（EEA 认证 CMP）、AdSense 代码注入 `<head>`
+
+Task 5: complete (2026-10-24 21:31) — 接入既有 AdSense 账号并提交审核
+
+- 发现：ego 里登录的 Google 账号（thefreem7@gmail.com）**已有 AdSense 账号** `pub-9919512237426779`，账号内已有 gptlives.com；故非新申请
+- AdSense 后台：网站 → 新增网站 enshroudedbuilder.com → 代码段验证所有权（通过）→ 申请审核（已提交，状态「正在准备」，2026-10-24 21:31）
+- 站点侧：`SITE.adsenseClient = "ca-pub-9919512237426779"`；Base `<head>` 注入 adsbygoogle.js；`public/ads.txt` 发布 google 授权行
+- 门禁：verify-site-build.sh 扩到 **19 passed, 0 failed**（新增 ads.txt 行、head 标签、client id 单一来源三项）
+- 未完成（需业主本人）：后台「收款」步骤仍空 —— 银行账户与税务信息；Ads.txt 状态仍「未找到」，待 Google 重新抓取
