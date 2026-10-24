@@ -40,6 +40,13 @@ export const pointsAtLevel = (level: number) =>
 
 export const MAX_POINTS = pointsAtLevel(TREE.leveling.playerLevelCap);
 
+/**
+ * Skills almost every build buys once the damage path is paid for. They are deliberately
+ * left out of the core order (which only covers damage), so every build page has to say
+ * what the leftover points are for — French players asked for exactly this.
+ */
+export const QOL_SKILLS = ["DOUBLE_JUMP", "UPDRAFT", "DESSERT_STOMACH"];
+
 const adjacency: Record<string, string[]> = Object.fromEntries(Object.keys(TREE.nodes).map((id) => [id, []]));
 for (const [a, b] of TREE.edges) { adjacency[a].push(b); adjacency[b].push(a); }
 export const ADJ = adjacency;

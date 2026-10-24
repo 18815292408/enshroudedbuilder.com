@@ -4,13 +4,21 @@
 import SkillName from "./SkillName.astro";
 import type { Build } from "../data/builds";
 import { planBuild } from "../lib/plan";
-import { skill, MAX_POINTS } from "../lib/tree";
+import { skill, MAX_POINTS, QOL_SKILLS } from "../lib/tree";
 
 interface Props { build: Build; headings?: { core?: string; order?: string; gear?: string; food?: string } }
 const { build: b, headings = {} } = Astro.props;
 const stages = planBuild(b);
 const final = stages[stages.length - 1];
 const flex = MAX_POINTS - final.pointsUsed;
+/** French wording for the comfort skills: the game data strings are English. */
+const QOL_FR: Record<string, { label: string; why: string }> = {
+  DOUBLE_JUMP: { label: "Double saut", why: "Permet de sauter une seconde fois en l'air (10 d'endurance). C'est ce qui rend l'exploration et les esquives jouables." },
+  UPDRAFT: { label: "Courants ascendants", why: "En planant, appuyer sur saut vous fait remonter, une fois par vol. Indispensable dès qu'on veut atteindre un rebord ou un coffre en hauteur." },
+  DESSERT_STOMACH: { label: "Estomac à dessert", why: "Ajoute un 4e emplacement de nourriture, donc un buff de plus en permanence." },
+};
+const qol = QOL_SKILLS.map((t) => ({ type: t, en: skill(t).name, cost: skill(t).cost, ...(QOL_FR[t] ?? { label: skill(t).name, why: "" }) }));
+const qolCost = qol.reduce((a, q) => a + q.cost, 0);
 const h = {
   core: headings.core ?? `Compétences clés du ${b.name}`,
   order: headings.order ?? `Ordre des points, niveau 1 à 50`,
@@ -64,12 +72,30 @@ const h = {
     <a href={`/builder/?b=${st.code}&g=${b.slug}`} class="inline-block mt-4 text-sm font-display tracking-wider uppercase text-flame no-underline hover:underline">Voir le palier {i + 1} dans le planificateur →</a>
   </section>
 ))}
-{flex > 0 && (
-  <p>
-    Le plan niveau 50 dépense {final.pointsUsed} des {MAX_POINTS} points. Il reste donc <strong>{flex} points libres</strong> pour du confort
-    (Double saut, Estomac à dessert, les nœuds de récolte) ou pour un second style d'arme. Chaque nœud d'attribut donne +1 plat.
-  </p>
-)}
+<h2 id="points-libres">Utiliser les {flex} points qui restent</h2>
+<p>
+  Le plan ci-dessus dépense {final.pointsUsed} des {MAX_POINTS} points d'un personnage qui a tout exploré : il reste donc <strong>{flex} points</strong>.
+  L'ordre des points s'arrête volontairement au chemin de dégâts, parce que c'est la partie qui doit être achetée dans un ordre fixe. Les trois compétences
+  ci-dessous sont celles que presque tout le monde prend ensuite, et elles coûtent assez peu pour tenir dans tous les builds du site.
+</p>
+<div class="panel overflow-x-auto not-prose">
+  <table class="table-game table-cards">
+    <thead><tr><th>Compétence</th><th>Coût</th><th>Pourquoi elle compte</th></tr></thead>
+    <tbody>
+      {qol.map((q) => (
+        <tr>
+          <td class="whitespace-nowrap"><strong class="text-parchment">{q.label}</strong> <span class="text-mist text-xs">{q.en}</span></td>
+          <td class="whitespace-nowrap">{q.cost} pts</td>
+          <td>{q.why}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<p>
+  Les trois coûtent <strong>{qolCost} points</strong>, ce qui laisse {flex - qolCost} points pour un second style d'arme, les nœuds de récolte ou des points
+  d'attribut (+1 plat chacun). Vous pouvez les ajouter dans le <a href={`/builder/?b=${final.code}&g=${b.slug}`}>planificateur</a> et partager le lien obtenu.
+</p>
 
 <h2 id="equipement">{h.gear}</h2>
 <p>

@@ -5,7 +5,7 @@ import SkillName from "../../components/SkillName.astro";
 import { BUILDS, buildBySlug, type Build } from "../../data/builds";
 import { NEW_FOODS, WIKI_EDITED } from "../../data/gear";
 import { planBuild } from "../../lib/plan";
-import { skill, MAX_POINTS, REGION_LABEL, TREE } from "../../lib/tree";
+import { skill, MAX_POINTS, QOL_SKILLS, REGION_LABEL, TREE } from "../../lib/tree";
 import { SITE, SOURCES } from "../../lib/site";
 
 export function getStaticPaths() {
@@ -15,12 +15,14 @@ const b: Build = buildBySlug(Astro.params.slug!);
 const stages = planBuild(b);
 const final = stages[stages.length - 1];
 const flex = MAX_POINTS - final.pointsUsed;
+const qol = QOL_SKILLS.map((t) => ({ type: t, ...skill(t) }));
+const qolCost = qol.reduce((a, q) => a + q.cost, 0);
 // "Intelligence, then Spirit" already reads as a sentence; other lists get an "and".
 const statsText = b.stats.includes(" then ") ? b.stats : b.stats.replace(/, ([^,]+)$/, " and $1");
 const related = b.related.map(buildBySlug);
 const url = `${SITE.url}/builds/${b.slug}/`;
 const toc = [
-  ["overview", "Overview"], ["how-to-play", "How to play"], ["core-skills", "Core skills"], ["skill-order", "Skill order (1–50)"],
+  ["overview", "Overview"], ["how-to-play", "How to play"], ["core-skills", "Core skills"], ["skill-order", "Skill order (1–50)"], ["qol", "Leftover points"],
   ["gear", "Gear & weapons"], ["food", "Food & buffs"], ["pros-cons", "Pros & cons"], ["faq", "FAQ"],
 ];
 const jsonLd = [
@@ -129,7 +131,23 @@ const jsonLd = [
           <a href={`/builder/?b=${st.code}&g=${b.slug}`} class="inline-block mt-4 text-sm font-display tracking-wider uppercase text-flame no-underline hover:underline">View stage {i + 1} in the planner →</a>
         </section>
       ))}
-      {flex > 0 && <p>The level 50 plan spends {final.pointsUsed} of {MAX_POINTS} points. That leaves <strong>{flex} flexible points</strong> for quality-of-life skills such as Double Jump, Dessert Stomach or the gathering nodes, or for a second weapon style. Attribute nodes give a flat +1 each.</p>}
+      <h2 id="qol">Spending the {flex} leftover points</h2>
+      <p>The level 50 plan above spends {final.pointsUsed} of the {MAX_POINTS} points a fully explored character has, which leaves <strong>{flex} points</strong>. The core order stops at the damage path on purpose: it is the part that has to be bought in a fixed sequence. The three skills below are what nearly every player buys next, and they are cheap enough to fit in every build on this site.</p>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game table-cards">
+          <thead><tr><th>Skill</th><th>Cost</th><th>Why it matters</th></tr></thead>
+          <tbody>
+            {qol.map((q) => (
+              <tr>
+                <td class="whitespace-nowrap"><SkillName type={q.type} name={q.name} /></td>
+                <td class="whitespace-nowrap">{q.cost} pts</td>
+                <td>{q.levels[q.levels.length - 1]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>All three cost <strong>{qolCost} points</strong>, which leaves {flex - qolCost} for a second weapon style, the gathering nodes or attribute points (a flat +1 each). You can add them in the <a href={`/builder/?b=${final.code}&g=${b.slug}`}>planner</a> and share the resulting link.</p>
 
       <nav aria-label="Other builds" class="not-prose panel my-6 flex flex-wrap items-center gap-x-3 gap-y-1 p-4 text-sm">
         <span class="eyebrow !text-[0.66rem]">Other 1.0 builds</span>
