@@ -1,0 +1,110 @@
+---
+// Shared body for the French build pages: exact point order, gear and food rendered from the
+// same verified 1.0 game data the English pages use. Only the labels are French.
+import SkillName from "./SkillName.astro";
+import type { Build } from "../data/builds";
+import { planBuild } from "../lib/plan";
+import { skill, MAX_POINTS } from "../lib/tree";
+
+interface Props { build: Build; headings?: { core?: string; order?: string; gear?: string; food?: string } }
+const { build: b, headings = {} } = Astro.props;
+const stages = planBuild(b);
+const final = stages[stages.length - 1];
+const flex = MAX_POINTS - final.pointsUsed;
+const h = {
+  core: headings.core ?? `Compétences clés du ${b.name}`,
+  order: headings.order ?? `Ordre des points, niveau 1 à 50`,
+  gear: headings.gear ?? `Équipement et armes niveau 50`,
+  food: headings.food ?? `Nourriture et buffs`,
+};
+---
+
+<h2 id="competences">{h.core}</h2>
+<p>Ce sont les compétences dont le build dépend vraiment. Les valeurs sont celles du jeu au niveau maximum, tirées des données 1.0 et non d'une estimation.</p>
+<div class="panel overflow-x-auto not-prose">
+  <table class="table-game table-cards">
+    <thead><tr><th>Compétence</th><th>Coût</th><th>Effet au niveau max</th></tr></thead>
+    <tbody>
+      {b.core.map((t) => {
+        const s = skill(t);
+        return (
+          <tr>
+            <td class="whitespace-nowrap"><SkillName type={t} name={s.name} /></td>
+            <td class="whitespace-nowrap">{s.cost} pt{s.cost > 1 ? "s" : ""}{s.maxLevel > 1 ? ` × ${s.maxLevel}` : ""}</td>
+            <td>{s.levels[s.levels.length - 1]}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>
+
+<h2 id="ordre">{h.order}</h2>
+<p>
+  Chaque palier s'appuie sur le précédent et chaque compétence est reliée à l'arbre : rien n'est pris « hors chemin ». Les totaux de points sont exacts.
+  Les « points disponibles » supposent que vous avez ramassé les <strong>Racines du Voile</strong> (1 point) et les <strong>Puits d'élixir</strong> (3 points) des biomes terminés à ce niveau, en plus des 2 points par niveau.
+</p>
+{stages.map((st, i) => (
+  <section class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
+      <h3 class="font-display text-lg text-flame">{st.label}</h3>
+      <span class="text-sm text-ash">{st.pointsUsed} / {st.pointsAvailable} points</span>
+    </div>
+    <p class="text-ash mt-1 mb-4">{st.summary}</p>
+    <ol class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-[0.95rem]">
+      {st.added.map((a) => (
+        <li class="flex items-center justify-between gap-3 border-b border-parchment/5 pb-1.5">
+          <SkillName type={a.type} name={a.name} />
+          <span class="text-mist whitespace-nowrap text-sm">
+            {skill(a.type).maxLevel > 1 ? `Niv. ${a.from ? `${a.from}→` : ""}${a.to}` : a.to > 1 ? `×${a.to}` : ""} · {a.cost} pt
+          </span>
+        </li>
+      ))}
+    </ol>
+    <a href={`/builder/?b=${st.code}&g=${b.slug}`} class="inline-block mt-4 text-sm font-display tracking-wider uppercase text-flame no-underline hover:underline">Voir le palier {i + 1} dans le planificateur →</a>
+  </section>
+))}
+{flex > 0 && (
+  <p>
+    Le plan niveau 50 dépense {final.pointsUsed} des {MAX_POINTS} points. Il reste donc <strong>{flex} points libres</strong> pour du confort
+    (Double saut, Estomac à dessert, les nœuds de récolte) ou pour un second style d'arme. Chaque nœud d'attribut donne +1 plat.
+  </p>
+)}
+
+<h2 id="equipement">{h.gear}</h2>
+<p>
+  Les objets ci-dessous viennent des pages du <a href="https://enshrouded.wiki.gg/" rel="noopener">Enshrouded Wiki</a> mises à jour pour la 1.0.
+  Les bonus de set des nouveaux ensembles niveau 45 ne sont pas encore documentés : vérifiez-les en jeu avant d'y mettre vos matériaux.
+</p>
+{([["Armes", b.gear.weapons], ["Armure et main gauche", b.gear.armor], [b.gear.extrasLabel, b.gear.extras]] as const).map(([label, list]) =>
+  list.length > 0 && (
+    <>
+      <h3>{label}</h3>
+      <div class="grid sm:grid-cols-2 gap-3 not-prose">
+        {list.map((g) => (
+          <div class="panel p-4">
+            <p class="font-display text-parchment">{g.name}</p>
+            <p class="text-xs text-flame tracking-wide uppercase mt-0.5">{g.kind}</p>
+            <p class="text-sm text-ash mt-2 leading-snug">{g.facts}</p>
+            <a href={g.wiki} rel="noopener" class="text-xs text-mist hover:text-flame mt-2 inline-block">Source wiki ↗</a>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+)}
+
+<h2 id="nourriture">{h.food}</h2>
+<p>
+  Vous commencez avec 3 emplacements de nourriture et un seul aliment de chaque type peut être actif. La compétence Survivant « Estomac à dessert » ajoute un 4<sup>e</sup> emplacement. {b.foodNote}
+</p>
+<div class="panel overflow-x-auto not-prose">
+  <table class="table-game">
+    <thead><tr><th>Aliment</th><th>Buff</th></tr></thead>
+    <tbody>{b.food.map((f) => <tr><td class="whitespace-nowrap text-parchment">{f.name}</td><td>{f.effect}</td></tr>)}</tbody>
+  </table>
+</div>
+<p class="text-sm text-mist">
+  Ces valeurs viennent des tables du wiki, modifiées pour la dernière fois avant la 1.0 : elles ont pu être rééquilibrées. Les aliments ajoutés en 1.0
+  n'ont pas encore de buff documenté, donc on ne les met pas dans le tableau.
+</p>

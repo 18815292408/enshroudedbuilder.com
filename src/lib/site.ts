@@ -19,6 +19,17 @@ export const NAV = [
   { href: "/enshrouded-1-0-changes/", label: "1.0 Changes" },
 ];
 
+/**
+ * French navigation. These are separate pages written for French search intent, not
+ * translations of the English ones: the queries, the examples and the FAQ follow what
+ * French players actually type ("arbre de compétences", "build archer", "respec").
+ */
+export const NAV_FR = [
+  { href: "/fr/builds/", label: "Builds" },
+  { href: "/fr/arbre-de-competences/", label: "Arbre de compétences" },
+  { href: "/builder/", label: "Planificateur" },
+];
+
 /** Official and community sources cited across the site. */
 export const SOURCES = {
   changelog: { label: "Keen Games – 1.0 release changelog (Steam, Oct 14 2026)", url: "https://store.steampowered.com/news/app/1203620" },

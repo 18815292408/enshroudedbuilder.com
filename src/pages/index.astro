@@ -31,7 +31,7 @@ const jsonLd = [
 ];
 const embers = Array.from({ length: 18 }, (_, i) => ({ left: (i * 53) % 100, delay: (i * 0.7) % 9, dur: 7 + (i % 5) * 1.6 }));
 ---
-<Base title="Enshrouded 1.0 Builds – Best Class Tier List & Level 50 Guides" description="Best Enshrouded 1.0 builds for every class: level 50 skill orders from real game data, gear, food, a tier list and a free skill tree planner." jsonLd={jsonLd} ads={false}>
+<Base title="Enshrouded 1.0 Builds – Best Class Tier List & Level 50 Guides" description="Best Enshrouded 1.0 builds for every class: level 50 skill orders from real game data, gear, food, a tier list and a free skill tree planner." jsonLd={jsonLd} ads={false} altPath="/fr/">
   <section class="relative min-h-[34rem] md:min-h-[40rem] flex items-end overflow-hidden">
     <picture>
       <source media="(min-width: 800px)" srcset="/img/hero-1920.webp" />
@@ -123,6 +123,7 @@ const embers = Array.from({ length: 18 }, (_, i) => ({ left: (i * 53) % 100, del
     <p>The Battlemage, Summoner, Tank and Healer are rated <em>Easy</em>: forgiving and strong without perfect timing. The Wizard, Ranger and Warrior are <em>Medium</em>, and they reward good positioning, aim or attack timing. The Assassin is <em>Hard</em>: it has the biggest opener in the game (Sneak Attack deals +900% damage) but little armor.</p>
     <h3>4. Plan your points before you spend them</h3>
     <p>1.0 reset everyone's tree, and a fully explored level 50 character has {MAX_POINTS} points. That is roughly a third of the 675 points the whole tree would cost. Every guide links to the <a href="/builder/">skill tree planner</a> with the build already loaded, so you can see where the points go and change any skill before you commit.</p>
+    <p>Reading in French? The <a href="/fr/">French build guides</a> cover mage, warrior and archer with the same verified point orders, plus a walkthrough of where the {MAX_POINTS} points come from.</p>
     <h2 id="faq">Enshrouded 1.0 builds FAQ</h2>
     {homeFaq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
   </section>

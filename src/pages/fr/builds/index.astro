@@ -1,0 +1,128 @@
+---
+import Base from "../../../layouts/Base.astro";
+import AdSlot from "../../../components/AdSlot.astro";
+import { BUILDS, type Build } from "../../../data/builds";
+import { SITE } from "../../../lib/site";
+import { MAX_POINTS } from "../../../lib/tree";
+
+/** French build library. Links the three French guides first, then the English fiches. */
+const FR_PAGES: { slug: string; href: string; label: string; covers: string; note: string }[] = [
+  {
+    slug: "mage",
+    href: "/fr/builds/mage/",
+    label: "Build mage",
+    covers: "Battlemage, Wizard, Summoner",
+    note: "Baguette ou bâton, mana, dégâts élémentaires. Le guide explique d'abord quelle variante de mage vous voulez.",
+  },
+  {
+    slug: "guerrier",
+    href: "/fr/builds/guerrier/",
+    label: "Build guerrier",
+    covers: "Two-Handed Warrior, Tank",
+    note: "Arme à deux mains, rage de sang, et quand basculer vers le tank. Épée ou marteau : le guide tranche.",
+  },
+  {
+    slug: "archer",
+    href: "/fr/builds/archer/",
+    label: "Build archer",
+    covers: "Ranger, Assassin",
+    note: "Arc, tirs sur points faibles, flèches éternelles. Le guide explique aussi pourquoi la dague reste en secours.",
+  },
+];
+const FR_SLUGS = new Set(["battlemage", "wizard", "summoner", "warrior", "tank", "ranger", "assassin"]);
+const englishOnly = BUILDS.filter((b) => !FR_SLUGS.has(b.slug));
+const DIFF_FR: Record<string, string> = { Easy: "Facile", Medium: "Moyen", Hard: "Difficile" };
+const frHrefFor = (b: Build) =>
+  ["battlemage", "wizard", "summoner"].includes(b.slug) ? "/fr/builds/mage/"
+  : ["warrior", "tank"].includes(b.slug) ? "/fr/builds/guerrier/"
+  : ["ranger", "assassin"].includes(b.slug) ? "/fr/builds/archer/"
+  : `/builds/${b.slug}/`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Builds Enshrouded 1.0 en français",
+  url: `${SITE.url}/fr/builds/`,
+  inLanguage: "fr",
+  hasPart: FR_PAGES.map((p) => ({ "@type": "Article", headline: p.label, url: `${SITE.url}${p.href}` })),
+};
+---
+<Base
+  lang="fr"
+  altPath="/builds/"
+  title="Builds Enshrouded 1.0 : mage, guerrier, archer et tank"
+  description="Les builds Enshrouded 1.0 en français : mage, guerrier et archer, avec l'ordre exact des points et l'équipement niveau 50."
+  jsonLd={jsonLd}
+  ads={false}
+>
+  <section class="wrap pt-14">
+    <nav aria-label="Fil d'Ariane" class="text-sm text-mist mb-5"><a href="/fr/" class="hover:text-flame no-underline">Accueil</a> <span aria-hidden="true">/</span> <span class="text-ash">Builds</span></nav>
+    <p class="eyebrow mb-2">Bibliothèque de builds</p>
+    <h1 class="text-4xl md:text-5xl">Builds Enshrouded 1.0</h1>
+    <p class="text-ash mt-4 max-w-3xl text-lg">
+      Trois guides écrits en français — mage, guerrier, archer — qui couvrent sept des huit builds de la 1.0, plus les fiches anglaises pour le reste.
+      Chaque guide contient l'ordre exact des points, l'équipement et un lien qui ouvre le build dans le planificateur.
+    </p>
+  </section>
+
+  <section class="wrap mt-10 grid md:grid-cols-3 gap-5">
+    {FR_PAGES.map((p) => (
+      <a href={p.href} class="panel panel-ornate p-6 no-underline flex flex-col hover:border-flame/50 transition-colors">
+        <p class="eyebrow !text-spirit mb-2">En français</p>
+        <h2 class="font-display text-xl text-parchment">{p.label}</h2>
+        <p class="text-xs uppercase tracking-wider text-flame mt-1">{p.covers}</p>
+        <p class="text-ash text-sm mt-3 flex-1">{p.note}</p>
+        <span class="font-display text-xs tracking-[0.18em] uppercase text-flame mt-4">Lire le guide →</span>
+      </a>
+    ))}
+  </section>
+
+  <AdSlot />
+
+  <section class="wrap mt-14">
+    <h2 class="text-2xl mb-3">Les huit builds de la 1.0</h2>
+    <p class="text-ash max-w-3xl mb-5">
+      {MAX_POINTS} points au niveau 50 pour tout le monde, quelle que soit la classe. Le tier est notre avis ; la difficulté décrit la tolérance aux erreurs.
+    </p>
+    <div class="panel overflow-x-auto not-prose">
+      <table class="table-game min-w-[46rem]">
+        <thead><tr><th>Build</th><th>Tier</th><th>Difficulté</th><th>Modes</th><th>Armes</th><th>Attributs</th></tr></thead>
+        <tbody>
+          {BUILDS.map((b) => (
+            <tr>
+              <td><a href={frHrefFor(b)} class="text-parchment hover:text-flame">{b.name}</a></td>
+              <td>{b.tier}</td>
+              <td>{DIFF_FR[b.difficulty]}</td>
+              <td>{b.modes.join(" · ")}</td>
+              <td>{b.weapons}</td>
+              <td>{b.stats}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    {englishOnly.length > 0 && (
+      <p class="text-sm text-mist mt-3">
+        Fiches encore en anglais : {englishOnly.map((b, i) => (<>{i > 0 && ", "}<a href={`/builds/${b.slug}/`} class="underline hover:text-flame">{b.name}</a></>))}.
+      </p>
+    )}
+  </section>
+
+  <section class="wrap mt-14">
+    <h2 class="text-2xl mb-3">Par où commencer</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="panel p-5">
+        <p class="eyebrow !text-flame mb-2">Si vous débutez</p>
+        <p class="text-ash">Commencez par le <a href="/fr/builds/mage/" class="text-flame no-underline hover:underline">mage de bataille</a> : il bloque, il pare et il ne dépend d'aucune réserve de sorts. C'est le build qui pardonne le plus d'erreurs dans les premiers biomes.</p>
+      </div>
+      <div class="panel p-5">
+        <p class="eyebrow !text-flame mb-2">Si vous jouez à plusieurs</p>
+        <p class="text-ash">Le <a href="/fr/builds/guerrier/" class="text-flame no-underline hover:underline">tank</a> et le soigneur prennent toute leur valeur en coop. Le soigneur n'a pas encore sa page en français : sa fiche anglaise est <a href="/builds/healer/" class="text-flame no-underline hover:underline">ici</a>.</p>
+      </div>
+    </div>
+    <p class="text-ash mt-5">
+      Avant de choisir, lisez <a href="/fr/arbre-de-competences/" class="text-flame no-underline hover:underline">l'arbre de compétences</a> : il explique d'où viennent les {MAX_POINTS} points
+      et pourquoi un build qui n'en compte que 98 ne tient pas.
+    </p>
+  </section>
+</Base>

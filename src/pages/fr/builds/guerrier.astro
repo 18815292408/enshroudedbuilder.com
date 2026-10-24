@@ -1,0 +1,212 @@
+---
+import Base from "../../../layouts/Base.astro";
+import AdSlot from "../../../components/AdSlot.astro";
+import FrSkillOrder from "../../../components/FrSkillOrder.astro";
+import { buildBySlug } from "../../../data/builds";
+import { planBuild } from "../../../lib/plan";
+import { SITE, SOURCES } from "../../../lib/site";
+
+/**
+ * "Build guerrier" page. French players search "build guerrier", "build warrior" and
+ * "build guerrier tank"; the page separates the two-handed damage build from the tank
+ * before giving the point order.
+ */
+const b = buildBySlug("warrior");
+const tank = buildBySlug("tank");
+const finalCode = planBuild(b).at(-1)!.code;
+
+const faq = [
+  {
+    q: "Quelle arme à deux mains choisir en 1.0 ?",
+    a: "Ça dépend des nœuds que vous prenez. Barbarian's Path monte les haches, masses et marteaux à deux mains jusqu'à +15 %, Titan Edge monte les épées à deux mains jusqu'à +15 %. Brute ajoute des dégâts contondants et Slasher des dégâts tranchants : alignez le nœud sur l'arme que vous avez réellement en main, sinon vous payez des points pour rien.",
+  },
+  {
+    q: "Guerrier ou barbare dans Enshrouded ?",
+    a: "Dans l'arbre, Warrior est la zone à une main et parade, Barbarian la zone à deux mains. Les joueurs disent « guerrier » pour tout build de corps à corps. Le build de cette page est le Guerrier à deux mains, celui que la plupart des gens appellent barbare.",
+  },
+  {
+    q: "Le build guerrier est-il viable en solo ?",
+    a: "Oui, mais il demande de connaître les fenêtres d'attaque des ennemis. Ses coups sont lents et coûtent beaucoup d'endurance ; en échange, Blood Rage transforme chaque kill en bonus de dégâts cumulé. C'est un build qui s'améliore à mesure que vous enchaînez les combats.",
+  },
+  {
+    q: "Guerrier ou tank ?",
+    a: "Le guerrier à deux mains fait les dégâts, le tank encaisse et contrôle. En coop, le tank est plus utile au groupe ; en solo, le guerrier avance plus vite. Les deux partagent une bonne partie de l'arbre guerrier, donc changer de l'un à l'autre coûte moins cher qu'on ne le croit.",
+  },
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Build guerrier Enshrouded 1.0 : arme à deux mains et variante tank",
+    description: "Build guerrier Enshrouded 1.0 en français : arme à deux mains, rage de sang, ordre exact des points niveau 1 à 50, équipement et nourriture.",
+    inLanguage: "fr",
+    image: `${SITE.url}/img/warrior-960.webp`,
+    datePublished: "2026-10-24",
+    dateModified: SITE.lastVerified,
+    author: { "@type": "Organization", name: SITE.name, url: SITE.url, publishingPrinciples: `${SITE.url}/about/` },
+    publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    mainEntityOfPage: `${SITE.url}/fr/builds/guerrier/`,
+    about: { "@type": "VideoGame", name: "Enshrouded" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${SITE.url}/fr/` },
+      { "@type": "ListItem", position: 2, name: "Builds", item: `${SITE.url}/fr/builds/` },
+      { "@type": "ListItem", position: 3, name: "Build guerrier", item: `${SITE.url}/fr/builds/guerrier/` },
+    ],
+  },
+];
+---
+<Base
+  lang="fr"
+  title="Build guerrier Enshrouded 1.0 : deux mains et tank"
+  description="Build guerrier Enshrouded 1.0 en français : arme à deux mains, rage de sang, ordre exact des points niveau 1 à 50, équipement et nourriture."
+  type="article"
+  image="/img/warrior-960.webp"
+  jsonLd={jsonLd}
+  ads={false}
+>
+  <section class="relative overflow-hidden border-b border-flame/15">
+    <img src="/img/warrior-960.webp" srcset="/img/warrior-480.webp 480w, /img/warrior-960.webp 960w" sizes="100vw" alt="" width="960" height="640" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-right opacity-80" />
+    <div class="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-night/0"></div>
+    <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-night to-transparent"></div>
+    <div class="wrap relative py-14 md:py-20">
+      <nav aria-label="Fil d'Ariane" class="text-sm text-mist mb-5"><a href="/fr/" class="hover:text-flame no-underline">Accueil</a> <span aria-hidden="true">/</span> <a href="/fr/builds/" class="hover:text-flame no-underline">Builds</a> <span aria-hidden="true">/</span> <span class="text-ash">Guerrier</span></nav>
+      <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${b.tier}`} title="Tier éditorial">{b.tier}</span><span class="eyebrow">Enshrouded 1.0 · niveau 50</span></div>
+      <h1 class="text-3xl md:text-5xl font-bold text-parchment max-w-3xl">Build guerrier Enshrouded 1.0 <span class="text-flame block text-2xl md:text-3xl mt-2">arme à deux mains, rage de sang, variante tank</span></h1>
+      <p class="mt-4 text-lg text-ash max-w-2xl">
+        Le guerrier à deux mains est le build qui frappe le plus fort de la 1.0, à condition de choisir la bonne arme et de comprendre Blood Rage.
+        Cette page donne l'ordre exact des points et explique aussi quand basculer vers le tank.
+      </p>
+      <dl class="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl text-sm">
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Difficulté</dt><dd class="text-parchment mt-1">Moyen</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Modes</dt><dd class="text-parchment mt-1">{b.modes.join(" · ")}</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Armes</dt><dd class="text-parchment mt-1">Épée, hache, masse à deux mains</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Attributs</dt><dd class="text-parchment mt-1">Force, puis Constitution</dd></div>
+      </dl>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a class="btn btn-flame" href={`/builder/?b=${finalCode}&g=warrior`}>Ouvrir le build dans le planificateur</a>
+        <a class="btn btn-ghost" href="#ordre">Ordre des points</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-10">
+    <article class="prose-game min-w-0">
+      <div class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
+        <p class="eyebrow !text-flame mb-3">Ce que cette page vous donne</p>
+        <ul class="space-y-2 text-ash">
+          <li class="flex gap-2"><span class="text-spirit">→</span><span>Le choix entre épée à deux mains et marteau, avec les nœuds qui vont avec — pas juste « prenez le plus gros chiffre ».</span></li>
+          <li class="flex gap-2"><span class="text-spirit">→</span><span>L'ordre des points niveau par niveau, contrôlé contre le budget réel : au niveau 50 le personnage dispose de 212 points, pas 98.</span></li>
+          <li class="flex gap-2"><span class="text-ember">→</span><span>Pas de promesse de « meilleur build » : les dégâts viennent des données du jeu, le classement est un avis.</span></li>
+        </ul>
+      </div>
+
+      <h2 id="deux">Guerrier à deux mains ou tank ?</h2>
+      <p>
+        Les deux builds partagent l'arbre guerrier, mais ils ne jouent pas le même jeu. Le guerrier à deux mains cherche à tuer vite ; le tank cherche à tenir et à punir.
+        En solo, le premier avance plus vite ; en coop, le second rend le groupe entier plus solide.
+      </p>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game min-w-[40rem]">
+          <thead><tr><th>Build</th><th>Tier</th><th>Rôle</th><th>Difficulté</th><th>Pour qui</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="text-parchment">Guerrier à deux mains</td><td>{b.tier}</td><td>Dégâts de mêlée</td><td>Moyen</td>
+              <td>Ceux qui veulent les plus gros coups du jeu et acceptent des animations lentes.</td>
+            </tr>
+            <tr>
+              <td class="text-parchment">Tank</td><td>{tank.tier}</td><td>Encaisse, bloque, contrôle</td><td>Facile</td>
+              <td>Le coop, et les joueurs qui préfèrent survivre à tout plutôt que frapper fort.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-mist">La fiche complète du tank est en anglais : <a href="/builds/tank/" class="underline hover:text-flame">Tank build</a>.</p>
+
+      <h2 id="arme">Épée à deux mains ou marteau ?</h2>
+      <p>
+        C'est la question qui décide de la moitié de votre arbre. Trois nœuds se répondent : <strong>Barbarian's Path</strong> monte les haches, masses et marteaux à deux mains
+        jusqu'à +15 %, <strong>Titan Edge</strong> monte les épées à deux mains jusqu'à +15 %, et <strong>Brute</strong> ajoute des dégâts contondants quand <strong>Slasher</strong>
+        ajoute des dégâts tranchants. Prendre Titan Edge avec un marteau, c'est payer 3 à 5 points pour un bonus qui ne s'applique jamais.
+      </p>
+      <p>
+        En pratique : l'épée à deux mains pour le tranchant et la vitesse d'enchaînement, le marteau pour le contondant et les ennemis blindés. Le plan ci-dessous prend les deux nœuds
+        de dégâts d'arme parce qu'il est écrit pour une épée, et laisse la place de basculer si vous trouvez un marteau légendaire avant.
+      </p>
+
+      <h2 id="jouer">Comment le jouer</h2>
+      <ul>
+        <li><strong>Blood Rage</strong> : chaque kill de mêlée à moins de 15 mètres donne +15 % de dégâts de mêlée pendant 10 secondes. Commencez toujours par les ennemis faibles pour arriver sur le gros avec le bonus actif.</li>
+        <li><strong>Whirlwind Crescendo</strong> ajoute une attaque tournoyante à la fin d'un enchaînement à deux mains — mais elle coûte 75 d'endurance à chaque déclenchement.</li>
+        <li><strong>Steadfast</strong> répare votre arme à chaque kill, et <strong>Battle Heal</strong> vous soigne sur les coups critiques de mêlée : ce sont vos deux sources de survie, pas les potions.</li>
+        <li>Les armes à deux mains peuvent parer. Sur un ennemi <em>Overpowered</em>, <strong>Breach</strong> ajoute +100 % de dégâts physiques de mêlée : c'est votre fenêtre de burst.</li>
+      </ul>
+
+      <AdSlot />
+
+      <FrSkillOrder build={b} headings={{ core: "Compétences clés du guerrier", order: "Ordre des points, niveau 1 à 50", gear: "Équipement et armes niveau 50", food: "Nourriture et buffs" }} />
+
+      <h2 id="forces">Points forts et faiblesses</h2>
+      <p class="text-sm text-mist">Avis éditorial, pas une donnée du jeu.</p>
+      <div class="grid md:grid-cols-2 gap-4 not-prose">
+        <div class="panel p-5"><p class="eyebrow !text-spirit mb-2">Points forts</p><ul class="space-y-2 text-ash">{b.pros.map((p) => <li class="flex gap-2"><span class="text-spirit">+</span>{p}</li>)}</ul></div>
+        <div class="panel p-5"><p class="eyebrow !text-ember mb-2">Faiblesses</p><ul class="space-y-2 text-ash">{b.cons.map((p) => <li class="flex gap-2"><span class="text-ember">−</span>{p}</li>)}</ul></div>
+      </div>
+
+      <section id="faq">
+        <h2>Questions fréquentes</h2>
+        <div class="faq-list">
+          {faq.map((f) => (
+            <div class="faq-item">
+              <h3 class="faq-q text-lg text-parchment mt-6">{f.q}</h3>
+              <p class="faq-a text-ash">{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <h2 id="sources">Sources</h2>
+      <ul class="text-sm">
+        <li><a href={SOURCES.gameData.url} rel="noopener">{SOURCES.gameData.label}</a></li>
+        <li><a href={SOURCES.changelog.url} rel="noopener">{SOURCES.changelog.label}</a></li>
+        <li><a href={SOURCES.wiki.url} rel="noopener">{SOURCES.wiki.label}</a></li>
+      </ul>
+      <p class="text-sm text-mist">Données vérifiées le {SITE.lastVerified} sur Enshrouded {SITE.gameVersion}. Les points forts et faiblesses sont un avis éditorial.</p>
+    </article>
+
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 panel p-5">
+        <p class="eyebrow mb-3">Sur cette page</p>
+        <ul class="space-y-1.5 text-sm">
+          <li><a href="#deux" class="text-ash hover:text-flame no-underline">Guerrier ou tank</a></li>
+          <li><a href="#arme" class="text-ash hover:text-flame no-underline">Épée ou marteau</a></li>
+          <li><a href="#jouer" class="text-ash hover:text-flame no-underline">Comment le jouer</a></li>
+          <li><a href="#competences" class="text-ash hover:text-flame no-underline">Compétences clés</a></li>
+          <li><a href="#ordre" class="text-ash hover:text-flame no-underline">Ordre des points</a></li>
+          <li><a href="#equipement" class="text-ash hover:text-flame no-underline">Équipement</a></li>
+          <li><a href="#faq" class="text-ash hover:text-flame no-underline">Questions fréquentes</a></li>
+        </ul>
+        <hr class="divider my-4" />
+        <a class="btn btn-flame w-full justify-center mt-1 !text-xs" href="/fr/arbre-de-competences/">Comprendre l'arbre</a>
+      </div>
+    </aside>
+  </div>
+
+  <section class="wrap mt-14">
+    <h2 class="text-2xl mb-4">Autres builds en français</h2>
+    <div class="grid sm:grid-cols-3 gap-4">
+      <a href="/fr/builds/mage/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build mage</p><p class="text-sm text-ash mt-1">Mage de bataille, sorcier ou invocateur.</p></a>
+      <a href="/fr/builds/archer/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build archer</p><p class="text-sm text-ash mt-1">Arc, tirs critiques, flèches éternelles.</p></a>
+      <a href="/fr/builds/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Tous les builds</p><p class="text-sm text-ash mt-1">Les huit builds de la 1.0, avec tier et difficulté.</p></a>
+    </div>
+  </section>
+</Base>

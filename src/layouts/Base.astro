@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import { SITE, DISCLAIMER, NAV } from "../lib/site";
+import { SITE, DISCLAIMER, NAV, NAV_FR } from "../lib/site";
 import AdSlot from "../components/AdSlot.astro";
 
 interface Props {
@@ -12,21 +12,33 @@ interface Props {
   noindex?: boolean;
   /** false when the page places its own slot (or should carry none, like 404). */
   ads?: boolean;
+  /** "fr" switches document language, navigation, footer and consent copy. */
+  lang?: "en" | "fr";
+  /** The other-language version of this page, for the header switcher and hreflang. */
+  altPath?: string;
 }
-const { title, description, image = "/img/og-default.jpg", type = "website", jsonLd, noindex = false, ads = true } = Astro.props;
+const { title, description, image = "/img/og-default.jpg", type = "website", jsonLd, noindex = false, ads = true, lang = "en", altPath } = Astro.props;
+const fr = lang === "fr";
+const nav = fr ? NAV_FR : NAV;
+const home = fr ? "/fr/" : "/";
+const switchHref = fr ? altPath ?? "/" : altPath ?? "/fr/";
+const switchLabel = fr ? "EN" : "FR";
+const switchTitle = fr ? "Read the English version" : "Lire la version française";
 const canonical = new URL(Astro.url.pathname, SITE.url).href;
 const ogImage = new URL(image, SITE.url).href;
 const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 const path = Astro.url.pathname;
 ---
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {altPath && <link rel="alternate" hreflang={fr ? "en" : "fr"} href={new URL(altPath, SITE.url).href} />}
+    {altPath && <link rel="alternate" hreflang={lang} href={canonical} />}
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#0c0a10" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -59,19 +71,20 @@ const path = Astro.url.pathname;
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 btn btn-flame">Skip to content</a>
     <header class="sticky top-0 z-40 border-b border-flame/15 bg-night/85 backdrop-blur-md">
       <div class="wrap flex items-center justify-between gap-4 h-16">
-        <a href="/" class="flex items-center gap-2.5 no-underline group">
+        <a href={home} class="flex items-center gap-2.5 no-underline group">
           <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#e0661e"/></linearGradient></defs><path d="M16 2c2 6 8 8 8 16a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 5 3 5-1-5 1-9 1-13z" fill="url(#fl)"/><path d="M16 30a4 4 0 0 1-4-4c0-3 4-5 4-8 0 3 4 5 4 8a4 4 0 0 1-4 4z" fill="#fff3d6" opacity=".85"/></svg>
           <span class="font-display font-bold text-[1.05rem] tracking-wide text-parchment group-hover:text-flame transition-colors">Enshrouded<span class="text-flame">Builder</span></span>
         </a>
-        <nav aria-label="Main" class="hidden md:flex items-center gap-1">
-          {NAV.map((n) => (
+        <nav aria-label={fr ? "Navigation principale" : "Main"} class="hidden md:flex items-center gap-1">
+          {nav.map((n) => (
             <a href={n.href} class:list={["px-3 py-2 rounded font-display text-[0.82rem] tracking-[0.12em] uppercase no-underline transition-colors", path.startsWith(n.href) ? "text-flame" : "text-ash hover:text-parchment"]}>{n.label}</a>
           ))}
         </nav>
+        <a href={switchHref} hreflang={fr ? "en" : "fr"} lang={fr ? "en" : "fr"} title={switchTitle} aria-label={switchTitle} class="btn btn-ghost !py-2 !px-3 !text-xs font-display tracking-wider">{switchLabel}</a>
         <details class="md:hidden relative">
-          <summary class="list-none cursor-pointer btn btn-ghost !py-2 !px-3" aria-label="Open menu">Menu</summary>
+          <summary class="list-none cursor-pointer btn btn-ghost !py-2 !px-3" aria-label={fr ? "Ouvrir le menu" : "Open menu"}>{fr ? "Menu" : "Menu"}</summary>
           <div class="absolute right-0 mt-2 w-56 panel p-2 flex flex-col">
-            {NAV.map((n) => <a href={n.href} class="px-3 py-2.5 rounded no-underline text-parchment hover:bg-night-3 font-display text-sm tracking-wider uppercase">{n.label}</a>)}
+            {nav.map((n) => <a href={n.href} class="px-3 py-2.5 rounded no-underline text-parchment hover:bg-night-3 font-display text-sm tracking-wider uppercase">{n.label}</a>)}
           </div>
         </details>
       </div>
@@ -88,34 +101,59 @@ const path = Astro.url.pathname;
           <p class="text-mist leading-relaxed">{DISCLAIMER}</p>
         </div>
         <div>
-          <p class="eyebrow mb-3">Guides</p>
+          <p class="eyebrow mb-3">{fr ? "Guides en français" : "Guides"}</p>
           <ul class="space-y-1.5 text-ash">
-            <li><a class="hover:text-flame no-underline" href="/builds/">All 1.0 builds</a></li>
-            <li><a class="hover:text-flame no-underline" href="/builder/">Skill tree planner</a></li>
-            <li><a class="hover:text-flame no-underline" href="/skills/">1.0 skills list</a></li>
-            <li><a class="hover:text-flame no-underline" href="/enshrouded-1-0-changes/">What changed in 1.0</a></li>
+            {fr ? (
+              <>
+                <li><a class="hover:text-flame no-underline" href="/fr/">Builds Enshrouded 1.0</a></li>
+                <li><a class="hover:text-flame no-underline" href="/fr/builds/">Tous les builds par classe</a></li>
+                <li><a class="hover:text-flame no-underline" href="/fr/arbre-de-competences/">Arbre de compétences</a></li>
+                <li><a class="hover:text-flame no-underline" href="/builder/">Planificateur de builds</a></li>
+              </>
+            ) : (
+              <>
+                <li><a class="hover:text-flame no-underline" href="/builds/">All 1.0 builds</a></li>
+                <li><a class="hover:text-flame no-underline" href="/builder/">Skill tree planner</a></li>
+                <li><a class="hover:text-flame no-underline" href="/skills/">1.0 skills list</a></li>
+                <li><a class="hover:text-flame no-underline" href="/fr/">Guides en français</a></li>
+              </>
+            )}
           </ul>
         </div>
         <div>
-          <p class="eyebrow mb-3">Site</p>
+          <p class="eyebrow mb-3">{fr ? "Site" : "Site"}</p>
           <ul class="space-y-1.5 text-ash">
-            <li><a class="hover:text-flame no-underline" href="/about/">About &amp; sources</a></li>
-            <li><a class="hover:text-flame no-underline" href="/privacy/">Privacy</a></li>
-            <li><button type="button" data-consent-open class="hover:text-flame cursor-pointer">Analytics settings</button></li>
+            <li><a class="hover:text-flame no-underline" href="/about/">{fr ? "À propos et sources" : "About & sources"}</a></li>
+            <li><a class="hover:text-flame no-underline" href="/privacy/">{fr ? "Confidentialité" : "Privacy"}</a></li>
+            <li><button type="button" data-consent-open class="hover:text-flame cursor-pointer">{fr ? "Paramètres de mesure d'audience" : "Analytics settings"}</button></li>
             <li><a class="hover:text-flame no-underline" href="/contact/">Contact</a></li>
           </ul>
         </div>
       </div>
       <div class="wrap pb-8 text-xs text-mist">
-        Game data last verified {SITE.lastVerified} against Enshrouded {SITE.gameVersion}. Item and food details adapted from the <a class="underline hover:text-flame" href="https://enshrouded.wiki.gg/" rel="noopener">Enshrouded Wiki</a> (CC BY-SA 4.0).
+        {fr ? (
+          <>
+            Données de jeu vérifiées le {SITE.lastVerified} sur Enshrouded {SITE.gameVersion}. Équipements et nourriture repris du{" "}
+            <a class="underline hover:text-flame" href="https://enshrouded.wiki.gg/" rel="noopener">Enshrouded Wiki</a> (CC BY-SA 4.0).
+          </>
+        ) : (
+          <>
+            Game data last verified {SITE.lastVerified} against Enshrouded {SITE.gameVersion}. Item and food details adapted from the{" "}
+            <a class="underline hover:text-flame" href="https://enshrouded.wiki.gg/" rel="noopener">Enshrouded Wiki</a> (CC BY-SA 4.0).
+          </>
+        )}
       </div>
     </footer>
-    <div id="consent" role="dialog" aria-live="polite" aria-label="Analytics consent" hidden class="fixed inset-x-3 bottom-3 z-50 sm:left-auto sm:right-4 sm:bottom-4 sm:max-w-sm panel panel-ornate p-4 text-sm">
-      <p class="text-parchment">We use Google Analytics and Microsoft Clarity for anonymous, aggregated statistics, and our ad partner to show ads that pay for the site. Nothing loads until you allow it.</p>
-      <p class="mt-1 text-mist"><a href="/privacy/" class="underline hover:text-flame">Privacy policy</a></p>
+    <div id="consent" role="dialog" aria-live="polite" aria-label={fr ? "Consentement à la mesure d'audience" : "Analytics consent"} hidden class="fixed inset-x-3 bottom-3 z-50 sm:left-auto sm:right-4 sm:bottom-4 sm:max-w-sm panel panel-ornate p-4 text-sm">
+      <p class="text-parchment">
+        {fr
+          ? "Nous utilisons Google Analytics et Microsoft Clarity pour des statistiques anonymes et agrégées, ainsi que notre partenaire publicitaire pour financer le site. Rien ne se charge avant votre accord."
+          : "We use Google Analytics and Microsoft Clarity for anonymous, aggregated statistics, and our ad partner to show ads that pay for the site. Nothing loads until you allow it."}
+      </p>
+      <p class="mt-1 text-mist"><a href="/privacy/" class="underline hover:text-flame">{fr ? "Politique de confidentialité" : "Privacy policy"}</a></p>
       <div class="mt-3 flex gap-2">
-        <button type="button" data-consent="granted" class="btn btn-flame !py-2 !px-3 !text-xs">Allow analytics</button>
-        <button type="button" data-consent="denied" class="btn btn-ghost !py-2 !px-3 !text-xs">Decline</button>
+        <button type="button" data-consent="granted" class="btn btn-flame !py-2 !px-3 !text-xs">{fr ? "Autoriser" : "Allow analytics"}</button>
+        <button type="button" data-consent="denied" class="btn btn-ghost !py-2 !px-3 !text-xs">{fr ? "Refuser" : "Decline"}</button>
       </div>
     </div>
     <script is:inline define:vars={{ clarityId: SITE.clarityId }}>

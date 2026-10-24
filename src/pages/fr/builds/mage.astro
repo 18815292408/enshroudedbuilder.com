@@ -1,0 +1,215 @@
+---
+import Base from "../../../layouts/Base.astro";
+import AdSlot from "../../../components/AdSlot.astro";
+import FrSkillOrder from "../../../components/FrSkillOrder.astro";
+import { buildBySlug } from "../../../data/builds";
+import { planBuild } from "../../../lib/plan";
+import { SITE, SOURCES } from "../../../lib/site";
+
+/**
+ * "Build mage" page. French players search "build mage", "build sorcier" and "build
+ * magicien" interchangeably; the page explains which of the three caster builds each
+ * term actually means before giving the point order.
+ */
+const b = buildBySlug("battlemage");
+const finalCode = planBuild(b).at(-1)!.code;
+
+const faq = [
+  {
+    q: "Quel est le meilleur build mage en Enshrouded 1.0 ?",
+    a: "Pour commencer, le Mage de bataille (baguette + ward) : il bloque, il pare, il régénère sa mana et il ne dépend pas des charges de sorts. Le Sorcier au bâton fait plus de dégâts de zone mais reste fragile, et l'Invocateur est le plus simple en solo parce que ses invocations prennent l'aggro.",
+  },
+  {
+    q: "Quelle est la différence entre mage, sorcier et magicien dans Enshrouded ?",
+    a: "Le jeu ne connaît pas ces mots : l'arbre s'appelle Wizard, Battlemage, Healer et Trickster. Les joueurs francophones disent « sorcier » ou « magicien » pour le Wizard au bâton, et « mage de bataille » pour le Battlemage à la baguette. Ce sont deux builds différents, pas deux traductions du même.",
+  },
+  {
+    q: "Baguette ou bâton pour un mage ?",
+    a: "La baguette comme arme principale, le bâton pour les pics de dégâts. La compétence Blast and Cast donne +50 % de dégâts de base au prochain sort de bâton pendant 10 secondes après un coup critique à la baguette : c'est là que se joue le burst du build.",
+  },
+  {
+    q: "Faut-il des charges de sorts pour jouer mage ?",
+    a: "Pas avec la baguette : ses attaques ne consomment aucune charge. Et en 1.0, chaque sort possède une version Éternelle qui coûte de la mana au lieu de charges, donc un mage niveau 50 peut jouer sans jamais crafter de charges.",
+  },
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Build mage Enshrouded 1.0 : mage de bataille, sorcier ou invocateur",
+    description: "Build mage Enshrouded 1.0 en français : quelle variante choisir, ordre exact des points niveau 1 à 50, équipement et nourriture.",
+    inLanguage: "fr",
+    image: `${SITE.url}/img/battlemage-960.webp`,
+    datePublished: "2026-10-24",
+    dateModified: SITE.lastVerified,
+    author: { "@type": "Organization", name: SITE.name, url: SITE.url, publishingPrinciples: `${SITE.url}/about/` },
+    publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    mainEntityOfPage: `${SITE.url}/fr/builds/mage/`,
+    about: { "@type": "VideoGame", name: "Enshrouded" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${SITE.url}/fr/` },
+      { "@type": "ListItem", position: 2, name: "Builds", item: `${SITE.url}/fr/builds/` },
+      { "@type": "ListItem", position: 3, name: "Build mage", item: `${SITE.url}/fr/builds/mage/` },
+    ],
+  },
+];
+---
+<Base
+  lang="fr"
+  title="Build mage Enshrouded 1.0 : sorcier ou mage de bataille ?"
+  description="Build mage Enshrouded 1.0 en français : mage de bataille, sorcier ou invocateur, ordre exact des points niveau 1 à 50, équipement et nourriture."
+  type="article"
+  image="/img/battlemage-960.webp"
+  jsonLd={jsonLd}
+  ads={false}
+>
+  <section class="relative overflow-hidden border-b border-flame/15">
+    <img src="/img/battlemage-960.webp" srcset="/img/battlemage-480.webp 480w, /img/battlemage-960.webp 960w" sizes="100vw" alt="" width="960" height="640" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-right opacity-80" />
+    <div class="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-night/0"></div>
+    <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-night to-transparent"></div>
+    <div class="wrap relative py-14 md:py-20">
+      <nav aria-label="Fil d'Ariane" class="text-sm text-mist mb-5"><a href="/fr/" class="hover:text-flame no-underline">Accueil</a> <span aria-hidden="true">/</span> <a href="/fr/builds/" class="hover:text-flame no-underline">Builds</a> <span aria-hidden="true">/</span> <span class="text-ash">Mage</span></nav>
+      <div class="flex items-center gap-3 mb-4"><span class={`tier tier-${b.tier}`} title="Tier éditorial">{b.tier}</span><span class="eyebrow">Enshrouded 1.0 · niveau 50</span></div>
+      <h1 class="text-3xl md:text-5xl font-bold text-parchment max-w-3xl">Build mage Enshrouded 1.0 <span class="text-flame block text-2xl md:text-3xl mt-2">mage de bataille, sorcier ou invocateur ?</span></h1>
+      <p class="mt-4 text-lg text-ash max-w-2xl">
+        « Build mage » recouvre trois builds différents en 1.0, et le mauvais choix se paie au niveau 30. Cette page explique lequel prendre selon votre façon de jouer,
+        puis donne l'ordre exact des points du Mage de bataille, celui qui pardonne le plus d'erreurs.
+      </p>
+      <dl class="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl text-sm">
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Difficulté</dt><dd class="text-parchment mt-1">Facile</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Modes</dt><dd class="text-parchment mt-1">{b.modes.join(" · ")}</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Armes</dt><dd class="text-parchment mt-1">Baguette + ward, bâton en second</dd></div>
+        <div class="panel px-4 py-3"><dt class="eyebrow !text-[0.66rem]">Attributs</dt><dd class="text-parchment mt-1">Intelligence, puis Esprit</dd></div>
+      </dl>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a class="btn btn-flame" href={`/builder/?b=${finalCode}&g=battlemage`}>Ouvrir le build dans le planificateur</a>
+        <a class="btn btn-ghost" href="#ordre">Ordre des points</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-10">
+    <article class="prose-game min-w-0">
+      <div class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
+        <p class="eyebrow !text-flame mb-3">Ce que cette page vous donne</p>
+        <ul class="space-y-2 text-ash">
+          <li class="flex gap-2"><span class="text-spirit">→</span><span>La différence réelle entre les trois builds de mage, pour ne pas investir 30 points dans celui qui ne vous convient pas.</span></li>
+          <li class="flex gap-2"><span class="text-spirit">→</span><span>L'ordre des points niveau par niveau, recalculé sur les données du jeu 1.0 et contrôlé contre le budget de points à chaque palier.</span></li>
+          <li class="flex gap-2"><span class="text-ember">→</span><span>Pas de « meilleur build » sorti de nulle part : le tier est un avis, les chiffres viennent du jeu.</span></li>
+        </ul>
+      </div>
+
+      <h2 id="trois">Trois façons de jouer un mage en 1.0</h2>
+      <p>
+        Le jeu n'a pas de classe « mage » : il a une branche Wizard, une branche Battlemage, une branche Healer et une branche Trickster, et c'est leur combinaison qui définit le build.
+        En pratique, trois configurations reviennent chez les joueurs francophones.
+      </p>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game min-w-[42rem]">
+          <thead><tr><th>Build</th><th>Arme</th><th>Portée</th><th>Difficulté</th><th>Pour qui</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="text-parchment">Mage de bataille</td><td>Baguette + ward</td><td>Mi-distance</td><td>Facile</td>
+              <td>Le choix par défaut en solo. Il bloque et pare comme un corps à corps tout en faisant des dégâts magiques, et ses attaques de baguette ne coûtent aucune charge.</td>
+            </tr>
+            <tr>
+              <td class="text-parchment">Sorcier (Wizard)</td><td>Bâton</td><td>Longue</td><td>Moyen</td>
+              <td>Si vous voulez du dégât de zone et des sorts élémentaires. Plus fragile : le bâton occupe les deux mains, donc pas de blocage.</td>
+            </tr>
+            <tr>
+              <td class="text-parchment">Invocateur (Summoner)</td><td>Bâton</td><td>Longue</td><td>Facile</td>
+              <td>Le plus tranquille en solo : les invocations prennent l'aggro à votre place. Moins de contrôle direct sur le combat.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-mist">Les fiches complètes du Sorcier et de l'Invocateur sont en anglais : <a href="/builds/wizard/" class="underline hover:text-flame">Wizard</a>, <a href="/builds/summoner/" class="underline hover:text-flame">Summoner</a>.</p>
+
+      <h2 id="pourquoi">Pourquoi le mage de bataille est le bon point de départ</h2>
+      <p>
+        La 1.0 a été une mise à jour de mages : les baguettes ont reçu une attaque lourde qui traverse les ennemis, et deux compétences actives ont été ajoutées —
+        Wand Evasion Attack, qui lance un disque perforant quand vous esquivez, et Aerial Wand Attack, qui transforme un saut en attaque de zone.
+        Résultat : un build à la baguette fait des dégâts en permanence, sans jamais dépendre d'une réserve de charges.
+      </p>
+      <p>
+        Le second avantage est défensif. Avec un ward en main gauche, vous parez et vous bloquez, et Arcane Deflection vous rend de la mana à chaque parade réussie.
+        C'est la seule configuration magique qui ne meurt pas dès qu'un ennemi arrive au contact — ce qui compte beaucoup quand on joue seul.
+      </p>
+
+      <h2 id="jouer">Comment le jouer</h2>
+      <ul>
+        <li>Ouvrez avec les attaques légères de baguette pour monter le Focus, puis passez à l'attaque lourde pour traverser une ligne d'ennemis.</li>
+        <li>Esquivez <em>à travers</em> les attaques plutôt que de reculer : chaque esquive devient une attaque grâce à Wand Evasion Attack.</li>
+        <li>Parez avec le ward. Chaque parade réussie rend de la mana, ce qui alimente les sorts du bâton.</li>
+        <li>Après un coup critique à la baguette, passez au bâton dans les 10 secondes : Blast and Cast ajoute 50 % aux dégâts de base du sort.</li>
+      </ul>
+
+      <AdSlot />
+
+      <FrSkillOrder build={b} headings={{ core: "Compétences clés du mage de bataille", order: "Ordre des points, niveau 1 à 50", gear: "Équipement et armes niveau 50", food: "Nourriture et buffs" }} />
+
+      <h2 id="forces">Points forts et faiblesses</h2>
+      <p class="text-sm text-mist">Avis éditorial, pas une donnée du jeu.</p>
+      <div class="grid md:grid-cols-2 gap-4 not-prose">
+        <div class="panel p-5"><p class="eyebrow !text-spirit mb-2">Points forts</p><ul class="space-y-2 text-ash">{b.pros.map((p) => <li class="flex gap-2"><span class="text-spirit">+</span>{p}</li>)}</ul></div>
+        <div class="panel p-5"><p class="eyebrow !text-ember mb-2">Faiblesses</p><ul class="space-y-2 text-ash">{b.cons.map((p) => <li class="flex gap-2"><span class="text-ember">−</span>{p}</li>)}</ul></div>
+      </div>
+
+      <section id="faq">
+        <h2>Questions fréquentes</h2>
+        <div class="faq-list">
+          {faq.map((f) => (
+            <div class="faq-item">
+              <h3 class="faq-q text-lg text-parchment mt-6">{f.q}</h3>
+              <p class="faq-a text-ash">{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <h2 id="sources">Sources</h2>
+      <ul class="text-sm">
+        <li><a href={SOURCES.gameData.url} rel="noopener">{SOURCES.gameData.label}</a></li>
+        <li><a href={SOURCES.changelog.url} rel="noopener">{SOURCES.changelog.label}</a></li>
+        <li><a href={SOURCES.wiki.url} rel="noopener">{SOURCES.wiki.label}</a></li>
+      </ul>
+      <p class="text-sm text-mist">Données vérifiées le {SITE.lastVerified} sur Enshrouded {SITE.gameVersion}. Les points forts et faiblesses sont un avis éditorial.</p>
+    </article>
+
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 panel p-5">
+        <p class="eyebrow mb-3">Sur cette page</p>
+        <ul class="space-y-1.5 text-sm">
+          <li><a href="#trois" class="text-ash hover:text-flame no-underline">Trois builds de mage</a></li>
+          <li><a href="#pourquoi" class="text-ash hover:text-flame no-underline">Pourquoi commencer ici</a></li>
+          <li><a href="#jouer" class="text-ash hover:text-flame no-underline">Comment le jouer</a></li>
+          <li><a href="#competences" class="text-ash hover:text-flame no-underline">Compétences clés</a></li>
+          <li><a href="#ordre" class="text-ash hover:text-flame no-underline">Ordre des points</a></li>
+          <li><a href="#equipement" class="text-ash hover:text-flame no-underline">Équipement</a></li>
+          <li><a href="#faq" class="text-ash hover:text-flame no-underline">Questions fréquentes</a></li>
+        </ul>
+        <hr class="divider my-4" />
+        <a class="btn btn-flame w-full justify-center mt-1 !text-xs" href="/fr/arbre-de-competences/">Comprendre l'arbre</a>
+      </div>
+    </aside>
+  </div>
+
+  <section class="wrap mt-14">
+    <h2 class="text-2xl mb-4">Autres builds en français</h2>
+    <div class="grid sm:grid-cols-3 gap-4">
+      <a href="/fr/builds/guerrier/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build guerrier</p><p class="text-sm text-ash mt-1">Deux mains, rage de sang, variante tank.</p></a>
+      <a href="/fr/builds/archer/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build archer</p><p class="text-sm text-ash mt-1">Arc, tirs critiques, flèches éternelles.</p></a>
+      <a href="/fr/builds/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Tous les builds</p><p class="text-sm text-ash mt-1">Les huit builds de la 1.0, avec tier et difficulté.</p></a>
+    </div>
+  </section>
+</Base>

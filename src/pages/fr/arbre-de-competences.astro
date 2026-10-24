@@ -1,0 +1,257 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { BUILDS } from "../../data/builds";
+import { SITE, SOURCES } from "../../lib/site";
+import { BIOMES, MAX_POINTS, REGION_LABEL, TREE, levelPoints, pointsAtLevel } from "../../lib/tree";
+
+/**
+ * French skill-tree page. Targets "arbre de compétence enshrouded", "point de compétence"
+ * and "reset compétence" — queries French players type, which currently return mostly
+ * machine-translated guides. Every number here is computed from the 1.0 export.
+ */
+const nodesPerRegion: Record<string, number> = {};
+for (const n of Object.values(TREE.nodes)) nodesPerRegion[n.r] = (nodesPerRegion[n.r] ?? 0) + 1;
+const buildsByRegion: Record<string, string[]> = {};
+for (const b of BUILDS) for (const r of b.regions) (buildsByRegion[r] ??= []).push(b.name);
+
+const TREE_FR: Record<string, string> = { mage: "Mage", warrior: "Guerrier", ranger: "Rôdeur" };
+const branches = Object.keys(TREE.regions)
+  .sort((a, b) => TREE_FR[TREE.regions[a]].localeCompare(TREE_FR[TREE.regions[b]]) || a.localeCompare(b))
+  .map((r) => ({ id: r, label: REGION_LABEL[r], tree: TREE_FR[TREE.regions[r]], nodes: nodesPerRegion[r] ?? 0, builds: buildsByRegion[r] ?? [] }));
+
+const nodeTotal = Object.keys(TREE.nodes).length;
+const typeTotal = Object.keys(TREE.types).length;
+const biomeTotal = BIOMES.reduce((a, b) => a + b.points, 0);
+const levelTotal = MAX_POINTS - biomeTotal;
+const atLevels = [10, 20, 30, 40, 50].map((l) => ({ l, p: pointsAtLevel(l) }));
+
+const faq = [
+  {
+    q: "Combien de compétences compte l'arbre d'Enshrouded 1.0 ?",
+    a: `L'export des données 1.0 (build ${TREE.source.gameBuild}) contient ${typeTotal} compétences et nœuds d'attribut distincts, placés sur ${nodeTotal} nœuds répartis en treize branches et trois arbres : mage, guerrier et rôdeur.`,
+  },
+  {
+    q: "Combien de points de compétence au niveau 50 ?",
+    a: `${MAX_POINTS} au total : ${levelTotal} points de niveau (2 par niveau à partir du niveau 2) et ${biomeTotal} points ramassés dans le monde — 1 par Racine du Voile, 3 par Puits d'élixir.`,
+  },
+  {
+    q: "Faut-il choisir une classe ?",
+    a: "Non. Enshrouded n'a pas de classe au sens strict : n'importe quel personnage peut prendre n'importe quel nœud, à condition que les nœuds soient reliés entre eux. Les « classes » sont des branches de l'arbre, pas un choix verrouillé au départ.",
+  },
+  {
+    q: "Que se passe-t-il pour mes points quand je passe en 1.0 ?",
+    a: "Keen Games réinitialise l'arbre la première fois que vous chargez une sauvegarde existante en 1.0 (changelog officiel). Vous récupérez donc tous vos points et devez les redistribuer une fois.",
+  },
+  {
+    q: "Peut-on annuler un mauvais choix de points ?",
+    a: "Le planificateur de cette page sert exactement à ça : tester une répartition avant de dépenser, sans toucher à votre personnage. Pour un changement en cours de partie, nous ne donnons pas de prix ni de méthode de respec, faute de source vérifiée sur la 1.0 — voir la section plus bas.",
+  },
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Arbre de compétences Enshrouded 1.0 : branches, points et ordre de départ",
+    description: `Arbre de compétences Enshrouded 1.0 expliqué en français : ${nodeTotal} nœuds, 3 arbres, ${MAX_POINTS} points, d'où ils viennent et par où commencer.`,
+    inLanguage: "fr",
+    image: `${SITE.url}/img/og-default.jpg`,
+    datePublished: "2026-10-24",
+    dateModified: SITE.lastVerified,
+    author: { "@type": "Organization", name: SITE.name, url: SITE.url, publishingPrinciples: `${SITE.url}/about/` },
+    publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    mainEntityOfPage: `${SITE.url}/fr/arbre-de-competences/`,
+    about: { "@type": "VideoGame", name: "Enshrouded" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${SITE.url}/fr/` },
+      { "@type": "ListItem", position: 2, name: "Arbre de compétences", item: `${SITE.url}/fr/arbre-de-competences/` },
+    ],
+  },
+];
+---
+<Base
+  lang="fr"
+  title="Arbre de compétences Enshrouded 1.0 : 212 points et branches"
+  description="L'arbre de compétences Enshrouded 1.0 en français : 231 nœuds, 3 arbres, 212 points au niveau 50, d'où viennent les points et par où commencer."
+  type="article"
+  jsonLd={jsonLd}
+  ads={false}
+>
+  <section class="wrap pt-14">
+    <nav aria-label="Fil d'Ariane" class="text-sm text-mist mb-5"><a href="/fr/" class="hover:text-flame no-underline">Accueil</a> <span aria-hidden="true">/</span> <span class="text-ash">Arbre de compétences</span></nav>
+    <p class="eyebrow mb-2">Enshrouded 1.0 · build {TREE.source.gameBuild}</p>
+    <h1 class="text-4xl md:text-5xl max-w-3xl">L'arbre de compétences d'Enshrouded 1.0</h1>
+    <p class="text-ash mt-4 max-w-3xl text-lg">
+      Treize branches, trois arbres, {nodeTotal} nœuds et {MAX_POINTS} points à répartir au niveau 50. Cette page explique comment l'arbre est construit,
+      d'où viennent les points et par où commencer — puis vous renvoie vers le planificateur pour tester votre répartition.
+    </p>
+
+    <div class="panel panel-ornate p-5 md:p-6 mt-8 max-w-3xl not-prose">
+      <p class="eyebrow !text-flame mb-3">Ce que cette page vous donne</p>
+      <ul class="space-y-2 text-ash">
+        <li class="flex gap-2"><span class="text-spirit">→</span><span>La structure réelle de l'arbre 1.0, comptée sur les données du jeu : {typeTotal} compétences, {nodeTotal} nœuds, et le nombre de nœuds par branche.</span></li>
+        <li class="flex gap-2"><span class="text-spirit">→</span><span>Le calcul exact des {MAX_POINTS} points, biome par biome, pour savoir si votre répartition est seulement possible à votre niveau.</span></li>
+        <li class="flex gap-2"><span class="text-ember">→</span><span>Pas de prix de respec ni de méthode inventée : on dit clairement ce qui est vérifié et ce qui ne l'est pas.</span></li>
+      </ul>
+    </div>
+
+    <div class="mt-7 flex flex-wrap gap-3">
+      <a class="btn btn-flame" href="/builder/">Ouvrir le planificateur</a>
+      <a class="btn btn-ghost" href="/fr/">Voir les builds</a>
+    </div>
+  </section>
+
+  <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-12">
+    <article class="prose-game min-w-0">
+      <h2 id="structure">Trois arbres, treize branches</h2>
+      <p>
+        L'arbre n'est pas une liste de classes : c'est un graphe. Chaque nœud doit être relié au précédent pour être débloqué, et le noyau central (<strong>Core</strong>, {nodesPerRegion["core"] ?? 0} nœuds)
+        est accessible à tous. Les douze autres branches se répartissent en trois arbres — mage, guerrier, rôdeur — mais rien ne vous empêche de piocher dans deux arbres,
+        c'est même ce que font la plupart des builds de cette page (le Mage de bataille prend des nœuds de Trickster et de Healer).
+      </p>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game min-w-[40rem]">
+          <thead><tr><th>Branche</th><th>Arbre</th><th>Nœuds</th><th>Utilisée par</th></tr></thead>
+          <tbody>
+            {branches.map((b) => (
+              <tr>
+                <td class="text-parchment whitespace-nowrap">{b.label}</td>
+                <td class="text-ash">{b.tree}</td>
+                <td>{b.nodes}</td>
+                <td class="text-ash text-sm">{b.builds.length ? b.builds.join(", ") : "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-mist">Les noms de branches sont ceux de l'arbre en jeu (client anglais) : c'est ce que vous voyez dans le planificateur.</p>
+
+      <h2 id="points">D'où viennent les {MAX_POINTS} points</h2>
+      <p>
+        Le budget complet est plus large que les seuls points de niveau. {levelTotal} points viennent des niveaux, mais il faut y ajouter les Racines du Voile
+        et les Puits d'élixir : un build niveau 50 calculé sur les seuls points de niveau ne tient pas debout. Voici le budget réel.
+      </p>
+      <div class="grid sm:grid-cols-2 gap-4 not-prose my-5">
+        <div class="panel p-5">
+          <p class="eyebrow !text-flame mb-2">Points de niveau</p>
+          <p class="text-3xl font-display text-parchment">{levelTotal}</p>
+          <p class="text-sm text-ash mt-1">2 points par niveau, du niveau 2 au niveau 50 ({levelPoints(50)} points), soit {levelTotal} en tout.</p>
+        </div>
+        <div class="panel p-5">
+          <p class="eyebrow !text-spirit mb-2">Points du monde</p>
+          <p class="text-3xl font-display text-parchment">{biomeTotal}</p>
+          <p class="text-sm text-ash mt-1">Racines du Voile (1 point) et Puits d'élixir (3 points) dans les sept biomes.</p>
+        </div>
+      </div>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game">
+          <thead><tr><th>Biome</th><th>Points</th><th>Cumul</th></tr></thead>
+          <tbody>
+            {(() => { let acc = 0; return BIOMES.map((b) => { acc += b.points; return (<tr><td class="text-parchment">{b.name}</td><td>{b.points}</td><td class="text-ash">{acc}</td></tr>); }); })()}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        En pratique, votre budget à un niveau donné dépend donc des biomes que vous avez terminés. C'est pour ça que le planificateur vous laisse cocher les biomes :
+        il recalcule les points disponibles au lieu de supposer que vous avez tout ramassé.
+      </p>
+      <div class="panel overflow-x-auto not-prose">
+        <table class="table-game">
+          <thead><tr><th>Niveau</th><th>Points disponibles si tous les biomes jusqu'à ce niveau sont faits</th></tr></thead>
+          <tbody>{atLevels.map((x) => <tr><td class="text-parchment">Niveau {x.l}</td><td>{x.p}</td></tr>)}</tbody>
+        </table>
+      </div>
+
+      <AdSlot />
+
+      <h2 id="commencer">Par où commencer</h2>
+      <p>
+        Les trois premiers points doivent aller dans la compétence qui définit votre dégât, pas dans le confort. Deux points par niveau, c'est peu : un nœud à 3 points
+        pris au niveau 5 vous coûte une compétence de palier supérieur au niveau 10.
+      </p>
+      <ul>
+        <li>Décidez d'abord votre <strong>arme principale</strong> (baguette, bâton, arc, arme à deux mains, dague) : c'est elle qui détermine la branche à ouvrir en premier.</li>
+        <li>Prenez ensuite le <strong>nœud d'attribut</strong> correspondant (Intelligence, Dextérité, Force, Esprit) : chaque point d'attribut donne un bonus de dégâts direct sur votre arme.</li>
+        <li>Gardez le <strong>Double saut</strong> et les nœuds de déplacement pour plus tard : ils changent le confort d'exploration, pas votre capacité à tuer.</li>
+        <li>Ne diluez pas. Un personnage qui prend 4 points dans trois arbres différents n'a aucune compétence de fin de branche, et ce sont elles qui font la différence au niveau 30.</li>
+      </ul>
+
+      <h2 id="respec">Changer de build : ce qu'on sait et ce qu'on ne dit pas</h2>
+      <p>
+        Une chose est certaine et documentée : en 1.0, l'arbre est <strong>réinitialisé une seule fois</strong> la première fois que vous chargez une sauvegarde existante
+        (changelog Keen Games du 14 octobre 2026). Vous récupérez tous vos points et les redistribuez.
+      </p>
+      <p>
+        Pour un changement de build en cours de partie, nous ne publions ni prix ni méthode : les sources publiques ne s'accordent pas sur le coût d'un respec en 1.0,
+        et nous préférons ne rien affirmer plutôt que de vous envoyer dépenser des matériaux au hasard. Ce que nous pouvons faire, c'est vous éviter d'en avoir besoin :
+        testez la répartition dans le planificateur avant de valider, et gardez vos points de côté jusqu'au niveau 20, où les branches réellement utiles se dessinent.
+      </p>
+
+      <h2 id="planificateur">Comment lire le planificateur</h2>
+      <p>
+        Le planificateur est en anglais, mais il n'y a que quatre choses à comprendre : la liste des compétences à gauche, le budget de points en haut,
+        le sélecteur de niveau et le bouton de partage. Chaque page de build de ce site vous donne un lien qui ouvre directement le build au niveau 50,
+        avec les points déjà placés — vous n'avez rien à reproduire à la main.
+      </p>
+      <p>
+        <a href="/builder/" class="btn btn-flame !text-xs">Ouvrir le planificateur</a>
+      </p>
+
+      <section id="faq">
+        <h2>Questions fréquentes</h2>
+        <div class="faq-list">
+          {faq.map((f) => (
+            <div class="faq-item">
+              <h3 class="faq-q text-lg text-parchment mt-6">{f.q}</h3>
+              <p class="faq-a text-ash">{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <h2 id="sources">Sources</h2>
+      <ul class="text-sm">
+        <li><a href={SOURCES.gameData.url} rel="noopener">{SOURCES.gameData.label}</a></li>
+        <li><a href={SOURCES.changelog.url} rel="noopener">{SOURCES.changelog.label}</a></li>
+        <li><a href={SOURCES.wiki.url} rel="noopener">{SOURCES.wiki.label}</a></li>
+      </ul>
+      <p class="text-sm text-mist">Données vérifiées le {SITE.lastVerified} sur Enshrouded {SITE.gameVersion}.</p>
+    </article>
+
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 panel p-5">
+        <p class="eyebrow mb-3">Sur cette page</p>
+        <ul class="space-y-1.5 text-sm">
+          <li><a href="#structure" class="text-ash hover:text-flame no-underline">Trois arbres, treize branches</a></li>
+          <li><a href="#points" class="text-ash hover:text-flame no-underline">D'où viennent les points</a></li>
+          <li><a href="#commencer" class="text-ash hover:text-flame no-underline">Par où commencer</a></li>
+          <li><a href="#respec" class="text-ash hover:text-flame no-underline">Changer de build</a></li>
+          <li><a href="#planificateur" class="text-ash hover:text-flame no-underline">Lire le planificateur</a></li>
+          <li><a href="#faq" class="text-ash hover:text-flame no-underline">Questions fréquentes</a></li>
+        </ul>
+        <hr class="divider my-4" />
+        <p class="text-xs text-mist">{nodeTotal} nœuds · {MAX_POINTS} points · 3 arbres</p>
+        <a class="btn btn-flame w-full justify-center mt-4 !text-xs" href="/builder/">Ouvrir le planificateur</a>
+      </div>
+    </aside>
+  </div>
+
+  <section class="wrap mt-14">
+    <h2 class="text-2xl mb-4">Passer de l'arbre au build</h2>
+    <div class="grid sm:grid-cols-3 gap-4">
+      <a href="/fr/builds/mage/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build mage</p><p class="text-sm text-ash mt-1">Bâton ou baguette, dégâts élémentaires et mana.</p></a>
+      <a href="/fr/builds/guerrier/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build guerrier</p><p class="text-sm text-ash mt-1">Deux mains, rage de sang, tank en variante.</p></a>
+      <a href="/fr/builds/archer/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build archer</p><p class="text-sm text-ash mt-1">Arc, tirs critiques et flèches éternelles.</p></a>
+    </div>
+  </section>
+</Base>
