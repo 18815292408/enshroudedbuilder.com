@@ -121,6 +121,7 @@ const path = Astro.url.pathname;
             <li><a class="hover:text-flame no-underline" href="/about/">{fr ? "À propos et sources" : "About & sources"}</a></li>
             <li><a class="hover:text-flame no-underline" href="/privacy/">{fr ? "Confidentialité" : "Privacy"}</a></li>
             <li><button type="button" data-consent-open class="hover:text-flame cursor-pointer">{fr ? "Paramètres de mesure d'audience" : "Analytics settings"}</button></li>
+            <li><a class="hover:text-flame no-underline" href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
             <li><a class="hover:text-flame no-underline" href="/contact/">Contact</a></li>
           </ul>
         </div>

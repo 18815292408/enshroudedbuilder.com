@@ -1,12 +1,18 @@
 ---
 import Base from "../layouts/Base.astro";
 import { SITE } from "../lib/site";
+const email = "contact@enshroudedbuilder.com";
 ---
 <Base title="Contact – Enshrouded Builder" description="Report a build error, suggest a build or get in touch with EnshroudedBuilder.com.">
   <article class="wrap pt-14 prose-game max-w-3xl">
     <h1 class="text-4xl">Contact</h1>
-    <p>Found a number that changed in a patch, a broken link or a bug in the planner? Want a build added? Open an issue on our public GitHub repository. It is the fastest way to reach us, and every report is tracked.</p>
+    <p>Found a number that changed in a patch, a broken link or a bug in the planner? Want a build added? Write to us at <a href={`mailto:${email}`}>{email}</a>. Every message is read.</p>
+    <h2>Reporting a build error</h2>
+    <p>Tell us the game version you play on and which number looks wrong. A screenshot of the in-game skill tooltip helps a lot.</p>
+    <h2>Bugs and feature requests</h2>
+    <p>The planner is open source. If you prefer a public thread, or you want to follow the fix, open an issue on the GitHub repository: it is tracked from report to release.</p>
     <p><a class="btn btn-flame no-underline !text-[#22130a]" href={`${SITE.repo}/issues/new`} rel="noopener">Open an issue on GitHub</a></p>
-    <p>When you report a build error, tell us the game version you play on and which number looks wrong. A screenshot of the in-game skill tooltip helps a lot.</p>
+    <h2>Press and corrections</h2>
+    <p>Media enquiries and correction requests go to the same address, <a href={`mailto:${email}`}>{email}</a>. We answer within a few days.</p>
   </article>
 </Base>
