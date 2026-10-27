@@ -1,6 +1,7 @@
 # 游戏更新 → 新内页 监控方案（未实施）
 
-状态：**计划**，2026-10-24 定稿，暂不实施。实施前需先确认文末「待决策」两项。
+状态：**已实施（2026-10-26）**。执行规则以根目录 `HERMES.md` 为准，本文只保留当初的设计思路。
+实施要点：Hermes 任务 `b0a60cb2c4c7`（早 11 / 晚 11，监控脚本无变化不唤醒模型）；新页门禁 `scripts/hermes-page-gate.py` + `hermes/config.json`（审核期每 14 天最多 1 个工具页/版本页）；AdSense 状态用 `scripts/hermes-adsense.py` 切换。与本文的差异：不用 cadence 脚本（monitor 模式已免去空跑成本）；量级来源暂只用「联想词 + SERP ≥3 个专门页面」两道信号。
 
 目标：Enshrouded 每次官方更新后，自动发现变更、判断有没有值得做的搜索词、按站点数据模型生成内页，并经过门禁发布。
 参照对象是同一台 Mac mini 上的 `loadoutvault.com`（`HERMES.md` + `scripts/hermes-publish.sh` + `scripts/hermes-cadence.py` + Hermes cron 任务 `cd7592e96d2e`）。
