@@ -8,6 +8,7 @@ cd "$(dirname "$0")/.."
 export PATH="$HOME/.local/node26/bin:$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 MSG="${1:-Hermes: game update}"
 SITE=https://enshroudedbuilder.com
+PNPM="npx -y pnpm@11.7.0"  # the mini's corepack pnpm is broken; pin the version this repo locks with
 ALLOWED='^(src/data/|src/pages/|vendor/enshrouded-skill-tree/|drafts/|HERMES-LOG\.md$|src/lib/site\.ts$)'
 
 retry() { # retry <tries> <cmd...> with 15s, 30s, 60s backoff
@@ -37,8 +38,8 @@ if [ -n "$BAD" ]; then
 fi
 
 # 2. Build + site gate + new-page gate.
-[ -d node_modules ] || retry 3 pnpm install --frozen-lockfile >/dev/null 2>&1
-if ! pnpm run build > /tmp/enshroudedbuilder-build.log 2>&1; then
+[ -d node_modules ] || retry 3 $PNPM install --frozen-lockfile >/dev/null 2>&1
+if ! $PNPM run build > /tmp/enshroudedbuilder-build.log 2>&1; then
   echo "PUBLISH BLOCKED: build failed (edits kept for fixing)"; tail -25 /tmp/enshroudedbuilder-build.log; exit 3
 fi
 if ! npx tsx scripts/check-builds.mts > /tmp/enshroudedbuilder-check.log 2>&1; then
@@ -80,7 +81,7 @@ done
 if [ -n "$BADLIVE" ]; then
   echo "LIVE CHECK FAILED:$BADLIVE — reverting this commit and redeploying the previous version"
   rm -f .hermes-pending-pages.json
-  git revert --no-edit HEAD -q && pnpm run build > /tmp/enshroudedbuilder-build.log 2>&1 && retry 3 deploy && echo "ROLLED BACK" || echo "ROLLBACK FAILED"
+  git revert --no-edit HEAD -q && $PNPM run build > /tmp/enshroudedbuilder-build.log 2>&1 && retry 3 deploy && echo "ROLLED BACK" || echo "ROLLBACK FAILED"
   retry 3 sh -c 'git pull -q --rebase && git push -q' || true
   exit 6
 fi
