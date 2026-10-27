@@ -37,7 +37,7 @@ if [ -n "$BAD" ]; then
   [ -z "$CHANGED" ] && { echo "PUBLISH: nothing left to publish"; exit 0; }
 fi
 
-# 2. Build + site gate + new-page gate.
+# 2. Build + site gate + new-page gate + guard on live pages (title/description/H1 stay, no drastic rewrites).
 [ -d node_modules ] || retry 3 $PNPM install --frozen-lockfile >/dev/null 2>&1
 if ! $PNPM run build > /tmp/enshroudedbuilder-build.log 2>&1; then
   echo "PUBLISH BLOCKED: build failed (edits kept for fixing)"; tail -25 /tmp/enshroudedbuilder-build.log; exit 3
@@ -49,6 +49,7 @@ if ! bash scripts/verify-site-build.sh > /tmp/enshroudedbuilder-verify.log 2>&1;
   echo "PUBLISH BLOCKED: site gate failed (edits kept for fixing)"; grep '^FAIL' /tmp/enshroudedbuilder-verify.log; exit 3
 fi
 if ! python3 scripts/hermes-page-gate.py check; then exit 3; fi
+if ! python3 scripts/hermes-tdh-guard.py "$SITE"; then exit 3; fi
 
 # 3. Commit + push (rebase on remote first, retry on network errors).
 git add -A -- src/data src/pages vendor/enshrouded-skill-tree drafts HERMES-LOG.md src/lib/site.ts 2>/dev/null

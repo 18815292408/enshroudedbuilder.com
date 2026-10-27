@@ -81,6 +81,14 @@
 - 不要改：`src/layouts/`、`src/components/`、`src/styles/`、`scripts/`、`public/`（尤其 `ads.txt`）、`hermes/`、配置文件。发布脚本会自动撤销。需要改的，写进日志「技术待办（交给 Claude）」。
 - `lastVerified` 是全站的「已核实日期」，所有 build 页的更新时间都读它。**只有真的对照新版本核实过数据才改**，不要为了刷新日期改。
 
+**改老页面要克制（防止排名和流量掉）**
+已经上线的页面在搜索里已有位置，改得太猛等于让搜索引擎重新认识它，流量可能掉。所以：
+- **不改 TDH**：老页面的 title、meta description、H1 一律不动。数据跟着变的数字（比如「All 178 Skills」变成 180）可以变，其他字一个都不改。
+- **不大改正文**：一次发布里，老页面原有文字至少保留 70%；超过 200 词的页面一次最多增长到原来的 1.6 倍。要补的内容多，就分几次运行慢慢加。
+- 优先「加一条、改一个数、补一句」：在原有小节里追加或更正，不要重写段落、调整小节顺序、改小节标题。
+- 不删页、不改网址。
+- 这些由 `scripts/hermes-tdh-guard.py` 在发布时强制检查。真觉得某个 TDH 必须改，写进日志「技术待办（交给 Claude）」，说明原因，不要自己改。
+
 **新页面的写法**
 - 文件放 `src/pages/<关键词-slug>.astro`，网址里带关键词（如 `/enshrouded-skill-points-calculator/`）。
 - 页面主体最外层元素加 `data-page-kind="tool"`（或 `"version"` / `"guide"`），发布门禁靠它判断类型；不写按 guide 算，最严。
@@ -102,7 +110,7 @@
 | `rejected`（被拒） | 0 | 不建新页，只改进现有页 |
 
 这些数字写在 `hermes/config.json`，由 `scripts/hermes-page-gate.py` 在发布时强制执行，你改不了也不要尝试绕过。额外规矩：
-- 改现有页面不限次数，但一次运行只做一个主题的改动，不要顺手大面积改写老页面。
+- 改现有页面不限次数，但一次运行只做一个主题的改动，并遵守第五节「改老页面要克制」。
 - 不删页、不改网址（门禁会拦）。内容过时就改内容。
 - 页面里不加任何广告代码、不加其他广告联盟（站内门禁 `verify-site-build.sh` 会拦）。
 - 不建「新闻快讯」式短页（比如「Steam Deck 认证了」）、不按关键词批量套模板、不建只换了一个词的近似页。
@@ -113,7 +121,7 @@
 ## 七、发布
 
 `scripts/hermes-publish.sh "Hermes: <一句英文说明>"`
-它会依次：撤销越界改动 → 构建 → 点数预算检查 → 站内门禁 → 新页门禁 → 提交推送 → `wrangler pages deploy` → 检查首页和新页线上 200 → 记录新页日期。
+它会依次：撤销越界改动 → 构建 → 点数预算检查 → 站内门禁 → 新页门禁 → 老页面保护（TDH 和正文改动幅度）→ 提交推送 → `wrangler pages deploy` → 检查首页和新页线上 200 → 记录新页日期。
 - 输出 `PUBLISHED ... live=200` 就是成功。
 - 注意：本站 `git push` **不会**自动部署，只有这个脚本里的 wrangler 才会上线。不要自己跳过脚本发布。
 
@@ -123,6 +131,9 @@
 |---|---|
 | `PAGE GATE BLOCKED: new-page quota` 或 `kind ... is not allowed` | 把新页文件移到 `drafts/`（保留，不参与构建），其余改动再跑一次发布。日志「新页候选」写上草稿路径和最早可发日期。下次额度恢复时移回 `src/pages/` 再发。 |
 | `PAGE GATE BLOCKED: thin page` / `orphan page` / `title` / `description` | 补有来源的内容 / 从相关老页加链接 / 改长改短，再发。最多 3 轮，还不行移到 `drafts/`。 |
+| `TDH GUARD BLOCKED: ... title / meta description / H1 changed` | 把老页面的 title、description、H1 改回原样（输出里有线上原文），再发。确实要改的写进「技术待办（交给 Claude）」。 |
+| `TDH GUARD BLOCKED: drastic rewrite` / `drastic growth` | 恢复被删改的原文，只保留这次真正需要的增改；内容多就拆到下次运行。 |
+| `TDH GUARD BLOCKED: cannot read ...` | 网络问题，下次再发，改动留着。 |
 | `PAGE GATE BLOCKED: live URLs would disappear` | 你删了或改名了某个页面，恢复它（`git checkout -- <文件>`）。 |
 | `PAGE GATE BLOCKED: cannot read the live sitemap` | 网络问题，下次再发，改动留着。 |
 | `PUBLISH BLOCKED: build failed` / `point budgets failed` / `site gate failed` | 读输出修；修不了 `git checkout -- src/ vendor/` 撤销、日志写原因。最多 3 轮。 |
