@@ -6,8 +6,13 @@ import type { Build } from "../data/builds";
 import { planBuild } from "../lib/plan";
 import { skill, MAX_POINTS, QOL_SKILLS } from "../lib/tree";
 
-interface Props { build: Build; headings?: { core?: string; order?: string; gear?: string; food?: string } }
-const { build: b, headings = {} } = Astro.props;
+interface Props {
+  build: Build;
+  headings?: { core?: string; order?: string; gear?: string; food?: string };
+  /** Rendered in the same slot the English template uses for its "Other builds" strip. */
+  otherBuilds?: { href: string; label: string }[];
+}
+const { build: b, headings = {}, otherBuilds = [] } = Astro.props;
 const stages = planBuild(b);
 const final = stages[stages.length - 1];
 const flex = MAX_POINTS - final.pointsUsed;
@@ -96,6 +101,13 @@ const h = {
   Les trois coûtent <strong>{qolCost} points</strong>, ce qui laisse {flex - qolCost} points pour un second style d'arme, les nœuds de récolte ou des points
   d'attribut (+1 plat chacun). Vous pouvez les ajouter dans le <a href={`/builder/?b=${final.code}&g=${b.slug}`}>planificateur</a> et partager le lien obtenu.
 </p>
+
+{otherBuilds.length > 0 && (
+  <nav aria-label="Autres builds" class="not-prose panel my-6 flex flex-wrap items-center gap-x-3 gap-y-1 p-4 text-sm">
+    <span class="eyebrow !text-[0.66rem]">Autres builds 1.0</span>
+    {otherBuilds.map((o) => <a href={o.href} class="text-flame no-underline hover:underline">{o.label}</a>)}
+  </nav>
+)}
 
 <h2 id="equipement">{h.gear}</h2>
 <p>

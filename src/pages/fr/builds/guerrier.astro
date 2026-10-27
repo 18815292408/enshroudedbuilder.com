@@ -1,8 +1,13 @@
 ---
 import Base from "../../../layouts/Base.astro";
+import BuildCard from "../../../components/BuildCard.astro";
 import FrSkillOrder from "../../../components/FrSkillOrder.astro";
+import JumpNav from "../../../components/JumpNav.astro";
+import TocAside from "../../../components/TocAside.astro";
+import VerifiedBadge from "../../../components/VerifiedBadge.astro";
 import { buildBySlug } from "../../../data/builds";
 import { planBuild } from "../../../lib/plan";
+import { REGION_LABEL } from "../../../lib/tree";
 import { SITE, SOURCES } from "../../../lib/site";
 
 /**
@@ -12,7 +17,21 @@ import { SITE, SOURCES } from "../../../lib/site";
  */
 const b = buildBySlug("warrior");
 const tank = buildBySlug("tank");
+const mage = buildBySlug("battlemage");
+const archer = buildBySlug("ranger");
 const finalCode = planBuild(b).at(-1)!.code;
+const toc: [string, string][] = [
+  ["deux", "Guerrier ou tank"],
+  ["arme", "Épée ou marteau"],
+  ["jouer", "Comment le jouer"],
+  ["competences", "Compétences clés"],
+  ["ordre", "Ordre des points"],
+  ["points-libres", "Points qui restent"],
+  ["equipement", "Équipement"],
+  ["nourriture", "Nourriture"],
+  ["forces", "Points forts et faiblesses"],
+  ["faq", "Questions fréquentes"],
+];
 
 const faq = [
   {
@@ -100,6 +119,9 @@ const jsonLd = [
 
   <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-10">
     <article class="prose-game min-w-0">
+      <JumpNav items={toc} label="Sur cette page" />
+      <VerifiedBadge lang="fr" />
+
       <div class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
         <p class="eyebrow !text-flame mb-3">Ce que cette page vous donne</p>
         <ul class="space-y-2 text-ash">
@@ -150,7 +172,16 @@ const jsonLd = [
         <li>Les armes à deux mains peuvent parer. Sur un ennemi <em>Overpowered</em>, <strong>Breach</strong> ajoute +100 % de dégâts physiques de mêlée : c'est votre fenêtre de burst.</li>
       </ul>
 
-      <FrSkillOrder build={b} headings={{ core: "Compétences clés du guerrier", order: "Ordre des points, niveau 1 à 50", gear: "Équipement et armes niveau 50", food: "Nourriture et buffs" }} />
+      <FrSkillOrder
+        build={b}
+        headings={{ core: "Compétences clés du guerrier", order: "Ordre des points, niveau 1 à 50", gear: "Équipement et armes niveau 50", food: "Nourriture et buffs" }}
+        otherBuilds={[
+          { href: "/fr/builds/mage/", label: "Mage" },
+          { href: "/fr/builds/archer/", label: "Archer" },
+          { href: "/fr/builds/", label: "Tous les builds" },
+          { href: "/fr/arbre-de-competences/", label: "Arbre de compétences" },
+        ]}
+      />
 
       <h2 id="forces">Points forts et faiblesses</h2>
       <p class="text-sm text-mist">Avis éditorial, pas une donnée du jeu.</p>
@@ -159,17 +190,8 @@ const jsonLd = [
         <div class="panel p-5"><p class="eyebrow !text-ember mb-2">Faiblesses</p><ul class="space-y-2 text-ash">{b.cons.map((p) => <li class="flex gap-2"><span class="text-ember">−</span>{p}</li>)}</ul></div>
       </div>
 
-      <section id="faq">
-        <h2>Questions fréquentes</h2>
-        <div class="faq-list">
-          {faq.map((f) => (
-            <div class="faq-item">
-              <h3 class="faq-q text-lg text-parchment mt-6">{f.q}</h3>
-              <p class="faq-a text-ash">{f.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <h2 id="faq">Questions fréquentes</h2>
+      {faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
 
       <h2 id="sources">Sources</h2>
       <ul class="text-sm">
@@ -180,31 +202,19 @@ const jsonLd = [
       <p class="text-sm text-mist">Données vérifiées le {SITE.lastVerified} sur Enshrouded {SITE.gameVersion}. Les points forts et faiblesses sont un avis éditorial.</p>
     </article>
 
-    <aside class="hidden lg:block">
-      <div class="sticky top-24 panel p-5">
-        <p class="eyebrow mb-3">Sur cette page</p>
-        <ul class="space-y-1.5 text-sm">
-          <li><a href="#deux" class="text-ash hover:text-flame no-underline">Guerrier ou tank</a></li>
-          <li><a href="#arme" class="text-ash hover:text-flame no-underline">Épée ou marteau</a></li>
-          <li><a href="#jouer" class="text-ash hover:text-flame no-underline">Comment le jouer</a></li>
-          <li><a href="#competences" class="text-ash hover:text-flame no-underline">Compétences clés</a></li>
-          <li><a href="#ordre" class="text-ash hover:text-flame no-underline">Ordre des points</a></li>
-          <li><a href="#points-libres" class="text-ash hover:text-flame no-underline">Points qui restent</a></li>
-          <li><a href="#equipement" class="text-ash hover:text-flame no-underline">Équipement</a></li>
-          <li><a href="#faq" class="text-ash hover:text-flame no-underline">Questions fréquentes</a></li>
-        </ul>
-        <hr class="divider my-4" />
-        <a class="btn btn-flame w-full justify-center mt-1 !text-xs" href="/fr/arbre-de-competences/">Comprendre l'arbre</a>
-      </div>
-    </aside>
+    <TocAside
+      items={toc}
+      label="Sur cette page"
+      note={`Régions principales : ${b.regions.map((r) => REGION_LABEL[r]).join(", ")}`}
+      cta={{ href: `/builder/?b=${finalCode}&g=${b.slug}`, label: "Ouvrir dans le planificateur" }}
+    />
   </div>
 
   <section class="wrap mt-14">
-    <h2 class="text-2xl mb-4">Autres builds en français</h2>
-    <div class="grid sm:grid-cols-3 gap-4">
-      <a href="/fr/builds/mage/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build mage</p><p class="text-sm text-ash mt-1">Mage de bataille, sorcier ou invocateur.</p></a>
-      <a href="/fr/builds/archer/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build archer</p><p class="text-sm text-ash mt-1">Arc, tirs critiques, flèches éternelles.</p></a>
-      <a href="/fr/builds/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Tous les builds</p><p class="text-sm text-ash mt-1">Les huit builds de la 1.0, avec tier et difficulté.</p></a>
+    <h2 class="text-2xl mb-5">Autres builds en français</h2>
+    <div class="grid sm:grid-cols-2 gap-5">
+      <BuildCard build={mage} title="Build mage" tag="En français" lang="fr" />
+      <BuildCard build={archer} title="Build archer" tag="En français" lang="fr" />
     </div>
   </section>
 </Base>

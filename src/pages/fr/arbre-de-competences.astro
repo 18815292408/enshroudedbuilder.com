@@ -1,6 +1,10 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { BUILDS } from "../../data/builds";
+import BuildCard from "../../components/BuildCard.astro";
+import JumpNav from "../../components/JumpNav.astro";
+import TocAside from "../../components/TocAside.astro";
+import VerifiedBadge from "../../components/VerifiedBadge.astro";
+import { BUILDS, buildBySlug } from "../../data/builds";
 import { SITE, SOURCES } from "../../lib/site";
 import { BIOMES, MAX_POINTS, REGION_LABEL, TREE, levelPoints, pointsAtLevel } from "../../lib/tree";
 
@@ -24,6 +28,17 @@ const typeTotal = Object.keys(TREE.types).length;
 const biomeTotal = BIOMES.reduce((a, b) => a + b.points, 0);
 const levelTotal = MAX_POINTS - biomeTotal;
 const atLevels = [10, 20, 30, 40, 50].map((l) => ({ l, p: pointsAtLevel(l) }));
+const toc: [string, string][] = [
+  ["structure", "Trois arbres, treize branches"],
+  ["points", "D'où viennent les points"],
+  ["commencer", "Par où commencer"],
+  ["respec", "Changer de build"],
+  ["planificateur", "Lire le planificateur"],
+  ["faq", "Questions fréquentes"],
+];
+const mage = buildBySlug("battlemage");
+const guerrier = buildBySlug("warrior");
+const archer = buildBySlug("ranger");
 
 const faq = [
   {
@@ -112,6 +127,9 @@ const jsonLd = [
 
   <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-12">
     <article class="prose-game min-w-0">
+      <JumpNav items={toc} label="Sur cette page" />
+      <VerifiedBadge lang="fr" />
+
       <h2 id="structure">Trois arbres, treize branches</h2>
       <p>
         L'arbre n'est pas une liste de classes : c'est un graphe. Chaque nœud doit être relié au précédent pour être débloqué, et le noyau central (<strong>Core</strong>, {nodesPerRegion["core"] ?? 0} nœuds)
@@ -204,17 +222,8 @@ const jsonLd = [
         <a href="/builder/" class="btn btn-flame !text-xs">Ouvrir le planificateur</a>
       </p>
 
-      <section id="faq">
-        <h2>Questions fréquentes</h2>
-        <div class="faq-list">
-          {faq.map((f) => (
-            <div class="faq-item">
-              <h3 class="faq-q text-lg text-parchment mt-6">{f.q}</h3>
-              <p class="faq-a text-ash">{f.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <h2 id="faq">Questions fréquentes</h2>
+      {faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
 
       <h2 id="sources">Sources</h2>
       <ul class="text-sm">
@@ -225,30 +234,20 @@ const jsonLd = [
       <p class="text-sm text-mist">Données vérifiées le {SITE.lastVerified} sur Enshrouded {SITE.gameVersion}.</p>
     </article>
 
-    <aside class="hidden lg:block">
-      <div class="sticky top-24 panel p-5">
-        <p class="eyebrow mb-3">Sur cette page</p>
-        <ul class="space-y-1.5 text-sm">
-          <li><a href="#structure" class="text-ash hover:text-flame no-underline">Trois arbres, treize branches</a></li>
-          <li><a href="#points" class="text-ash hover:text-flame no-underline">D'où viennent les points</a></li>
-          <li><a href="#commencer" class="text-ash hover:text-flame no-underline">Par où commencer</a></li>
-          <li><a href="#respec" class="text-ash hover:text-flame no-underline">Changer de build</a></li>
-          <li><a href="#planificateur" class="text-ash hover:text-flame no-underline">Lire le planificateur</a></li>
-          <li><a href="#faq" class="text-ash hover:text-flame no-underline">Questions fréquentes</a></li>
-        </ul>
-        <hr class="divider my-4" />
-        <p class="text-xs text-mist">{nodeTotal} nœuds · {MAX_POINTS} points · 3 arbres</p>
-        <a class="btn btn-flame w-full justify-center mt-4 !text-xs" href="/builder/">Ouvrir le planificateur</a>
-      </div>
-    </aside>
+    <TocAside
+      items={toc}
+      label="Sur cette page"
+      note={`${nodeTotal} nœuds · ${MAX_POINTS} points · 3 arbres`}
+      cta={{ href: "/builder/", label: "Ouvrir le planificateur" }}
+    />
   </div>
 
   <section class="wrap mt-14">
-    <h2 class="text-2xl mb-4">Passer de l'arbre au build</h2>
-    <div class="grid sm:grid-cols-3 gap-4">
-      <a href="/fr/builds/mage/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build mage</p><p class="text-sm text-ash mt-1">Bâton ou baguette, dégâts élémentaires et mana.</p></a>
-      <a href="/fr/builds/guerrier/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build guerrier</p><p class="text-sm text-ash mt-1">Deux mains, rage de sang, tank en variante.</p></a>
-      <a href="/fr/builds/archer/" class="panel p-5 no-underline hover:border-flame/50 transition-colors"><p class="font-display text-parchment">Build archer</p><p class="text-sm text-ash mt-1">Arc, tirs critiques et flèches éternelles.</p></a>
+    <h2 class="text-2xl mb-5">Passer de l'arbre au build</h2>
+    <div class="grid sm:grid-cols-3 gap-5">
+      <BuildCard build={mage} title="Build mage" tag="En français" lang="fr" />
+      <BuildCard build={guerrier} title="Build guerrier" tag="En français" lang="fr" />
+      <BuildCard build={archer} title="Build archer" tag="En français" lang="fr" />
     </div>
   </section>
 </Base>

@@ -1,7 +1,10 @@
 ---
 import Base from "../../layouts/Base.astro";
 import BuildCard from "../../components/BuildCard.astro";
+import JumpNav from "../../components/JumpNav.astro";
 import SkillName from "../../components/SkillName.astro";
+import TocAside from "../../components/TocAside.astro";
+import VerifiedBadge from "../../components/VerifiedBadge.astro";
 import { BUILDS, buildBySlug, type Build } from "../../data/builds";
 import { NEW_FOODS, WIKI_EDITED } from "../../data/gear";
 import { planBuild } from "../../lib/plan";
@@ -67,12 +70,8 @@ const jsonLd = [
 
   <div class="wrap grid lg:grid-cols-[1fr_16rem] gap-10 mt-10">
     <article class="prose-game min-w-0">
-      <nav aria-label="On this page" class="not-prose lg:hidden sticky top-16 z-30 mb-4 border-y border-flame/15 bg-night/90 py-2 backdrop-blur">
-        <ul class="flex gap-2 overflow-x-auto text-[0.78rem]">
-          {toc.map(([id, label]) => <li><a href={`#${id}`} class="chip whitespace-nowrap no-underline hover:border-flame hover:text-flame">{label}</a></li>)}
-        </ul>
-      </nav>
-      <p class="not-prose inline-flex flex-wrap items-center gap-2 rounded-md border border-spirit/40 bg-spirit/10 px-3 py-2 text-sm text-parchment"><span class="font-display text-spirit tracking-wider uppercase text-xs">✔ Updated {SITE.lastVerified}</span><span>Verified against <strong>Enshrouded {SITE.gameVersion}</strong>. Skill costs and effects come from the 1.0 game data (build {TREE.source.gameBuild}).</span></p>
+      <JumpNav items={toc} />
+      <VerifiedBadge />
 
       <div class="panel panel-ornate p-5 md:p-6 my-6 not-prose">
         <p class="eyebrow !text-flame mb-2">Quick answer</p>
@@ -199,15 +198,11 @@ const jsonLd = [
       <p class="text-sm text-mist">Found something wrong after a patch? See <a href="/contact/">contact</a>. We update builds when Keen Games changes the numbers.</p>
     </article>
 
-    <aside class="hidden lg:block">
-      <div class="sticky top-24 panel p-5">
-        <p class="eyebrow mb-3">On this page</p>
-        <ul class="space-y-1.5 text-sm">{toc.map(([id, l]) => <li><a href={`#${id}`} class="text-ash hover:text-flame no-underline">{l}</a></li>)}</ul>
-        <hr class="divider my-4" />
-        <p class="text-xs text-mist">Main regions: {b.regions.map((r) => REGION_LABEL[r]).join(", ")}</p>
-        <a class="btn btn-flame w-full justify-center mt-4 !text-xs" href={`/builder/?b=${final.code}&g=${b.slug}`}>Open in planner</a>
-      </div>
-    </aside>
+    <TocAside
+      items={toc}
+      note={`Main regions: ${b.regions.map((r) => REGION_LABEL[r]).join(", ")}`}
+      cta={{ href: `/builder/?b=${final.code}&g=${b.slug}`, label: "Open in planner" }}
+    />
   </div>
 
   <section class="wrap mt-16">

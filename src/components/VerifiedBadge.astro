@@ -1,0 +1,9 @@
+---
+import { SITE } from "../lib/site";
+import { TREE } from "../lib/tree";
+
+interface Props { lang?: "en" | "fr" }
+const { lang = "en" } = Astro.props;
+const fr = lang === "fr";
+---
+<p class="not-prose inline-flex flex-wrap items-center gap-2 rounded-md border border-spirit/40 bg-spirit/10 px-3 py-2 text-sm text-parchment"><span class="font-display text-spirit tracking-wider uppercase text-xs">✔ {fr ? "Mis à jour" : "Updated"} {SITE.lastVerified}</span><span>{fr ? <>Vérifié contre <strong>Enshrouded {SITE.gameVersion}</strong>. Les coûts et effets des compétences viennent des données du jeu 1.0 (build {TREE.source.gameBuild}).</> : <>Verified against <strong>Enshrouded {SITE.gameVersion}</strong>. Skill costs and effects come from the 1.0 game data (build {TREE.source.gameBuild}).</>}</span></p>

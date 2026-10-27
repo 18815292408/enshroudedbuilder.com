@@ -1,0 +1,20 @@
+---
+/** Desktop table of contents. The phone equivalent is <JumpNav>; both render the same items. */
+interface Props {
+  items: [string, string][] | { id: string; label: string }[];
+  label?: string;
+  note?: string;
+  cta?: { href: string; label: string };
+}
+const { items, label = "On this page", note, cta } = Astro.props;
+const rows = items.map((i) => (Array.isArray(i) ? { id: i[0], label: i[1] } : i));
+---
+<aside class="hidden lg:block">
+  <div class="sticky top-24 panel p-5">
+    <p class="eyebrow mb-3">{label}</p>
+    <ul class="space-y-1.5 text-sm">{rows.map((i) => <li><a href={`#${i.id}`} class="text-ash hover:text-flame no-underline">{i.label}</a></li>)}</ul>
+    <hr class="divider my-4" />
+    {note && <p class="text-xs text-mist">{note}</p>}
+    {cta && <a class="btn btn-flame w-full justify-center mt-4 !text-xs" href={cta.href}>{cta.label}</a>}
+  </div>
+</aside>

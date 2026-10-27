@@ -1,21 +1,38 @@
 ---
 import type { Build } from "../data/builds";
-interface Props { build: Build; eager?: boolean }
-const { build: b, eager = false } = Astro.props;
+import { DIFF_FR, FR_BUILD_HREF } from "../lib/site";
+
+interface Props {
+  build: Build;
+  eager?: boolean;
+  /** Where the card goes. English build guides by default; French pages pass their own class guide. */
+  href?: string;
+  /** Overrides the build name when the card points at a French page that covers several builds. */
+  title?: string;
+  blurb?: string;
+  /** Small tag under the name, e.g. "En français". */
+  tag?: string;
+  lang?: "en" | "fr";
+}
+const { build: b, eager = false, href, title, blurb, tag, lang = "en" } = Astro.props;
+const fr = lang === "fr";
+const to = href ?? (fr ? FR_BUILD_HREF[b.slug] ?? `/builds/${b.slug}/` : `/builds/${b.slug}/`);
+const text = blurb ?? (fr ? b.shortFr ?? b.short : b.short);
 ---
-<a href={`/builds/${b.slug}/`} class="group panel panel-ornate overflow-hidden no-underline flex flex-col hover:border-flame/50 transition-colors">
+<a href={to} class="group panel panel-ornate overflow-hidden no-underline flex flex-col hover:border-flame/50 transition-colors">
   <div class="relative aspect-[3/2] overflow-hidden">
-    <img src={`/img/${b.slug}-480.webp`} srcset={`/img/${b.slug}-480.webp 480w, /img/${b.slug}-960.webp 960w`} sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw" alt={`${b.name} build art`} width="480" height="320" loading={eager ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+    <img src={`/img/${b.slug}-480.webp`} srcset={`/img/${b.slug}-480.webp 480w, /img/${b.slug}-960.webp 960w`} sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw" alt={fr ? `${title ?? b.name} — illustration` : `${b.name} build art`} width="480" height="320" loading={eager ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
     <div class="absolute inset-0 bg-gradient-to-t from-night-2 via-night-2/10 to-transparent"></div>
-    <span class={`tier tier-${b.tier} absolute top-3 left-3`} title={`${b.tier} tier`}>{b.tier}</span>
+    <span class={`tier tier-${b.tier} absolute top-3 left-3`} title={fr ? `Tier ${b.tier}` : `${b.tier} tier`}>{b.tier}</span>
   </div>
   <div class="p-5 flex flex-col gap-3 flex-1">
-    <h3 class="text-xl text-parchment group-hover:text-flame transition-colors">{b.name}</h3>
-    <p class="text-ash text-[0.97rem] leading-snug flex-1">{b.short}</p>
+    {tag && <p class="eyebrow !text-spirit !mb-0">{tag}</p>}
+    <h3 class="text-xl text-parchment group-hover:text-flame transition-colors">{title ?? b.name}</h3>
+    <p class="text-ash text-[0.97rem] leading-snug flex-1">{text}</p>
     <div class="flex flex-wrap gap-1.5">
-      <span class="chip">Difficulty: {b.difficulty}</span>
+      <span class="chip">{fr ? `Difficulté : ${DIFF_FR[b.difficulty] ?? b.difficulty}` : `Difficulty: ${b.difficulty}`}</span>
       {b.modes.map((m) => <span class="chip">{m}</span>)}
     </div>
-    <span class="font-display text-xs tracking-[0.18em] uppercase text-flame">View level 50 build →</span>
+    <span class="font-display text-xs tracking-[0.18em] uppercase text-flame">{fr ? "Lire le build niveau 50 →" : "View level 50 build →"}</span>
   </div>
 </a>

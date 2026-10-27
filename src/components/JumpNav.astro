@@ -1,0 +1,15 @@
+---
+/** Sticky chapter bar for phones. The desktop equivalent is <TocAside>. */
+interface Props {
+  items: [string, string][] | { id: string; label: string }[];
+  /** aria-label only; the bar itself shows nothing but the links. */
+  label?: string;
+}
+const { items, label = "On this page" } = Astro.props;
+const rows = items.map((i) => (Array.isArray(i) ? { id: i[0], label: i[1] } : i));
+---
+<nav aria-label={label} class="not-prose lg:hidden sticky top-16 z-30 mb-4 border-y border-flame/15 bg-night/90 py-2 backdrop-blur">
+  <ul class="flex gap-2 overflow-x-auto text-[0.78rem]">
+    {rows.map((i) => <li><a href={`#${i.id}`} class="chip whitespace-nowrap no-underline hover:border-flame hover:text-flame">{i.label}</a></li>)}
+  </ul>
+</nav>

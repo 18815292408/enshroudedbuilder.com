@@ -8,6 +8,8 @@ export type Build = {
   /** Common player term searched instead of the in-game name (used in the H1). */
   alias?: string;
   short: string;
+  /** Summary used on the French cards. Builds without a French guide fall back to `short`. */
+  shortFr?: string;
   title: string;
   description: string;
   tier: "S" | "A" | "B";
@@ -35,6 +37,7 @@ export const BUILDS: Build[] = [
     slug: "battlemage",
     name: "Battlemage",
     short: "Wand-and-ward caster that sustains its own mana and hits from mid range.",
+    shortFr: "Mage de bataille : baguette et protection, il tient sa mana seul et frappe à mi-distance.",
     title: "Enshrouded 1.0 Battlemage Build – Wand & Ward Skill Tree to Level 50",
     description: "Best Enshrouded 1.0 Battlemage build: wand skills, the new Wand Evasion and Aerial Wand attacks, Blast and Cast, a level 1–50 skill order with exact point costs, gear and food.",
     tier: "S",
@@ -82,6 +85,7 @@ export const BUILDS: Build[] = [
     name: "Wizard",
     alias: "Mage Guide & Skill Tree",
     short: "Staff caster built around elemental damage, crits and area spells.",
+    shortFr: "Sorcier au bâton : dégâts élémentaires, critiques et sorts de zone, mais fragile.",
     title: "Enshrouded 1.0 Wizard Build – Best Mage Skill Tree, Spells & Gear",
     description: "Enshrouded 1.0 Wizard (mage) build: staff skills, elemental damage nodes, the new Blizzard, Ball Lightning and Pillar of Flames spells, level 1–50 skill order, armor and food.",
     tier: "A",
@@ -129,6 +133,7 @@ export const BUILDS: Build[] = [
     name: "Summoner",
     alias: "Necromancer & Minion Guide",
     short: "Necromancer-style caster that fights with Hollow allies and totems.",
+    shortFr: "Invocateur : les alliés Hollow et les totems encaissent à votre place.",
     title: "Enshrouded 1.0 Summoner Build – Necromancer & Minion Guide",
     description: "Enshrouded 1.0 Summoner / Necromancer build: Advanced Necromancy, Totem Mastery, Hollow Wretch summons and Fire, Ice and Shock Totems, with a level 1–50 skill order and gear.",
     tier: "S",
@@ -175,6 +180,7 @@ export const BUILDS: Build[] = [
     slug: "ranger",
     name: "Ranger",
     short: "Bow build stacking crit, Skillshots and the new Puncture node.",
+    shortFr: "Archer : dextérité, tirs critiques et le nouveau nœud Puncture.",
     title: "Enshrouded 1.0 Ranger Build – Best Bow Skill Tree, Arrows & Armor",
     description: "Enshrouded 1.0 Ranger build: bow damage nodes, the new Puncture, Barrage and Survival Instinct skills, Multi Shot, Eternal arrows, a level 1–50 skill order, armor and food.",
     tier: "A",
@@ -221,6 +227,7 @@ export const BUILDS: Build[] = [
     slug: "tank",
     name: "Tank",
     short: "Shield-and-mace protector that boosts armor, resistances and group survival.",
+    shortFr: "Tank bouclier-masse : armure, résistances et survie du groupe.",
     title: "Enshrouded 1.0 Tank Build – Shield Skill Tree, Armor & Aggro Guide",
     description: "Enshrouded 1.0 Tank build: Heavy Plates, Shiny Plates, Earth Aura, Tower, Warden and Nemesis, parry and Merciless Attack skills, level 1–50 skill order, best shields and armor.",
     tier: "B",
@@ -267,6 +274,7 @@ export const BUILDS: Build[] = [
     slug: "warrior",
     name: "Two-Handed Warrior",
     short: "Barbarian-style greatsword and hammer build with high melee burst.",
+    shortFr: "Guerrier à deux mains : épée ou marteau, gros burst de mêlée.",
     title: "Enshrouded 1.0 Warrior Build – Two-Handed Barbarian Skill Tree & Gear",
     description: "Enshrouded 1.0 two-handed Warrior / Barbarian build: greatsword and hammer skills, Blood Rage, Relentless, Whirlwind Crescendo, a level 1–50 skill order, weapons and food.",
     tier: "A",
@@ -359,6 +367,7 @@ export const BUILDS: Build[] = [
     slug: "assassin",
     name: "Assassin",
     short: "Dagger build for sneak attacks, backstabs, poison and armor-breaking crits.",
+    shortFr: "Assassin à la dague : furtivité, dos, poison et critiques brise-armure.",
     title: "Enshrouded 1.0 Assassin Build – Dagger Skill Tree, Sneak Attack & Poison",
     description: "Enshrouded 1.0 Assassin build: dagger skills (moved into the Assassin area in 1.0), Sneak Attack, Backstab Mastery, Venomous Blades, Expose Weakness, a level 1–50 skill order and gear.",
     tier: "B",

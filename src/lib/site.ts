@@ -21,6 +21,20 @@ export const NAV = [
   { href: "/enshrouded-1-0-changes/", label: "1.0 Changes" },
 ];
 
+/** Build difficulty labels on the French pages. The game data keeps the English values. */
+export const DIFF_FR: Record<string, string> = { Easy: "Facile", Medium: "Moyen", Hard: "Difficile" };
+
+/** Which French page carries each build's guide. Builds not listed only have the English fiche. */
+export const FR_BUILD_HREF: Record<string, string> = {
+  battlemage: "/fr/builds/mage/",
+  wizard: "/fr/builds/mage/",
+  summoner: "/fr/builds/mage/",
+  warrior: "/fr/builds/guerrier/",
+  tank: "/fr/builds/guerrier/",
+  ranger: "/fr/builds/archer/",
+  assassin: "/fr/builds/archer/",
+};
+
 /**
  * French navigation. These are separate pages written for French search intent, not
  * translations of the English ones: the queries, the examples and the FAQ follow what

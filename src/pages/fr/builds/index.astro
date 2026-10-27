@@ -1,10 +1,11 @@
 ---
 import Base from "../../../layouts/Base.astro";
+import BuildCard from "../../../components/BuildCard.astro";
 import { BUILDS, type Build } from "../../../data/builds";
-import { SITE } from "../../../lib/site";
+import { DIFF_FR, FR_BUILD_HREF, SITE } from "../../../lib/site";
 import { MAX_POINTS } from "../../../lib/tree";
 
-/** French build library. Links the three French guides first, then the English fiches. */
+/** French build library. Same layout as /builds/: card grid first, then the comparison table. */
 const FR_PAGES: { slug: string; href: string; label: string; covers: string; note: string }[] = [
   {
     slug: "mage",
@@ -28,14 +29,8 @@ const FR_PAGES: { slug: string; href: string; label: string; covers: string; not
     note: "Arc, tirs sur points faibles, flèches éternelles. Le guide explique aussi pourquoi la dague reste en secours.",
   },
 ];
-const FR_SLUGS = new Set(["battlemage", "wizard", "summoner", "warrior", "tank", "ranger", "assassin"]);
-const englishOnly = BUILDS.filter((b) => !FR_SLUGS.has(b.slug));
-const DIFF_FR: Record<string, string> = { Easy: "Facile", Medium: "Moyen", Hard: "Difficile" };
-const frHrefFor = (b: Build) =>
-  ["battlemage", "wizard", "summoner"].includes(b.slug) ? "/fr/builds/mage/"
-  : ["warrior", "tank"].includes(b.slug) ? "/fr/builds/guerrier/"
-  : ["ranger", "assassin"].includes(b.slug) ? "/fr/builds/archer/"
-  : `/builds/${b.slug}/`;
+const frHref = (b: Build) => FR_BUILD_HREF[b.slug] ?? `/builds/${b.slug}/`;
+const englishOnly = BUILDS.filter((b) => !FR_BUILD_HREF[b.slug]);
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -54,7 +49,6 @@ const jsonLd = {
   jsonLd={jsonLd}
 >
   <section class="wrap pt-14">
-    <nav aria-label="Fil d'Ariane" class="text-sm text-mist mb-5"><a href="/fr/" class="hover:text-flame no-underline">Accueil</a> <span aria-hidden="true">/</span> <span class="text-ash">Builds</span></nav>
     <p class="eyebrow mb-2">Bibliothèque de builds</p>
     <h1 class="text-4xl md:text-5xl">Builds Enshrouded 1.0</h1>
     <p class="text-ash mt-4 max-w-3xl text-lg">
@@ -65,14 +59,18 @@ const jsonLd = {
 
   <section class="wrap mt-10 grid md:grid-cols-3 gap-5">
     {FR_PAGES.map((p) => (
-      <a href={p.href} class="panel panel-ornate p-6 no-underline flex flex-col hover:border-flame/50 transition-colors">
+      <a href={p.href} class="group panel panel-ornate p-6 no-underline flex flex-col hover:border-flame/50 transition-colors">
         <p class="eyebrow !text-spirit mb-2">En français</p>
-        <h2 class="font-display text-xl text-parchment">{p.label}</h2>
+        <h3 class="text-xl text-parchment group-hover:text-flame transition-colors">{p.label}</h3>
         <p class="text-xs uppercase tracking-wider text-flame mt-1">{p.covers}</p>
         <p class="text-ash text-sm mt-3 flex-1">{p.note}</p>
         <span class="font-display text-xs tracking-[0.18em] uppercase text-flame mt-4">Lire le guide →</span>
       </a>
     ))}
+  </section>
+
+  <section class="wrap mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    {BUILDS.map((b, i) => <><BuildCard build={b} tag={FR_BUILD_HREF[b.slug] ? "En français" : "En anglais"} lang="fr" eager={i < 3} />{i === 2 && <div class="sm:col-span-2 lg:col-span-3"></div>}</>)}
   </section>
 
   <section class="wrap mt-14">
@@ -86,7 +84,7 @@ const jsonLd = {
         <tbody>
           {BUILDS.map((b) => (
             <tr>
-              <td><a href={frHrefFor(b)} class="text-parchment hover:text-flame">{b.name}</a></td>
+              <td><a href={frHref(b)} class="text-parchment hover:text-flame">{b.name}</a></td>
               <td>{b.tier}</td>
               <td>{DIFF_FR[b.difficulty]}</td>
               <td>{b.modes.join(" · ")}</td>
