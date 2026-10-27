@@ -1,0 +1,16 @@
+{
+  "_comment": "Read by scripts/hermes-publish.sh and scripts/hermes-adsense.py. Hermes must not edit this file by hand (the publish script reverts it). Change the AdSense state only with scripts/hermes-adsense.py.",
+  "adsense": "reviewing",
+  "adsense_since": "2026-10-24",
+  "new_page_quota": {
+    "reviewing": [{ "days": 14, "max": 1 }],
+    "approved": [{ "days": 1, "max": 1 }, { "days": 7, "max": 3 }, { "days": 30, "max": 8 }],
+    "rejected": [{ "days": 30, "max": 0 }]
+  },
+  "new_page_kinds_allowed": {
+    "reviewing": ["tool", "version"],
+    "approved": ["tool", "version", "guide"],
+    "rejected": []
+  },
+  "min_words": { "tool": 300, "version": 600, "guide": 900 }
+}

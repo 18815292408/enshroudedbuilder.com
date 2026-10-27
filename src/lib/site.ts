@@ -2,8 +2,8 @@ export const SITE = {
   name: "Enshrouded Builder",
   domain: "enshroudedbuilder.com",
   url: "https://enshroudedbuilder.com",
-  lastVerified: "2026-10-17",
-  gameVersion: "1.0 (hotfix 1.0.0.2)",
+  lastVerified: "2026-10-26",
+  gameVersion: "1.0 (hotfix 1.0.0.3)",
   repo: "https://github.com/18815292408/enshroudedbuilder.com",
   email: "contact@enshroudedbuilder.com",
   adsenseClient: "ca-pub-9919512237426779",
@@ -36,7 +36,7 @@ export const NAV_FR = [
 export const SOURCES = {
   changelog: { label: "Keen Games – 1.0 release changelog (Steam, Oct 14 2026)", url: "https://store.steampowered.com/news/app/1203620" },
   combat: { label: "Keen Games – “1.0 Combat: changes and additions” (Steam, Sep 23 2026)", url: "https://store.steampowered.com/news/app/1203620" },
-  hotfix: { label: "Keen Games – Hotfix 1.0.0.1 & 1.0.0.2 changelogs (Steam, Oct 15–16 2026)", url: "https://store.steampowered.com/news/app/1203620" },
+  hotfix: { label: "Keen Games – Hotfix 1.0.0.1, 1.0.0.2 & 1.0.0.3 changelogs (Steam, Oct 15–21 2026)", url: "https://store.steampowered.com/news/app/1203620" },
   gameData: { label: "Enshrouded 1.0 skill tree export, game build 1267041 (rossicler/enshrouded-skill-tree, GPL-3.0)", url: "https://github.com/rossicler/enshrouded-skill-tree" },
   wiki: { label: "Enshrouded Wiki (wiki.gg, CC BY-SA 4.0) – item, spell and food pages", url: "https://enshrouded.wiki.gg/" },
 };

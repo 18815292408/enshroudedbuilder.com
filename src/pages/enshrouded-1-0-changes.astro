@@ -4,7 +4,7 @@ import { skill, MAX_POINTS, BIOMES, levelPoints } from "../lib/tree";
 import { SITE, SOURCES } from "../lib/site";
 const newSkills = ["AERIAL_WAND_ATTACK", "WAND_EVASION_ATTACK", "ADVANCED_NECROMANCY", "TOTEM_MASTERY", "BLAST_AND_CAST", "PUNCTURE", "BARRAGE", "SURVIVAL_INSTINCT", "AIRBORNE_ARCHITECT"];
 const faq = [
-  { q: "When did Enshrouded 1.0 release?", a: "Enshrouded left Early Access with version 1.0 on October 15, 2026. Hotfixes 1.0.0.1 and 1.0.0.2 followed on October 15 and 16." },
+  { q: "When did Enshrouded 1.0 release?", a: "Enshrouded left Early Access with version 1.0 on October 15, 2026. Hotfixes 1.0.0.1 and 1.0.0.2 followed on October 15 and 16, and hotfix 1.0.0.3 on October 21." },
   { q: "Does Enshrouded 1.0 reset my skill tree?", a: "Yes. Keen Games' changelog says the skill tree is reset the first time you play 1.0 with an existing save, so you need to spend your points again." },
   { q: "What is the max level in Enshrouded 1.0?", a: "The player level cap is 50 and equipment can be upgraded to level 55." },
   { q: "How many skill points do you get at level 50?", a: `${MAX_POINTS} if you collect every Shroud Root and Elixir Well. That is ${levelPoints(50)} points from levels (2 per level after level 1) plus ${MAX_POINTS - levelPoints(50)} from exploration.` },
@@ -58,6 +58,15 @@ const faq = [
       <li>Hard-lock target switching is faster for bows and wands, and ranged and melee have separate auto-target settings.</li>
     </ul>
     <p>Builds that use these changes: <a href="/builds/ranger/">Ranger</a>, <a href="/builds/assassin/">Assassin</a>.</p>
+
+    <h2>Hotfixes since launch</h2>
+    <p>Three hotfixes have shipped since 1.0. Only one of them touched balance:</p>
+    <ul>
+      <li><strong>1.0.0.1</strong> (October 15, build 1267041): the <strong>Fire Wisp</strong> scroll now has a fixed level of 27. Before, its damage scaled with your level, which Keen Games called "ridiculously strong in the end-game". Also fixed indoor lighting and several crashes.</li>
+      <li><strong>1.0.0.2</strong> (October 16, build 1269579): fixed translated skill descriptions for Aerial Wand Attack, Evasion Attack, Wand Evasion Attack and Crash Down Attack, plus world settings and crash fixes. No skill numbers changed.</li>
+      <li><strong>1.0.0.3</strong> (October 21, build 1273043): crash fixes, a smoother Early Access save migration, and missing Early Access rewards now redeemable from the pause menu. No balance changes.</li>
+    </ul>
+    <p>None of the three changelogs lists a skill cost or effect change, so the skill values on this site still apply.</p>
 
     <h2>FAQ</h2>
     {faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
