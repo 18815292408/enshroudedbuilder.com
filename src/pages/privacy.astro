@@ -12,12 +12,13 @@ import Base from "../layouts/Base.astro";
     <p>The site is hosted on Cloudflare Pages. Like any web host, Cloudflare may process technical data such as IP addresses and request logs to deliver and protect the site. See <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.</p>
     <h2>Fonts</h2>
     <p>We load fonts from Google Fonts, which means your browser requests them from Google's servers. See <a href="https://policies.google.com/privacy" rel="noopener">Google's privacy policy</a>.</p>
-    <h2>Analytics (only with your consent)</h2>
-    <p>With your permission, we use <strong>Google Analytics 4</strong>, <strong>Microsoft Clarity</strong> and <strong>PVUV</strong> to see, in aggregate, which pages and builds people use, so we know what to improve. We do not use them for advertising and we do not sell data.</p>
+    <h2>Analytics</h2>
+    <p>We use <strong>PVUV</strong> to count page views, and <strong>Google Analytics 4</strong> and <strong>Microsoft Clarity</strong> only with your permission, to see, in aggregate, which pages and builds people use, so we know what to improve. We do not use them for advertising and we do not sell data.</p>
     <ul>
-      <li>Until you click <em>Allow analytics</em>, Google Analytics runs in Consent Mode with analytics storage denied. It sets no analytics cookies and only sends cookieless pings. Clarity and PVUV do not load at all.</li>
+      <li>In the European Economic Area, the United Kingdom, Switzerland and China, where prior consent is required, PVUV loads only after you click <em>Allow analytics</em>. Everywhere else it loads by default and you can turn it off at any time.</li>
+      <li>Google Analytics and Microsoft Clarity load only after you allow analytics. Until then, Google Analytics runs in Consent Mode with analytics storage denied: it sets no analytics cookies and only sends cookieless pings.</li>
       <li>If you allow analytics, Google Analytics may set cookies such as <code>_ga</code>, Clarity may record anonymized interactions such as clicks, scrolling and page views, and PVUV sets first-party cookies (<code>_pv_id</code>, <code>_pv_sid</code>, <code>_pv_ft</code>) that count visits and remember how you found the site; the visitor cookie lasts about 13 months. See <a href="https://policies.google.com/privacy" rel="noopener">Google's privacy policy</a>, the <a href="https://privacy.microsoft.com/privacystatement" rel="noopener">Microsoft privacy statement</a> and the <a href="https://www.pvuv.ai/privacy" rel="noopener">PVUV privacy policy</a>.</li>
-      <li>Your choice is saved in your browser's local storage. You can change it at any time with <strong>Analytics settings</strong> in the site footer.</li>
+      <li>Your choice is saved in your browser's local storage. You can change it at any time with <strong>Analytics settings</strong> in the site footer; turning analytics off deletes the analytics cookies this site has set.</li>
     </ul>
     <h2>Advertising</h2>
     <p>We fund the hosting of this site with advertising served by <strong>Google AdSense</strong>. Ads are only requested once you have made a choice in our consent banner, and in the European Economic Area, the United Kingdom and Switzerland they are subject to a consent management platform that records your choices before any advertising cookie is set.</p>
@@ -29,7 +30,7 @@ import Base from "../layouts/Base.astro";
     </ul>
     <p>We do not pass your name, email address or any other identifier to Google in ad requests, and we do not run interstitial ads that block a page.</p>
     <h2>Cookies</h2>
-    <p>Advertising cookies only appear after you allow them in the consent banner. Analytics cookies only appear after you allow analytics. A visitor who has not chosen gets neither.</p>
+    <p>Advertising cookies only appear after you allow them in the consent banner. Google Analytics and Clarity cookies only appear after you allow analytics. PVUV's visit cookies appear after you allow analytics, or on your first visit in regions where prior consent is not required. A visitor in a consent-required region who has not chosen gets none of them.</p>
     <h2>Contact</h2>
     <p>Questions about privacy, or a request about data we process? Write to <a href="mailto:contact@enshroudedbuilder.com">contact@enshroudedbuilder.com</a>, or use the <a href="/contact/">contact page</a>.</p>
   </article>
