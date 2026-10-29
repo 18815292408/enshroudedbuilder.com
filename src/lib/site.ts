@@ -9,6 +9,8 @@ export const SITE = {
   adsenseClient: "ca-pub-9919512237426779",
   ga4Id: "G-CE08NNE2Y6",
   clarityId: "yzf3hs2qms",
+  pvuvSite: "nAP4XhnA",
+  pvuvApi: "https://in.pvuv.ai",
 };
 
 export const DISCLAIMER =

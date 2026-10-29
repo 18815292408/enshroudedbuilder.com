@@ -145,8 +145,8 @@ const path = Astro.url.pathname;
     <div id="consent" role="dialog" aria-live="polite" aria-label={fr ? "Consentement à la mesure d'audience" : "Analytics consent"} hidden class="fixed inset-x-3 bottom-3 z-50 sm:left-auto sm:right-4 sm:bottom-4 sm:max-w-sm panel panel-ornate p-4 text-sm">
       <p class="text-parchment">
         {fr
-          ? "Nous utilisons Google Analytics et Microsoft Clarity pour des statistiques anonymes et agrégées. Rien ne se charge avant votre accord."
-          : "We use Google Analytics and Microsoft Clarity for anonymous, aggregated statistics. Nothing loads until you allow it."}
+          ? "Nous utilisons Google Analytics, Microsoft Clarity et PVUV pour des statistiques anonymes et agrégées. Rien ne se charge avant votre accord."
+          : "We use Google Analytics, Microsoft Clarity and PVUV for anonymous, aggregated statistics. Nothing loads until you allow it."}
       </p>
       <p class="mt-1 text-mist"><a href="/privacy/" class="underline hover:text-flame">{fr ? "Politique de confidentialité" : "Privacy policy"}</a></p>
       <div class="mt-3 flex gap-2">
@@ -154,7 +154,7 @@ const path = Astro.url.pathname;
         <button type="button" data-consent="denied" class="btn btn-ghost !py-2 !px-3 !text-xs">{fr ? "Refuser" : "Decline"}</button>
       </div>
     </div>
-    <script is:inline define:vars={{ clarityId: SITE.clarityId }}>
+    <script is:inline define:vars={{ clarityId: SITE.clarityId, pvuvSite: SITE.pvuvSite, pvuvApi: SITE.pvuvApi }}>
       (function () {
         var box = document.getElementById("consent");
         var read = function () { try { return localStorage.getItem("eb-consent"); } catch (e) { return null; } };
@@ -162,15 +162,24 @@ const path = Astro.url.pathname;
           if (window.clarity) return;
           (function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); }; t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, "clarity", "script", clarityId);
         };
+        var loadPvuv = function () {
+          if (document.querySelector('script[src="https://www.pvuv.ai/f.js"]')) return;
+          var s = document.createElement("script");
+          s.defer = true;
+          s.src = "https://www.pvuv.ai/f.js";
+          s.setAttribute("data-site", pvuvSite);
+          s.setAttribute("data-api", pvuvApi);
+          document.head.appendChild(s);
+        };
         var apply = function (choice) {
           try { localStorage.setItem("eb-consent", choice); } catch (e) {}
           /* Ad signals stay denied: the site runs no ad network while the AdSense review is pending. */
           gtag("consent", "update", { analytics_storage: choice, ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
-          if (choice === "granted") { loadClarity(); gtag("event", "page_view"); }
+          if (choice === "granted") { loadClarity(); loadPvuv(); gtag("event", "page_view"); }
           box.hidden = true;
         };
         var state = read();
-        if (state === "granted") loadClarity();
+        if (state === "granted") { loadClarity(); loadPvuv(); }
         if (!state) box.hidden = false;
         box.addEventListener("click", function (e) { var c = e.target.closest("[data-consent]"); if (c) apply(c.getAttribute("data-consent")); });
         document.querySelectorAll("[data-consent-open]").forEach(function (b) { b.addEventListener("click", function () { box.hidden = false; }); });
