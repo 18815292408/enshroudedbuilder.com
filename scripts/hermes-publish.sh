@@ -54,6 +54,8 @@ if ! python3 scripts/hermes-tdh-guard.py "$SITE"; then exit 3; fi
 # (or 1 official). In shadow mode this only records what would be blocked; in enforce mode it blocks.
 ZY="/Users/zhongyao/Documents/zhongyaoruanjian/SEO skill/zyseo"
 if [ -d "$ZY" ]; then
+  # fact-gate reads `git diff HEAD`, which skips untracked files: stage first so a brand-new page's numbers are checked too.
+  git add -A -- src/data src/pages vendor/enshrouded-skill-tree drafts HERMES-LOG.md src/lib/site.ts 2>/dev/null || true
   /Users/zhongyao/miniconda3/bin/python3 "$ZY/scripts/zyseo.py" fact-gate --site enshroudedbuilder-com --repo "$PWD" --base HEAD --head WORKTREE --json > /tmp/enshroudedbuilder-factgate.json 2>&1
   FG=$?
   /Users/zhongyao/miniconda3/bin/python3 - <<PY 2>/dev/null || true
