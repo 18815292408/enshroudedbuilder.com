@@ -50,6 +50,23 @@ if ! bash scripts/verify-site-build.sh > /tmp/enshroudedbuilder-verify.log 2>&1;
 fi
 if ! python3 scripts/hermes-page-gate.py check; then exit 3; fi
 if ! python3 scripts/hermes-tdh-guard.py "$SITE"; then exit 3; fi
+# Every new number in src/data must match a fact the zyseo ledger verified from >=2 independent sources
+# (or 1 official). In shadow mode this only records what would be blocked; in enforce mode it blocks.
+ZY="/Users/zhongyao/Documents/zhongyaoruanjian/SEO skill/zyseo"
+if [ -d "$ZY" ]; then
+  /Users/zhongyao/miniconda3/bin/python3 "$ZY/scripts/zyseo.py" fact-gate --site enshroudedbuilder-com --repo "$PWD" --base HEAD --head WORKTREE --json > /tmp/enshroudedbuilder-factgate.json 2>&1
+  FG=$?
+  /Users/zhongyao/miniconda3/bin/python3 - <<PY 2>/dev/null || true
+import json
+r = json.load(open("/tmp/enshroudedbuilder-factgate.json"))
+print(f"FACT GATE ({r['mode']}): backed={r['backed_facts']} unbacked={len(r['unbacked'])} page_warnings={len(r['warnings'])}")
+for u in r["unbacked"][:15]:
+    print(f"  UNBACKED {u['file']}:{u['line']} token={u['token']} :: {u['text'][:120]}")
+PY
+  if [ "$FG" = "3" ]; then
+    echo "FACT GATE BLOCKED: new values above have no verified fact. Run zyseo fact-add with their sources, or remove them."; exit 3
+  fi
+fi
 
 # 3. Commit + push (rebase on remote first, retry on network errors).
 git add -A -- src/data src/pages vendor/enshrouded-skill-tree drafts HERMES-LOG.md src/lib/site.ts 2>/dev/null

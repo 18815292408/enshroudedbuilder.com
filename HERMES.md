@@ -1,5 +1,12 @@
 # EnshroudedBuilder: Hermes 游戏更新巡检规则
 
+> **2026-11-01 起：本文件由 zyseo 游戏数据通道执行**（热点快速通道任务 11def69eddb2），站点专属维护任务已暂停并保持暂停。
+> 第一节「你是怎么被唤醒的」和第六节的定时上新频率不再适用：现在由 zyseo `trend-watch` 抓 `release_sources`（Steam 官方公告、wiki 技能点/食物数据），
+> 只把变化放进收件箱的 `data_update` / `fact_fix` 条目，模型按条目处理，不再自己定巡检时间。
+> **事实先入账**：任何新数值先用 `zyseo fact-add` 写成 claims（entity / field / value / aliases / sources），
+> 只有 status=verified（官方 1 家，或 ≥2 家独立来源一致）的事实能写进网站；发布脚本已接 `fact-gate`，没入账的新数值会被拦。
+> 广告审核期规则（只做加法、新页额度）同时生效，见第六节。
+
 你负责盯 Enshrouded（雾锁王国）的官方更新，把**可核实**的新信息变成 enshroudedbuilder.com 上对玩家有用的内容。仓库在 `~/Documents/zhongyaoruanjian/enshroudedbuilder.com`。
 本站是 build / 技能树 / 加点器站点，不是新闻站。新信息优先让现有工具和页面变准，其次才是新页面；新页面优先做工具页。
 
