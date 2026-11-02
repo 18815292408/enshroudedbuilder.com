@@ -24,3 +24,13 @@
 - 待核实：无
 - 技术待办（交给 Claude）：无
 - AdSense：reviewing（10-24 提交），未满 21 天，按第六节本次不询问
+
+## 2026-11-02（晚班，Hermes 游戏数据通道：ids 189）
+- 公告：1847920302247671「Changelog for Patch #1」（11-02 18:35 CST），官方页 https://enshrouded.com/en-US/news/changelog-for-patch-1 写明 aka Patch 1.0.1.0、Version 1283531、November 2, 2026。归类：带新版本号 + 远多于 5 条与 build 相关的平衡改动（技能花费、法术、掉落、配方）→ 新建版本页（AdSense reviewing 期间 version 类，额度 1/1 用了这 1 个）。
+- 新建 `/enshrouded-1-0-1-0-patch-notes/`（data-page-kind="version"）：只留与 build 有关的 12 条技能/战斗改动 + 8 个 build 的逐条影响表和「下次上线前复查什么」清单；官方没给新数字的地方明确写「未公布」，不推算。内链从 `/enshrouded-1-0-changes/` 与 `/skills/` 各加一条。
+- 改旧页（只加句子，未动 TDH）：`/enshrouded-1-0-changes/` 的 Hotfixes 小节补一段 1.0.1.0 的变化（Aerial Wand Attack 40 mana、Wand Evasion / Whirlwind 变便宜、格挡取消攻速的漏洞被修），并把「三份热修都没改技能花费，所以本站数值仍适用」改成「1.0.1.0 之前适用」；`/skills/` 顶部加一句说明导出仍是 1.0.0.1、三处花费已被 1.0.1.0 改动，链接到新页。
+- 事实入账：patch 1.0.1.0 / game build 1283531、Aerial Wand Attack / 40 mana、Whirlwind Crescendo / lowered 三条 fact-add 全部 verified（官方 enshrouded.com 单源）。Steam 商店页抓不到正文（JS 渲染），改以官方站为事实来源。
+- 未改：`src/lib/site.ts` 的 gameVersion / lastVerified 保持原样——技能数据导出仍是 build 1267041，没重新核实 build 页数值，不能把 lastVerified 改到今天。
+- 新页候选：无（本条已用掉 reviewing 期间 14 天 1 个的额度）。
+- 待核实：无。
+- 技术待办（交给 Claude）：等 rossicler/enshrouded-skill-tree 上游重导出 1.0.1.0 数据后，重建 skilltree.json，把 Aerial Wand Attack（40 mana）与另外两个被下调的技能文本换掉，届时可撤 `/skills/` 的临时说明。

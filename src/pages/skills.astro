@@ -20,6 +20,7 @@ const count = Object.keys(TREE.types).length;
     <h1 class="text-4xl md:text-5xl !mt-2">Enshrouded 1.0 Skills List</h1>
     <p class="text-lg">All {count} skill types in the 1.0 skill tree, with the in-game cost per level, max level and effect at max level. Data comes from game build {TREE.source.gameBuild} ({TREE.source.branch.replace("^/game38/branches/", "")}), last verified {SITE.lastVerified}. Skills marked <span class="chip !text-flame">New in 1.0</span> were added in the full release.</p>
     <p>Skills are grouped by the archetype region they sit closest to. Some sit between two regions, and any character can take any skill as long as it connects to the tree. Plan a full build in the <a href="/builder/">skill planner</a>.</p>
+    <p>Patch 1.0.1.0 (November 2, 2026) changed three ability costs after this export: Aerial Wand Attack now costs 40 mana instead of stamina, and the Wand Evasion Attack and Whirlwind Crescendo costs were reduced. The tables below still show the 1.0.0.1 export values until the game data export is regenerated; the changes are listed on the <a href="/enshrouded-1-0-1-0-patch-notes/">patch 1.0.1.0 notes page</a>.</p>
     <nav class="flex flex-wrap gap-2 not-prose mt-4" aria-label="Archetypes">{trees.flatMap((t) => t.regions).map((r) => <a href={`#${r}`} class="chip hover:text-flame no-underline">{REGION_LABEL[r]}</a>)}</nav>
   </section>
   {trees.map((tree) => (
