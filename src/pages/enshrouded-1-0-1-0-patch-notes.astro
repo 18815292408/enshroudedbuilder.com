@@ -1,0 +1,113 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE, SOURCES } from "../lib/site";
+
+const faq = [
+  { q: "Is Enshrouded 1.0.1.0 a hotfix or a full patch?", a: "It is Patch #1, a full patch rather than a hotfix. Keen Games calls it “Changelog for Patch #1, aka Patch 1.0.1.0”, the game build is 1283531, and it went live on November 2, 2026." },
+  { q: "Does patch 1.0.1.0 reset the skill tree?", a: "No. The patch changes the cost of three abilities, but it does not change the tree layout and does not force a respec. You keep the points you have already spent." },
+  { q: "Did the level cap change in 1.0.1.0?", a: "No. The player level cap is still 50 and gear still upgrades to level 55. The patch only adjusts skill costs, combat behaviour, loot and crafting." },
+  { q: "Does 1.0.1.0 change the Fire Wisp scroll?", a: "No. The Fire Wisp was fixed to level 27 in hotfix 1.0.0.1 on October 15, 2026. Patch 1.0.1.0 does not mention it." },
+  { q: "Where can I read the full patch notes?", a: "Keen Games publishes them on the Enshrouded Steam news feed and on enshrouded.com. This page only keeps the build-relevant parts and links the official post in the sources below." },
+];
+
+const skillChanges = [
+  ["Aerial Wand Attack", "Now costs 40 mana instead of stamina."],
+  ["Wand Evasion Attack", "Mana cost reduced. Keen Games does not publish the new number."],
+  ["Whirlwind Crescendo", "Stamina cost lowered. The exact new cost is not published."],
+  ["Wand attack speed", "Block-cancelling each wand shot no longer boosts attack frequency."],
+  ["Lupa's Scalper daggers", "Now enable the Riposte kick ability while wielded."],
+  ["Mana, health and stamina leech perks", "Descriptions updated where they were wrong."],
+  ["Chain Heal", "No longer heals enemy Hollow skeletons."],
+  ["Shielded Ancient Construct", "Now has phases where the shield is on cooldown."],
+  ["Fell Vinebloom", "Poison damage from its area attack reduced."],
+  ["Scavenger proximity mines", "Explosion radius reduced."],
+  ["Bosses", "Stay engaged in combat longer when attacked from range."],
+  ["Fell mini critters", "Smaller combat collider, so they stop blocking arrows."],
+];
+
+const buildImpact = [
+  { slug: "battlemage", name: "Battlemage", effect: "Both wand actives now draw on mana instead of stamina, and the animation-cancel fix lowers the ceiling of block-cancel spam.", todo: "Re-test your mana bar in a long fight and keep Aerial Wand Attack out of the opener if you run low." },
+  { slug: "wizard", name: "Wizard", effect: "Staff gameplay is untouched. Only the leech perk descriptions changed.", todo: "Nothing to change in the rotation." },
+  { slug: "summoner", name: "Summoner", effect: "Chain Heal no longer tops up enemy Hollow skeletons, so healing near your own summons is safer.", todo: "Use Chain Heal as before; it no longer helps the enemy." },
+  { slug: "ranger", name: "Ranger", effect: "Arrows no longer stop on the smaller Fell mini critters, and elite flying critters give more XP.", todo: "Small quality-of-life gain while farming and levelling." },
+  { slug: "tank", name: "Tank", effect: "No direct change. The shielded Ancient Construct now drops its shield in phases.", todo: "Watch for the new shield cooldown phases and parry then." },
+  { slug: "warrior", name: "Warrior", effect: "Whirlwind Crescendo costs less stamina, so the finisher fits more easily after a heavy combo.", todo: "Try one more Whirlwind per stamina bar; check the new number in game." },
+  { slug: "healer", name: "Healer", effect: "Same Chain Heal fix as the Summoner, plus the leech description update.", todo: "Nothing to change; heals no longer repair enemy skeletons." },
+  { slug: "assassin", name: "Assassin", effect: "Lupa's Scalper daggers now trigger the Riposte kick ability when wielded.", todo: "If you use those daggers, the kick is available again." },
+];
+
+const lootChanges = [
+  "A few food options were added to the path before and inside the first cave, so a new character no longer starves before reaching the first wide area.",
+  "Purple berries are easier to spot.",
+  "Two more craftable versions of lore weapons were added.",
+  "Crab cakes now accept any type of milk.",
+  "The goo recipe also unlocks by picking up the Shroud mushroom resource from Revelwoods.",
+  "Big farm animal beds can now be crafted with any wood type.",
+  "Azure Russula seedlings are a bit cheaper to produce in the farmbed.",
+  "Basalt was removed as loot from several terrain and block materials, because it let some recipes unlock too early in the progression.",
+  "Ancient props have more health, and destructible inanimate objects now show a grey health bar.",
+  "The Ashwind Strider and Sky Specter armor sets had their name and description switched; that is fixed.",
+];
+---
+
+<Base title="Enshrouded Patch 1.0.1.0 Notes – Build Changes & Fixes" description="Enshrouded patch 1.0.1.0 (build 1283531, November 2, 2026): the skill, wand, loot and crafting changes that affect your build, and what to re-check." jsonLd={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }}>
+  <article class="wrap pt-14 prose-game max-w-3xl" data-page-kind="version">
+    <p class="eyebrow">Patch notes for builders</p>
+    <h1 class="text-4xl md:text-5xl !mt-2">Enshrouded patch 1.0.1.0: what changed for your build</h1>
+    <p class="text-lg">On November 2, 2026 Keen Games shipped <strong>Patch #1, version 1.0.1.0</strong> (game build 1283531), the first full patch since the 1.0 launch. The official changelog runs past a hundred lines and most of it is crash fixes, UI work and building polish. This page keeps only the parts that can change a build — skill costs, combat behaviour, loot and crafting — and adds what to re-check for each of our builds.</p>
+
+    <h2>Skill and combat changes</h2>
+    <p>Three abilities changed cost. Only one of them comes with a number in the official notes: the <strong>Aerial Wand Attack now costs 40 mana instead of stamina</strong>. For the Wand Evasion Attack and Whirlwind Crescendo, Keen Games says the cost was reduced or lowered but does not publish the new figure, so this page does not guess one.</p>
+    <div class="panel overflow-x-auto not-prose my-5">
+      <table class="table-game min-w-[34rem]">
+        <thead><tr><th>Change</th><th>What the official notes say</th></tr></thead>
+        <tbody>{skillChanges.map(([name, change]) => <tr><td class="text-parchment whitespace-nowrap">{name}</td><td>{change}</td></tr>)}</tbody>
+      </table>
+    </div>
+    <p>The rest of the combat list is about how fights behave rather than about numbers on your character sheet: bosses stay engaged longer, the shielded Ancient Construct now has shield cooldown phases, the Fell Vinebloom's area poison hurts less, Scavenger mines have a smaller blast, and Fell mini critters no longer eat arrows aimed at something behind them.</p>
+
+    <h2>What it means for each build</h2>
+    <p>The table below is our read of the patch against the eight builds on this site. It is not a Keen Games statement; it is the checklist we would run before the next session.</p>
+    <div class="panel overflow-x-auto not-prose my-5">
+      <table class="table-game min-w-[38rem]">
+        <thead><tr><th>Build</th><th>Effect of 1.0.1.0</th><th>What to do</th></tr></thead>
+        <tbody>{buildImpact.map((b) => <tr><td class="text-parchment whitespace-nowrap"><a href={`/builds/${b.slug}/`}>{b.name}</a></td><td>{b.effect}</td><td>{b.todo}</td></tr>)}</tbody>
+      </table>
+    </div>
+    <p>The biggest practical change is on the wand side. A Battlemage used to pay stamina for the Aerial Wand Attack and mana for the Wand Evasion Attack, so the two moves sat on separate resources. Both now cost mana, which suits a build that already stacks Intelligence and mana regeneration through Unity and Mana Currents — but it also means a long fight drains one bar instead of two. If you were chaining both moves as an opener, test the rotation once before you take it into the Shroud.</p>
+
+    <h2>Loot, food and crafting</h2>
+    <ul>{lootChanges.map((t) => <li>{t}</li>)}</ul>
+    <p>Two of these matter beyond convenience. Removing basalt from terrain and block loot stops a few recipes from unlocking before the progression expects them, so an early run may no longer hand you a recipe you used to get for free. The extra food on the starting path also makes the first hour less punishing on a fresh character.</p>
+
+    <h2>Fixes that make farming smoother</h2>
+    <ul>
+      <li>Defeated enemies no longer need a second interaction before you can loot them.</li>
+      <li>Fewer Fell enemies drop no loot at all; Keen Games says another fix is planned for the next update.</li>
+      <li>Elite flying critters now give more XP when defeated, which helps while levelling a new character.</li>
+      <li>Enemy levels now fit the region in more cases.</li>
+      <li>Sprint can be set to toggle in the keyboard and mouse settings.</li>
+      <li>Save data migration errors are fixed, and the memory budget for player bases during migration was increased. If a save failed to migrate before, the patch notes ask you to try again.</li>
+    </ul>
+
+    <h2>What to re-check in your build</h2>
+    <ol>
+      <li><strong>Mana budget on wand builds.</strong> The Aerial Wand Attack is now a 40 mana skill. If it used to be your stamina dump, move some sustain to mana.</li>
+      <li><strong>Wand DPS habits.</strong> Block-cancelling shots no longer raises attack frequency, so a rotation built on that trick will do less damage.</li>
+      <li><strong>Warrior stamina.</strong> Whirlwind Crescendo is cheaper, but the exact new cost is not in the notes; confirm it in the skill tooltip before you re-plan points.</li>
+      <li><strong>Healer and Summoner.</strong> Chain Heal no longer heals enemy Hollow skeletons, so you can heal in a crowded Hollow fight without helping the other side.</li>
+      <li><strong>Old saves.</strong> Back up a save before migrating; the patch fixes several migration failures and lets you retry.</li>
+    </ol>
+
+    <h2>FAQ</h2>
+    {faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
+
+    <h2>Sources</h2>
+    <ul class="text-sm">
+      <li><a href="https://store.steampowered.com/news/app/1203620/view/694276363007298066" rel="noopener">Keen Games – “Changelog for Patch #1, aka Patch 1.0.1.0” (Steam, November 2, 2026)</a></li>
+      <li><a href={SOURCES.changelog.url} rel="noopener">{SOURCES.changelog.label}</a></li>
+      <li><a href={SOURCES.hotfix.url} rel="noopener">{SOURCES.hotfix.label}</a></li>
+    </ul>
+    <p class="text-sm text-mist">Every number and behaviour on this page comes from the official changelog above. Where the notes give no figure, the page says so instead of filling it in. The 1.0 launch changes are collected on the <a href="/enshrouded-1-0-changes/">1.0 changes page</a>.</p>
+  </article>
+</Base>
