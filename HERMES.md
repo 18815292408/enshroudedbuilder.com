@@ -129,7 +129,8 @@
 
 `scripts/hermes-publish.sh "Hermes: <一句英文说明>"`
 它会依次：撤销越界改动 → 构建 → 点数预算检查 → 站内门禁 → 新页门禁 → 老页面保护（TDH 和正文改动幅度）→ 提交推送 → `wrangler pages deploy` → 检查首页和新页线上 200 → 记录新页日期。
-- 输出 `PUBLISHED ... live=200` 就是成功。
+（2026-11-02 起所有改动走 PR：发布脚本过完构建/守卫/事实门禁后推到 `zyseo/data-updates` 分支，由「zyseo PR 审核合并」任务合并，合并后它跑 `scripts/hermes-deploy.sh` 部署、确认上线、失败自动回滚。你不用管部署。）
+- 输出 `PR READY ...` 就是成功。
 - 注意：本站 `git push` **不会**自动部署，只有这个脚本里的 wrangler 才会上线。不要自己跳过脚本发布。
 
 ## 八、自己处理清单（照做，不问用户）
@@ -145,8 +146,10 @@
 | `PAGE GATE BLOCKED: cannot read the live sitemap` | 网络问题，下次再发，改动留着。 |
 | `PUBLISH BLOCKED: build failed` / `point budgets failed` / `site gate failed` | 读输出修；修不了 `git checkout -- src/ vendor/` 撤销、日志写原因。最多 3 轮。 |
 | `edits outside allowed paths` | 脚本已撤销那些文件。确实需要的改动写进「技术待办（交给 Claude）」。 |
-| `PUSH FAILED` | 不用管，下次一起推。 |
-| `DEPLOY FAILED` | 不用管，下次再部署。连续 3 次运行都失败才在汇报里说一句。 |
+| `PR READY` | 成功：已交给 PR，等审核合并任务合并后自动上线。汇报写「已提交，等合并上线」。 |
+| `PR WAITING` | 上一批数据还没合并、这次改到了同一处：改动留在工作区不用撤，等上一批合并后下次运行再发。 |
+| `PUSH FAILED` | 不用管，下次运行再推。 |
+| `DEPLOY FAILED`（合并任务部署时） | 合并任务会再跑一次 `scripts/hermes-deploy.sh`；连续 3 次失败才在汇报里说一句。 |
 | `DEPLOY AUTH EXPIRED` | 唯一需要用户动手的情况：汇报写「需要你在 Mac mini 上重新登录一次 Cloudflare（终端运行 npx wrangler login）」。 |
 | `LIVE CHECK FAILED` / `ROLLED BACK` | 脚本已撤回这次改动并重新部署上一版。日志写原因，下次检查后再发。 |
 | Steam 接口 / 网页打不开 | 换来源（`store.steampowered.com/news/app/1203620`、浏览器）或等下次，不要报错给用户。 |

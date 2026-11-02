@@ -70,43 +70,26 @@ PY
   fi
 fi
 
-# 3. Commit + push (rebase on remote first, retry on network errors).
-git add -A -- src/data src/pages vendor/enshrouded-skill-tree drafts HERMES-LOG.md src/lib/site.ts 2>/dev/null
+# 3. 交给 PR（2026-11-02 用户定：zyseo 接入的站全部走 PR）：推到 zyseo/data-updates 分支，
+#    由「zyseo PR 审核合并」任务审核合并；合并后它会跑 scripts/hermes-deploy.sh 部署并确认上线。
+BR="zyseo/data-updates"
+PATHS=""
+for p in src/data src/pages vendor/enshrouded-skill-tree drafts HERMES-LOG.md src/lib/site.ts; do [ -e "$p" ] && PATHS="$PATHS $p"; done
+if ! retry 3 git fetch -q origin; then echo "PUSH FAILED: git fetch 失败（改动留在工作区，下次再发）"; exit 4; fi
+if ! git stash push -q --include-untracked -- $PATHS; then echo "PUSH FAILED: 暂存改动失败（改动留在工作区）"; exit 4; fi
+if git rev-parse -q --verify "origin/$BR" >/dev/null && ! git merge-base --is-ancestor "origin/$BR" origin/main; then
+  git checkout -q -B "$BR" "origin/$BR"   # 上一批还没合并：这批接在它后面，一起审
+else
+  git checkout -q -B "$BR" origin/main
+fi
+if ! git stash pop -q; then
+  git reset -q --hard HEAD; git clean -fdq -- $PATHS; git checkout -q main; git stash pop -q
+  echo "PR WAITING: 上一批数据还没合并，和这次改到了同一处；改动留在工作区，等上一批合并后再发"; exit 4
+fi
+git add -A -- $PATHS
 git commit -q -m "$MSG"
-if ! retry 3 sh -c 'git pull -q --rebase && git push -q'; then
-  echo "PUSH FAILED after retries (commit kept locally, next run will push it)"
+if ! retry 3 git push -q origin "$BR"; then
+  echo "PUSH FAILED after retries（提交留在本地分支 ${BR}，下次再推）"; git checkout -q main; exit 4
 fi
-
-# 4. Deploy (git push does NOT deploy this site; wrangler must run) + verify live.
-deploy() { npx wrangler pages deploy dist --project-name enshroudedbuilder --branch main --commit-dirty=true > /tmp/enshroudedbuilder-deploy.log 2>&1; }
-if ! retry 3 deploy; then
-  if grep -qiE "authentication|not logged in|token.*(expired|invalid)|login" /tmp/enshroudedbuilder-deploy.log; then
-    echo "DEPLOY AUTH EXPIRED: Cloudflare login on the Mac mini needs to be renewed (code is pushed; site unchanged)"
-  else
-    echo "DEPLOY FAILED after retries (code is pushed; next run will deploy)"; tail -10 /tmp/enshroudedbuilder-deploy.log
-  fi
-  exit 5
-fi
-sleep 20
-URLS="/ $(python3 -c 'import json,os;p=".hermes-pending-pages.json";print(" ".join(e["url"] for e in json.load(open(p))) if os.path.exists(p) else "")')"
-BADLIVE=""
-for u in $URLS; do
-  CODE=000
-  for i in 1 2 3; do
-    CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE$u" -m 20 || true)
-    [ "$CODE" = "200" ] && break; sleep 20
-  done
-  [ "$CODE" = "200" ] || BADLIVE="$BADLIVE $u=$CODE"
-done
-if [ -n "$BADLIVE" ]; then
-  echo "LIVE CHECK FAILED:$BADLIVE — reverting this commit and redeploying the previous version"
-  rm -f .hermes-pending-pages.json
-  git revert --no-edit HEAD -q && $PNPM run build > /tmp/enshroudedbuilder-build.log 2>&1 && retry 3 deploy && echo "ROLLED BACK" || echo "ROLLBACK FAILED"
-  retry 3 sh -c 'git pull -q --rebase && git push -q' || true
-  exit 6
-fi
-python3 scripts/hermes-page-gate.py record
-if ! git diff --quiet -- hermes/new-pages.json; then
-  git add hermes/new-pages.json && git commit -q -m "Hermes: record new page date" && retry 3 sh -c 'git pull -q --rebase && git push -q' || true
-fi
-echo "PUBLISHED $(git rev-parse --short HEAD) · live=200 ·$URLS"
+git checkout -q main && git pull -q --ff-only origin main 2>/dev/null || true
+echo "PR READY $(git rev-parse --short "$BR")：已推到 ${BR}，等「zyseo PR 审核合并」任务合并后部署上线"
