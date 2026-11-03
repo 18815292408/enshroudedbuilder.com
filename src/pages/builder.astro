@@ -98,6 +98,14 @@ const jsonLd = {
     </ul>
     <h2>Where the data comes from</h2>
     <p>Node layout, links, costs, max levels and effect text come from the Enshrouded 1.0 game files (build {TREE.source.gameBuild}), via the open-source <a href={SOURCES.gameData.url} rel="noopener">enshrouded-skill-tree</a> export (GPL-3.0). Colors show the three trees: <span class="text-tree-mage">Mage</span>, <span class="text-tree-warrior">Warrior</span>, <span class="text-tree-ranger">Ranger</span> and the <span class="text-tree-core">Core</span>. Want a ready-made build? Browse the <a href="/builds/">1.0 build guides</a>.</p>
+
+    <h2>Enshrouded skill planner FAQ</h2>
+    <h3>Is this a skill planner or a talent calculator?</h3>
+    <p>Both names point at the same page. The planner draws every node in the 1.0 tree with its exact per-rank cost, so it works as an Enshrouded talent calculator while you level and as a full build calculator once you start comparing finished setups.</p>
+    <h3>How many skill points do you get at level 50?</h3>
+    <p>Leveling gives 98 points (2 per level after level 1), and the seven biomes add up to 114 more from Shroud Roots and Elixir Wells, for a maximum of {MAX_POINTS} points. The whole tree costs 675 points, so a level 50 character can afford roughly a third of it — that is why the planner shows the remaining points live as you click.</p>
+    <h3>Does the planner include the 1.0 hotfixes?</h3>
+    <p>Yes. Node layout, links and costs come from build {TREE.source.gameBuild} (hotfix 1.0.0.1); hotfixes 1.0.0.2 and 1.0.0.3 changed no skill numbers, so the point totals here still match the live game.</p>
   </section>
 
   <script type="application/json" id="planner-data" set:html={JSON.stringify(payload)} />
