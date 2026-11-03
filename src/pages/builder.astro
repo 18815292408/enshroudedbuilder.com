@@ -105,7 +105,7 @@ const jsonLd = {
     <h3>How many skill points do you get at level 50?</h3>
     <p>Leveling gives 98 points (2 per level after level 1), and the seven biomes add up to 114 more from Shroud Roots and Elixir Wells, for a maximum of {MAX_POINTS} points. The whole tree costs 675 points, so a level 50 character can afford roughly a third of it — that is why the planner shows the remaining points live as you click.</p>
     <h3>Does the planner include the 1.0 hotfixes?</h3>
-    <p>Yes. Node layout, links and costs come from build {TREE.source.gameBuild} (hotfix 1.0.0.1); hotfixes 1.0.0.2 and 1.0.0.3 changed no skill numbers, so the point totals here still match the live game.</p>
+    <p>Yes for skill points. Node layout, links and point costs come from build {TREE.source.gameBuild} (hotfix 1.0.0.1). Hotfixes 1.0.0.2 and 1.0.0.3 changed no skill numbers, and patch 1.0.1.0 changed three abilities' in-game mana or stamina costs plus a few perk descriptions but left every skill-point cost alone, so the point totals here still match the live game. The node effect text is still the 1.0.0.1 export — see the <a href="/enshrouded-1-0-1-0-patch-notes/">1.0.1.0 patch notes</a> for the three cost changes.</p>
   </section>
 
   <script type="application/json" id="planner-data" set:html={JSON.stringify(payload)} />
