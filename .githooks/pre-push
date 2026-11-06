@@ -1,0 +1,54 @@
+#!/bin/sh
+# main 分支推送守卫（2026-11-06）：只允许合并提交进 main。
+#
+# 为什么：2026-11-05 loadoutvault 的 63e1147「更正 WZStats 来源日期」是 PR 审核任务
+# 临时在 main 上 cherry-pick 出来的非合并提交，绕过了 zyseo/* 分支和发布节奏门。
+# 线上内容一律走 zyseo/* 分支 → PR 审核合并（合并提交 = 一次真实上线，节奏门按它计数）。
+#
+# 例外：部署脚本自动回滚产生的 `Revert "..."` 提交（上线检查失败时要把坏合并撤回）。
+# 关掉或改规则请改这个文件，不要在仓库里 -c core.hooksPath= 绕过。
+set -u
+
+zero=0000000000000000000000000000000000000000
+bad=""
+checked=0
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$remote_ref" = "refs/heads/main" ] || continue
+  [ "$local_sha" = "$zero" ] && continue            # 删分支，放行
+
+  if [ "$remote_sha" = "$zero" ]; then
+    # main 还不存在（首次推送）：没有可比的基线，只提醒不拦
+    echo "pre-push: 远端 main 还不存在，跳过直推检查" >&2
+    continue
+  fi
+  checked=1
+
+  # 这次要推上去的、不是合并提交的提交（第一父链上）
+  commits=$(git rev-list --first-parent --no-merges "$remote_sha..$local_sha" 2>/dev/null)
+  for sha in $commits; do
+    subject=$(git log -1 --format=%s "$sha" 2>/dev/null)
+    case "$subject" in
+      Revert\ \"*) continue ;;                       # 部署失败自动回滚：允许
+    esac
+    bad="$bad
+  $sha $(printf '%s' "$subject" | cut -c1-90)"
+  done
+done
+
+if [ -n "$bad" ]; then
+  cat >&2 <<EOF
+✋ 拒绝直推 main：这些提交不是合并提交，绕过了 zyseo/* 分支和发布节奏门。
+$bad
+
+正确做法：
+  1) git checkout -b zyseo/<主题>   （内容/数据改动推 zyseo/data-updates）
+  2) git push origin zyseo/<主题>
+  3) 「zyseo PR 审核合并」任务审核后 git merge --no-ff 再推 main
+内容改动同时要过 zyseo 的发布节奏门（publish_cadence：滚动 24h ≤2 次、间隔 ≥6h）。
+只有部署脚本自动回滚的 Revert 提交可以直接推。
+EOF
+  exit 1
+fi
+
+exit 0
