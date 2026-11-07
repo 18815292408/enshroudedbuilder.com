@@ -23,6 +23,7 @@ const qolCost = qol.reduce((a, q) => a + q.cost, 0);
 // "Intelligence, then Spirit" already reads as a sentence; other lists get an "and".
 const statsText = b.stats.includes(" then ") ? b.stats : b.stats.replace(/, ([^,]+)$/, " and $1");
 const related = b.related.map(buildBySlug);
+const opponent = b.versus ? buildBySlug(b.versus.slug) : null;
 const url = `${SITE.url}/builds/${b.slug}/`;
 const toc = [
   ["overview", "Overview"], ["how-to-play", "How to play"], ["core-skills", "Core skills"], ["skill-order", "Skill order (1–50)"], ["qol", "Leftover points"],
@@ -93,6 +94,7 @@ const jsonLd = [
 
       <h2 id="overview">{b.name} build overview</h2>
       {b.intro.map((p) => <p>{p}</p>)}
+      {b.slug === "wizard" && <p class="not-prose text-sm text-ash">Trying to choose between the two Intelligence casters? The <a href="/builds/battlemage/#versus" class="text-flame no-underline hover:underline">Battlemage vs Wizard comparison</a> sets the two level 50 plans side by side.</p>}
 
       <h2 id="how-to-play">How to play the {b.name}</h2>
       <ul>{b.playstyle.map((p) => <li>{p}</li>)}</ul>
@@ -187,6 +189,31 @@ const jsonLd = [
         <div class="panel p-5"><p class="eyebrow !text-spirit mb-2">Strengths</p><ul class="space-y-2 text-ash">{b.pros.map((p) => <li class="flex gap-2"><span class="text-spirit">+</span>{p}</li>)}</ul></div>
         <div class="panel p-5"><p class="eyebrow !text-ember mb-2">Weaknesses</p><ul class="space-y-2 text-ash">{b.cons.map((p) => <li class="flex gap-2"><span class="text-ember">−</span>{p}</li>)}</ul></div>
       </div>
+
+      {b.versus && opponent && (
+        <>
+          <h2 id="versus">{b.versus.title}</h2>
+          <p>{b.versus.intro}</p>
+          <div class="panel overflow-x-auto not-prose">
+            <table class="table-game">
+              <thead><tr><th>Attribute</th><th>{b.name}</th><th><a href={`/builds/${opponent.slug}/`} class="text-flame no-underline hover:underline">{opponent.name}</a></th></tr></thead>
+              <tbody>
+                {b.versus.rows.map((r) => (
+                  <tr><th scope="row" class="text-left whitespace-nowrap text-parchment">{r.label}</th><td>{r.self}</td><td>{r.other}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p>{b.versus.verdict}</p>
+        </>
+      )}
+
+      {b.whenNot && (
+        <>
+          <h2 id="when-not">When not to pick the {b.name}</h2>
+          <ul>{b.whenNot.map((p) => <li>{p}</li>)}</ul>
+        </>
+      )}
 
       <h2 id="faq">{b.name} build FAQ</h2>
       {b.faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}

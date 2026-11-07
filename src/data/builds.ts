@@ -30,6 +30,16 @@ export type Build = {
   cons: string[];
   faq: { q: string; a: string }[];
   related: string[];
+  /** Optional head-to-head table against a sibling build. */
+  versus?: {
+    slug: string;
+    title: string;
+    intro: string;
+    rows: { label: string; self: string; other: string }[];
+    verdict: string;
+  };
+  /** Cases where a different build is the better pick. */
+  whenNot?: string[];
 };
 
 export const BUILDS: Build[] = [
@@ -77,6 +87,29 @@ export const BUILDS: Build[] = [
       { q: "Is the Battlemage good in Enshrouded 1.0?", a: "Yes. Keen Games' 1.0 update focused on mages: wands got heavy attacks plus two new active skills (Wand Evasion Attack and Aerial Wand Attack), and Blast and Cast links wand crits to staff damage. Early 1.0 guides (for example hacktheminotaur and pindrop.gg) also rank the wand Battlemage at or near the top." },
       { q: "Wand or staff for a Battlemage?", a: "Use the wand as your main weapon and carry a staff for burst. Blast and Cast raises the base damage of your next staff attack by 50% for 10 seconds after a wand critical strike." },
       { q: "How many skill points does this build use?", a: "The full level 50 plan below uses the exact point costs from the 1.0 game data. You can open it in the Skill Planner and change anything." },
+      { q: "Is Battlemage better than Wizard in Enshrouded 1.0?", a: "Neither is strictly better. The Battlemage is easier to survive with because it blocks and parries, while the Wizard has higher burst and area damage but is squishier. The Battlemage vs Wizard table above compares the two level 50 plans row by row." },
+      { q: "Can the Battlemage solo in 1.0?", a: "Yes. Wand attacks cost no spell charges, Unity and Arcane Deflection return Mana while you fight, and the off-hand ward lets you block and parry. It is one of the more forgiving solo magic builds in 1.0." },
+      { q: "What stats does a Battlemage need?", a: "Intelligence first for wand and spell damage, then Spirit for Mana. The leveling plan puts points into Intelligence early and adds Spirit once the wand skills are online." },
+    ],
+    versus: {
+      slug: "wizard",
+      title: "Battlemage vs Wizard",
+      intro: "Both are Intelligence casters, but they ask for different habits. This table compares the two level 50 plans on this site; the point costs behind both come from the same 1.0 skill tree data.",
+      rows: [
+        { label: "Main hand", self: "Wand plus a Ward or Shield; staff on the swap slot", other: "Staff for spells; wand kept as backup" },
+        { label: "Damage pattern", self: "Fast wand hits and a piercing heavy attack; staff burst after a wand crit", other: "Charged staff spells with bigger per-hit damage but slower casts" },
+        { label: "Mana sustain", self: "Unity and Arcane Deflection, which returns Mana on a parry", other: "Mana Currents, Mana food and Eternal spells" },
+        { label: "Defence", self: "Blocks and parries with the off-hand ward", other: "Kiting, Blink and distance; no ward in hand while casting" },
+        { label: "New 1.0 tools", self: "Wand Evasion Attack, Aerial Wand Attack and Blast and Cast", other: "Nine new spells including Blizzard, Ball Lightning and Pillar of Flames" },
+        { label: "Difficulty", self: "Easy", other: "Medium" },
+        { label: "Best for", self: "Solo players who want magic with a shield", other: "Players who want the biggest ranged bursts and accept kiting" },
+      ],
+      verdict: "Pick the Battlemage if you want a forgiving solo build that can block. Pick the Wizard if you already kite well and want the largest area bursts. They share most Intelligence gear, so switching later costs little.",
+    },
+    whenNot: [
+      "You want the biggest single spell hits — the staff Wizard does that better.",
+      "You do not want to carry a staff for burst; the Battlemage damage ceiling depends on Blast and Cast.",
+      "You want pets or group healing instead of direct damage; the Summoner and Healer are separate builds.",
     ],
     related: ["wizard", "summoner", "healer"],
   },
