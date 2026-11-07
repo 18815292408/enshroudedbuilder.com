@@ -6,7 +6,7 @@ import TocAside from "../../components/TocAside.astro";
 import VerifiedBadge from "../../components/VerifiedBadge.astro";
 import { BUILDS, buildBySlug } from "../../data/builds";
 import { SITE, SOURCES } from "../../lib/site";
-import { BIOMES, MAX_POINTS, REGION_LABEL, TREE, levelPoints, pointsAtLevel } from "../../lib/tree";
+import { BIOMES, MAX_POINTS, REGION_LABEL, SKILL_TYPE_COUNT, SPARK_COUNT, TREE, levelPoints, pointsAtLevel } from "../../lib/tree";
 
 /**
  * French skill-tree page. Targets "arbre de compétence enshrouded", "point de compétence"
@@ -24,7 +24,7 @@ const branches = Object.keys(TREE.regions)
   .map((r) => ({ id: r, label: REGION_LABEL[r], tree: TREE_FR[TREE.regions[r]], nodes: nodesPerRegion[r] ?? 0, builds: buildsByRegion[r] ?? [] }));
 
 const nodeTotal = Object.keys(TREE.nodes).length;
-const typeTotal = Object.keys(TREE.types).length;
+const typeTotal = SKILL_TYPE_COUNT;
 const biomeTotal = BIOMES.reduce((a, b) => a + b.points, 0);
 const levelTotal = MAX_POINTS - biomeTotal;
 const atLevels = [10, 20, 30, 40, 50].map((l) => ({ l, p: pointsAtLevel(l) }));
@@ -43,7 +43,7 @@ const archer = buildBySlug("ranger");
 const faq = [
   {
     q: "Combien de compétences compte l'arbre d'Enshrouded 1.0 ?",
-    a: `L'export des données 1.0 (build ${TREE.source.gameBuild}) contient ${typeTotal} compétences et nœuds d'attribut distincts, placés sur ${nodeTotal} nœuds répartis en treize branches et trois arbres : mage, guerrier et rôdeur.`,
+    a: `L'export des données 1.0 (build ${TREE.source.gameBuild}) contient ${typeTotal} compétences et nœuds d'attribut distincts, placés sur ${nodeTotal} nœuds répartis en treize branches et trois arbres : mage, guerrier et rôdeur. Les ${SPARK_COUNT} étincelles ✦ (Sparks) du centre sont les points de départ gratuits.`,
   },
   {
     q: "Combien de points de compétence au niveau 50 ?",
@@ -96,7 +96,7 @@ const jsonLd = [
 <Base
   lang="fr"
   title="Arbre de compétences Enshrouded 1.0 : 212 points et branches"
-  description="L'arbre de compétences Enshrouded 1.0 en français : 231 nœuds, 3 arbres, 212 points au niveau 50, d'où viennent les points et par où commencer."
+  description="L'arbre de compétences Enshrouded 1.0 en français : 243 nœuds, 3 arbres, 212 points au niveau 50, d'où viennent les points et par où commencer."
   type="article"
   jsonLd={jsonLd}
  

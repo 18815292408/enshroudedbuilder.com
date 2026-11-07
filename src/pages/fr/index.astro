@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import BuildCard from "../../components/BuildCard.astro";
 import { BUILDS, type Build } from "../../data/builds";
 import { FR_BUILD_HREF, SITE, SOURCES } from "../../lib/site";
-import { BIOMES, MAX_POINTS, TREE } from "../../lib/tree";
+import { BIOMES, MAX_POINTS, TREE, SKILL_TYPE_COUNT } from "../../lib/tree";
 
 const biomeTotal = BIOMES.reduce((a, b) => a + b.points, 0);
 const levelTotal = MAX_POINTS - biomeTotal;
@@ -147,7 +147,7 @@ const jsonLd = [
       <div class="relative">
         <p class="eyebrow mb-2">Outil gratuit</p>
         <h2 class="text-3xl">Planificateur d'arbre de compétences</h2>
-        <p class="text-ash mt-3">Planifiez votre build sur l'arbre 1.0 complet : {Object.keys(TREE.nodes).length} nœuds et {Object.keys(TREE.types).length} compétences, avec les coûts du jeu. Réglez votre niveau et les biomes explorés, consultez vos attributs, et partagez le build en un lien.</p>
+        <p class="text-ash mt-3">Planifiez votre build sur l'arbre 1.0 complet : {Object.keys(TREE.nodes).length} nœuds et {SKILL_TYPE_COUNT} compétences, avec les coûts du jeu. Réglez votre niveau et les biomes explorés, consultez vos attributs, et partagez le build en un lien.</p>
         <a href="/builder/" class="btn btn-flame mt-6">Commencer à planifier</a>
       </div>
       <ul class="relative grid grid-cols-2 gap-3 text-sm">

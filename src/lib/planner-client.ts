@@ -1,6 +1,6 @@
 // Browser side of the skill planner. Reads the tree from #planner-data and renders it as SVG.
-type SkillType = { name: string; cost: number; maxLevel: number; color: string; stats: Record<string, number> | null; levels: string[] };
-type Node = { t: string; x: number; y: number; base?: number; ba?: [number, number]; r: string };
+type SkillType = { name: string; cost: number; maxLevel: number; color: string; stats: Record<string, number> | null; levels: string[]; root?: boolean };
+type Node = { t: string; x: number; y: number; base?: number; ba?: [number, number]; r: string; root?: number };
 type Data = {
   tree: { leveling: { playerLevelCap: number; skillPointsPerLevel: number }; regions: Record<string, string>; types: Record<string, SkillType>; nodes: Record<string, Node>; edges: [string, string][] };
   biomes: { id: string; name: string; points: number }[];
@@ -26,6 +26,8 @@ export function initPlanner() {
   const ids = Object.keys(tree.nodes);
   const adj: Record<string, string[]> = Object.fromEntries(ids.map((id) => [id, []]));
   for (const [a, b] of tree.edges) { adj[a].push(b); adj[b].push(a); }
+  const rootIds = ids.filter((id) => tree.nodes[id].root);
+  const rootSet = new Set(rootIds.length ? rootIds : ids.filter((id) => tree.nodes[id].base));
   const typeOf = (id: string) => tree.types[tree.nodes[id].t];
   const treeOf = (id: string) => (tree.nodes[id].r === "core" ? "core" : tree.regions[tree.nodes[id].r]);
 
@@ -37,12 +39,12 @@ export function initPlanner() {
     Math.max(0, level - 1) * tree.leveling.skillPointsPerLevel +
     biomeChecks.filter((c) => c.checked).reduce((a, c) => a + (data.biomes.find((b) => b.id === c.value)?.points ?? 0), 0);
   const used = () => Object.entries(sel).reduce((a, [id, l]) => a + typeOf(id).cost * l, 0);
-  const canTake = (id: string) => !sel[id] && (tree.nodes[id].base || adj[id].some((n) => sel[n]));
+  const canTake = (id: string) => !sel[id] && (rootSet.has(id) || adj[id].some((n) => sel[n]));
 
-  /** True if every selected node is still connected to the base ring without `without`. */
+  /** True if every selected node is still connected to a Sparks root without `without`. */
   const connected = (s: Record<string, number>) => {
     const seen = new Set<string>();
-    const stack = Object.keys(s).filter((id) => tree.nodes[id].base);
+    const stack = Object.keys(s).filter((id) => rootSet.has(id));
     stack.forEach((id) => seen.add(id));
     while (stack.length) { const cur = stack.pop()!; for (const n of adj[cur]) if (s[n] && !seen.has(n)) { seen.add(n); stack.push(n); } }
     return Object.keys(s).every((id) => seen.has(id));
@@ -56,8 +58,13 @@ export function initPlanner() {
       const lvl = Number(code[i + 2]);
       if (tree.nodes[id] && lvl >= 1) out[id] = Math.min(lvl, typeOf(id).maxLevel);
     }
-    // Drop anything not connected to the base ring (old or hand-edited links).
-    const seen = new Set<string>(); const stack = Object.keys(out).filter((id) => tree.nodes[id].base);
+    // Drop anything not connected to a Spark root (old or hand-edited links).
+    if (!Object.keys(out).some((id) => rootSet.has(id))) {
+      // Shared links from before the Sparks existed start on the inner ring: attach one free Spark.
+      const attach = Object.keys(out).flatMap((id) => adj[id]).find((id) => rootSet.has(id));
+      if (attach) out[attach] = 1;
+    }
+    const seen = new Set<string>(); const stack = Object.keys(out).filter((id) => rootSet.has(id));
     stack.forEach((id) => seen.add(id));
     while (stack.length) { const cur = stack.pop()!; for (const n of adj[cur]) if (out[n] && !seen.has(n)) { seen.add(n); stack.push(n); } }
     return Object.fromEntries(Object.entries(out).filter(([id]) => seen.has(id)));
@@ -108,12 +115,18 @@ export function initPlanner() {
   const nodeLayer = svgEl("g"); vp.appendChild(nodeLayer);
   for (const id of ids) {
     const n = tree.nodes[id]; const t = typeOf(id);
-    const r = t.stats ? 10 : t.cost >= 4 ? 19 : 15;
+    const isSpark = Boolean(tree.nodes[id].root);
+    const r = isSpark ? 12 : t.stats ? 10 : t.cost >= 4 ? 19 : 15;
     const g = svgEl("g", { transform: `translate(${n.x} ${n.y})`, "data-id": id, class: "pl-node", tabindex: 0, role: "button", "aria-label": t.name, style: "cursor:pointer;outline:none" });
     const ring = svgEl("circle", { r: r + 4, fill: "none", "stroke-width": 3 });
     const core = svgEl("circle", { r, "stroke-width": 2 });
     const label = svgEl("text", { y: r + 17, "text-anchor": "middle", "font-size": 13, "font-family": "Alegreya Sans, sans-serif", fill: "#ece3cf" });
-    if (t.stats || t.cost >= 4) {
+    if (isSpark) {
+      // The free ✦ Spark roots read as a star, not as a skill circle.
+      const star = svgEl("text", { y: 9, "text-anchor": "middle", "font-size": 30, fill: "#ffd27a", stroke: "#0c0a10", "stroke-width": 1.2, "paint-order": "stroke", "pointer-events": "none", "aria-hidden": "true" });
+      star.textContent = "✦";
+      g.append(ring, core, star, label);
+    } else if (t.stats || t.cost >= 4) {
       // keystones and attributes get a diamond marker so they read differently from regular skills
       const m = svgEl("rect", { x: -4, y: -4, width: 8, height: 8, transform: "rotate(45)", fill: "#0c0a10", opacity: 0.7, "pointer-events": "none" });
       g.append(ring, core, m, label);
@@ -193,7 +206,10 @@ export function initPlanner() {
   const showTip = (id: string, clientX: number, clientY: number) => {
     const t = typeOf(id); const lvl = sel[id] ?? 0;
     const lines = t.levels.map((txt, i) => `<p class="${i + 1 === lvl ? "text-parchment" : "text-mist"} mt-1">${t.maxLevel > 1 ? `<span class="text-flame">Lv ${i + 1}:</span> ` : ""}${escapeHtml(txt)}</p>`).join("");
-    tip.innerHTML = `<p class="font-display text-parchment">${escapeHtml(t.name)}</p><p class="text-xs text-flame uppercase tracking-wider">${escapeHtml(data.regionLabel[tree.nodes[id].r])} · ${t.cost} pt${t.cost > 1 ? "s" : ""}${t.maxLevel > 1 ? ` per level · ${lvl}/${t.maxLevel}` : lvl ? " · taken" : ""}</p>${lines}`;
+    const costLine = t.root
+      ? "free ✦ entry point"
+      : `${t.cost} pt${t.cost > 1 ? "s" : ""}${t.maxLevel > 1 ? ` per level · ${lvl}/${t.maxLevel}` : lvl ? " · taken" : ""}`;
+    tip.innerHTML = `<p class="font-display text-parchment">${escapeHtml(t.name)}</p><p class="text-xs text-flame uppercase tracking-wider">${escapeHtml(data.regionLabel[tree.nodes[id].r])} · ${escapeHtml(costLine)}</p>${lines}`;
     tip.classList.remove("hidden");
     const rect = stage.getBoundingClientRect();
     const x = Math.min(clientX - rect.left + 16, rect.width - tip.offsetWidth - 8);
@@ -276,12 +292,12 @@ export function initPlanner() {
     document.getElementById("attrs")!.innerHTML = Object.keys(STAT_NAME).map((k) => `<div class="flex justify-between gap-2"><dt class="text-ash">${STAT_NAME[k]}</dt><dd class="text-parchment font-display">+${stats[k] ?? 0}</dd></div>`).join("");
 
     const byType = new Map<string, { lvl: number; cost: number; id: string }>();
-    for (const [id, l] of Object.entries(sel)) { const k = tree.nodes[id].t; const e = byType.get(k) ?? { lvl: 0, cost: 0, id }; e.lvl += l; e.cost += typeOf(id).cost * l; byType.set(k, e); }
+    for (const [id, l] of Object.entries(sel)) { const k = tree.nodes[id].t; if (tree.types[k].root) continue; const e = byType.get(k) ?? { lvl: 0, cost: 0, id }; e.lvl += l; e.cost += typeOf(id).cost * l; byType.set(k, e); }
     const rows = [...byType.entries()].sort((a, b) => tree.nodes[a[1].id].r.localeCompare(tree.nodes[b[1].id].r) || tree.types[a[0]].name.localeCompare(tree.types[b[0]].name));
     document.getElementById("count")!.textContent = rows.length ? `(${rows.length})` : "";
     document.getElementById("list")!.innerHTML = rows.length
       ? rows.map(([k, e]) => `<li class="flex justify-between gap-2"><span><span style="color:${TREE_COLOR[treeOf(e.id)]}">◆</span> ${escapeHtml(tree.types[k].name)}${tree.types[k].stats ? ` ×${e.lvl}` : tree.types[k].maxLevel > 1 ? ` <span class="text-mist">${e.lvl}/${tree.types[k].maxLevel}</span>` : ""}</span><span class="text-mist">${e.cost} pt</span></li>`).join("")
-      : `<li class="text-mist">Nothing yet. Click a node on the inner ring to start.</li>`;
+      : `<li class="text-mist">Nothing yet. Click a ✦ Spark on the inner ring to start.</li>`;
     persist();
     renderSearchResults();
   }
@@ -291,6 +307,7 @@ export function initPlanner() {
   const matchIds = (q: string) => {
     if (!q) return [];
     const hits = ids.filter((id) => {
+      if (tree.nodes[id].root) return false;
       const t = typeOf(id);
       return t.name.toLowerCase().includes(q) || t.levels.some((l) => l.toLowerCase().includes(q));
     });

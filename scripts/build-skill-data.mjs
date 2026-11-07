@@ -10,6 +10,8 @@ const game = read("gameSkillData.json");
 const progression = read("gameProgression.json");
 const authored = read("authored.json");
 const text = read("nodes.en.json");
+const sparks = read("sparks.json");
+const patch = read("patch-1.0.1.0.json");
 
 const REGIONS = [
   ["trickster", 257], ["wizard", 286], ["healer", 316], ["battlemage", 347],
@@ -61,6 +63,32 @@ for (const [key, t] of Object.entries(types)) {
   if (gameName && gameName !== gameName.toUpperCase()) t.name = gameName;
 }
 
+// The tree's 12 free Spark roots are not part of the upstream skill export
+// (it only ships learnable skills). They are the only legal starting points.
+types.SPARK = {
+  name: "Spark",
+  cost: 0,
+  maxLevel: 1,
+  color: "gold",
+  stats: null,
+  root: true,
+  levels: ["Free entry point: costs no skill points and unlocks the skills it connects to."],
+};
+
+// Official ability-cost text from patch 1.0.1.0. Fail loudly if the export text moves.
+for (const [type, replacements] of Object.entries(patch.skillText)) {
+  if (!types[type]) throw new Error(`patch 1.0.1.0 references unknown skill type ${type}`);
+  for (const [from, to] of replacements) {
+    let hits = 0;
+    types[type].levels = types[type].levels.map((line) => {
+      if (!line.includes(from)) return line;
+      hits += 1;
+      return line.split(from).join(to);
+    });
+    if (!hits) throw new Error(`patch 1.0.1.0 text "${from}" not found in ${type}`);
+  }
+}
+
 const nodes = {};
 for (const [id, n] of Object.entries(game.nodes)) {
   const { x, y } = n.position;
@@ -76,6 +104,31 @@ for (const [id, n] of Object.entries(game.nodes)) {
 }
 const edges = game.edges.map(([a, b]) => [a, b]);
 
+// Add the 12 free Spark roots and wire them to the nodes they unlock.
+const { center, scale } = game.transform;
+const byGameId = Object.fromEntries(Object.entries(game.nodes).map(([id, n]) => [n.gameNodeId, id]));
+let nextNodeId = Math.max(...Object.keys(nodes).map(Number)) + 1;
+for (const s of sparks.nodes) {
+  if (s.cost !== 0 || s.maxLevel !== 1) throw new Error(`spark ${s.gameNodeId} must cost 0 with one rank`);
+  if (byGameId[s.gameNodeId]) throw new Error(`spark ${s.gameNodeId} already exists in the skill export`);
+  const id = String(nextNodeId++);
+  nodes[id] = {
+    t: "SPARK",
+    x: +(((s.x - center.x) * scale).toFixed(1)),
+    y: +(((s.y - center.y) * scale).toFixed(1)),
+    r: "core",
+    root: 1,
+  };
+  byGameId[s.gameNodeId] = id;
+}
+for (const s of sparks.nodes) {
+  for (const gid of s.connects) {
+    const target = byGameId[gid];
+    if (!target) throw new Error(`spark ${s.gameNodeId} links to unknown game node ${gid}`);
+    edges.push([byGameId[s.gameNodeId], target]);
+  }
+}
+
 const biomePoints = Object.fromEntries(Object.entries(progression.biomes).map(([k, v]) => [k, v.points]));
 const out = {
   source: {
@@ -83,6 +136,8 @@ const out = {
     branch: game.provenance.gameBuild.split("|")[1],
     exportedAtUtc: game.provenance.exportedAtUtc,
     contentHash: game.treeVersion.contentHash,
+    sparks: sparks.nodes.length,
+    patch: { gameBuild: patch.gameBuild, released: patch.released, source: patch.source },
   },
   leveling: progression.leveling,
   biomePoints,
@@ -94,4 +149,5 @@ const out = {
 fs.mkdirSync(new URL("../src/data/", import.meta.url), { recursive: true });
 fs.writeFileSync(new URL("../src/data/skilltree.json", import.meta.url), JSON.stringify(out));
 const maxPoints = (progression.leveling.playerLevelCap - 1) * progression.leveling.skillPointsPerLevel + Object.values(biomePoints).reduce((a, b) => a + b, 0);
-console.log(`skilltree.json: ${Object.keys(nodes).length} nodes, ${Object.keys(types).length} skills, ${edges.length} links, max points ${maxPoints}`);
+const skillCount = Object.values(types).filter((t) => !t.root).length;
+console.log(`skilltree.json: ${Object.keys(nodes).length} nodes (${skillCount} skills + ${sparks.nodes.length} Sparks), ${edges.length} links, max points ${maxPoints}`);
