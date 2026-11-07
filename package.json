@@ -8,7 +8,8 @@
     "dev": "astro dev",
     "build": "node scripts/build-skill-data.mjs && astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "check:tree": "tsx scripts/check-tree.mts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

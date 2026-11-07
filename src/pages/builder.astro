@@ -1,6 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import { TREE, BIOMES, MAX_POINTS, REGION_LABEL } from "../lib/tree";
+import { TREE, BIOMES, MAX_POINTS, REGION_LABEL, SPARK_COUNT } from "../lib/tree";
 import { BUILDS } from "../data/builds";
 import { planBuild } from "../lib/plan";
 import { SITE, SOURCES } from "../lib/site";
@@ -20,7 +20,7 @@ const jsonLd = {
         <a id="backlink" href="/builds/" class="hidden mb-3 btn btn-ghost !py-1.5 !text-xs">← Back to the build guide</a>
         <p class="eyebrow mb-1">Free tool · Enshrouded 1.0</p>
         <h1 class="text-3xl md:text-4xl">Enshrouded Skill Tree Planner</h1>
-        <p class="text-sm text-mist mt-2 max-w-xl">Node layout, costs and effect text come from the 1.0 game data, build {TREE.source.gameBuild} (hotfix 1.0.0.1). Hotfixes 1.0.0.2 and 1.0.0.3 changed no skill numbers. Last verified {SITE.lastVerified}.</p>
+        <p class="text-sm text-mist mt-2 max-w-xl">Node layout and links come from the 1.0 game data (build {TREE.source.gameBuild}); ability costs include the 1.0.1.0 changes (build {TREE.source.patch?.gameBuild}). Last verified {SITE.lastVerified}.</p>
       </div>
       <div class="flex flex-wrap gap-2">
         <label class="sr-only" for="preset">Load a build</label>
@@ -91,21 +91,23 @@ const jsonLd = {
   <section class="wrap mt-12 prose-game max-w-3xl">
     <h2>How to use the Enshrouded skill planner</h2>
     <ul>
-      <li>Start from any node on the inner ring. A skill can only be taken if it connects to a skill you already have, just like in game.</li>
+      <li>Start by clicking a free <strong>✦ Spark</strong> on the inner ring. From there a skill can only be taken if it connects to a Spark or skill you already have, just like in game.</li>
       <li>Click a node to add a level, and click again for skills with up to 3 levels. Right-click, Shift-click or long-press removes a level. You cannot remove a node that other selected skills depend on.</li>
       <li>Set your <strong>player level</strong> and the biomes you have explored to see your real point budget: 2 points per level after level 1, plus each biome's Shroud Roots (1 point) and Elixir Wells (3 points).</li>
       <li>The link updates as you plan. Use <strong>Copy share link</strong> to send the build to friends on Discord or Reddit.</li>
     </ul>
     <h2>Where the data comes from</h2>
-    <p>Node layout, links, costs, max levels and effect text come from the Enshrouded 1.0 game files (build {TREE.source.gameBuild}), via the open-source <a href={SOURCES.gameData.url} rel="noopener">enshrouded-skill-tree</a> export (GPL-3.0). Colors show the three trees: <span class="text-tree-mage">Mage</span>, <span class="text-tree-warrior">Warrior</span>, <span class="text-tree-ranger">Ranger</span> and the <span class="text-tree-core">Core</span>. Want a ready-made build? Browse the <a href="/builds/">1.0 build guides</a>.</p>
+    <p>Node layout, links, costs, max levels and effect text come from the Enshrouded 1.0 game files (build {TREE.source.gameBuild}), via the open-source <a href={SOURCES.gameData.url} rel="noopener">enshrouded-skill-tree</a> export (GPL-3.0). The {SPARK_COUNT} free <strong>✦ Sparks</strong> are the tree's root nodes; the upstream export leaves them out, so their ids and positions come from the live 1.0 tree. Patch 1.0.1.0 ability-cost text is applied on top of the export. Colors show the three trees: <span class="text-tree-mage">Mage</span>, <span class="text-tree-warrior">Warrior</span>, <span class="text-tree-ranger">Ranger</span> and the <span class="text-tree-core">Core</span>. Want a ready-made build? Browse the <a href="/builds/">1.0 build guides</a>.</p>
 
     <h2>Enshrouded skill planner FAQ</h2>
     <h3>Is this a skill planner or a talent calculator?</h3>
     <p>Both names point at the same page. The planner draws every node in the 1.0 tree with its exact per-rank cost, so it works as an Enshrouded talent calculator while you level and as a full build calculator once you start comparing finished setups.</p>
     <h3>How many skill points do you get at level 50?</h3>
     <p>Leveling gives 98 points (2 per level after level 1), and the seven biomes add up to 114 more from Shroud Roots and Elixir Wells, for a maximum of {MAX_POINTS} points. The whole tree costs 675 points, so a level 50 character can afford roughly a third of it — that is why the planner shows the remaining points live as you click.</p>
-    <h3>Does the planner include the 1.0 hotfixes?</h3>
-    <p>Yes for skill points. Node layout, links and point costs come from build {TREE.source.gameBuild} (hotfix 1.0.0.1). Hotfixes 1.0.0.2 and 1.0.0.3 changed no skill numbers, and patch 1.0.1.0 changed three abilities' in-game mana or stamina costs plus a few perk descriptions but left every skill-point cost alone, so the point totals here still match the live game. The node effect text is still the 1.0.0.1 export — see the <a href="/enshrouded-1-0-1-0-patch-notes/">1.0.1.0 patch notes</a> for the three cost changes.</p>
+    <h3>Does the planner include the 1.0 hotfixes and patch 1.0.1.0?</h3>
+    <p>Node layout, links and point costs come from build {TREE.source.gameBuild}. Hotfixes 1.0.0.2 and 1.0.0.3 changed no skill numbers, and patch 1.0.1.0 (build {TREE.source.patch?.gameBuild}) changed three abilities' in-game mana or stamina costs plus a few perk descriptions but left every skill-point cost alone, so the point totals here match the live game. The ability text includes the official 40 mana for Aerial Wand Attack; the Wand Evasion Attack and Whirlwind Crescendo reductions are marked as reduced because Keen Games published no new figure. See the <a href="/enshrouded-1-0-1-0-patch-notes/">1.0.1.0 patch notes</a>.</p>
+    <h3>What are the ✦ Sparks on the inner ring?</h3>
+    <p>Every character starts from one of the {SPARK_COUNT} free ✦ Sparks around the core. A Spark costs no skill points and unlocks the skills it touches, which is why the planner makes you pick one before any other node. You can still reach any part of the tree from any Spark; the choice only decides your first few links.</p>
   </section>
 
   <script type="application/json" id="planner-data" set:html={JSON.stringify(payload)} />

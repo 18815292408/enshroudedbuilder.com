@@ -1,0 +1,138 @@
+{
+  "source": {
+    "gameBuild": "1267041",
+    "capturedAt": "2026-11-07",
+    "note": "The 12 free Spark root nodes are missing from the upstream skill export, which only ships learnable skills. Node ids, positions and links below come from the live 1.0 skill tree; each costs 0 points and has one rank."
+  },
+  "nodes": [
+    {
+      "gameNodeId": "2398930034",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 3847,
+      "y": 3434,
+      "connects": [
+        "1669339746",
+        "2116701756"
+      ]
+    },
+    {
+      "gameNodeId": "2467630731",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 4153,
+      "y": 3435,
+      "connects": [
+        "2282076069",
+        "3126571237"
+      ]
+    },
+    {
+      "gameNodeId": "681148866",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 4563,
+      "y": 4153,
+      "connects": [
+        "31613866",
+        "29426941"
+      ]
+    },
+    {
+      "gameNodeId": "1376932952",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 4413,
+      "y": 4415,
+      "connects": [
+        "2178463311",
+        "3655395818"
+      ]
+    },
+    {
+      "gameNodeId": "3803852627",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 3587,
+      "y": 4417,
+      "connects": [
+        "134064960",
+        "3223249169"
+      ]
+    },
+    {
+      "gameNodeId": "1029901343",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 3433,
+      "y": 4150,
+      "connects": [
+        "1863946535",
+        "802872125"
+      ]
+    },
+    {
+      "gameNodeId": "2688257580",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 3435,
+      "y": 3849,
+      "connects": [
+        "1365673623"
+      ]
+    },
+    {
+      "gameNodeId": "2846577355",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 3584,
+      "y": 3587,
+      "connects": [
+        "1065999155"
+      ]
+    },
+    {
+      "gameNodeId": "1972578769",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 4414,
+      "y": 3587,
+      "connects": [
+        "1313439627",
+        "4292213056"
+      ]
+    },
+    {
+      "gameNodeId": "1707226914",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 4565,
+      "y": 3849,
+      "connects": [
+        "2778233134",
+        "3959272851"
+      ]
+    },
+    {
+      "gameNodeId": "2821465831",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 4152,
+      "y": 4567,
+      "connects": [
+        "2587217951"
+      ]
+    },
+    {
+      "gameNodeId": "3272898941",
+      "cost": 0,
+      "maxLevel": 1,
+      "x": 3849,
+      "y": 4565,
+      "connects": [
+        "3844459022",
+        "2193423673"
+      ]
+    }
+  ]
+}

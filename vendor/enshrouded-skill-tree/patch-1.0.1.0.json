@@ -1,0 +1,17 @@
+{
+  "gameBuild": "1283531",
+  "released": "2026-11-02",
+  "source": "https://store.steampowered.com/news/app/1203620/view/694276363007298066",
+  "note": "Patch 1.0.1.0 changed three ability costs. Only the Aerial Wand Attack figure is published; the other two are marked as reduced without inventing a number. Skill-point costs did not change.",
+  "skillText": {
+    "AERIAL_WAND_ATTACK": [
+      ["Cost: 25 Stamina", "Cost: 40 Mana (patch 1.0.1.0)"]
+    ],
+    "WAND_EVASION_ATTACK": [
+      ["Cost: 50 Mana", "Cost: reduced in patch 1.0.1.0; Keen Games has not published the new figure"]
+    ],
+    "WHIRLWIND_CRESCENDO": [
+      ["Cost: 75 Stamina", "Cost: reduced in patch 1.0.1.0; Keen Games has not published the new figure"]
+    ]
+  }
+}

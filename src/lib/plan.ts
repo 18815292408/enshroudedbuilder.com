@@ -24,6 +24,7 @@ export function planBuild(build: Build): PlannedStage[] {
       const prev = before[id] ?? 0;
       if (lvl === prev) continue;
       const t = TREE.nodes[id].t;
+      if (TREE.types[t].root) continue;
       const e = byType.get(t) ?? { from: 0, to: 0 };
       e.from += prev; e.to += lvl; byType.set(t, e);
     }

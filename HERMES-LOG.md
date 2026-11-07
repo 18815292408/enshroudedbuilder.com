@@ -34,3 +34,11 @@
 - 新页候选：无（本条已用掉 reviewing 期间 14 天 1 个的额度）。
 - 待核实：无。
 - 技术待办（交给 Claude）：等 rossicler/enshrouded-skill-tree 上游重导出 1.0.1.0 数据后，重建 skilltree.json，把 Aerial Wand Attack（40 mana）与另外两个被下调的技能文本换掉，届时可撤 `/skills/` 的临时说明。
+
+## 2026-11-07（技术缺口 GAP 78：补 12 个 ✦ Spark 根节点，技能花费跟到 1.0.1.0）
+- 上游 `gameSkillData.json` 仍停在 build 1267041，且导出只含可学习技能，缺少游戏里内圈的 12 个免费 ✦ Spark 根节点（竞品与 wiki 均按 243 = 231 技能 + 12 Sparks 渲染）。
+- `vendor/enshrouded-skill-tree/sparks.json`：12 个 Spark 的 gameNodeId、坐标与连线（取自 live 1.0 tree）；`patch-1.0.1.0.json`：官方补丁三处花费文本，Aerial Wand Attack 40 mana，另外两个只写「已下调、官方未公布」。
+- `scripts/build-skill-data.mjs` 现在把这些并进 `skilltree.json`：节点 231 → 243、连线 291 → 312，SPARK 类型 cost 0 / 1 rank。
+- 加点器规则改成「先点 Spark，再沿连线解锁」，12 个根节点渲染成金色 ✦；老分享链接自动补一个 Spark；`/skills/`、`/builder/`、首页、法语页的节点数同步为 243（技能类型仍 178）。
+- `lastVerified` → 2026-11-07，`gameVersion` → `1.0 (patch 1.0.1.0)`；新增 `npm run check:tree`，覆盖 Spark 数量、全树连通性、8 套预设分享码。
+- 新页候选：无。技术待办：GAP 78 关闭。

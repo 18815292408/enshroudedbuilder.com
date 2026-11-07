@@ -1,11 +1,11 @@
 import data from "../data/skilltree.json";
 
-export type SkillType = { name: string; cost: number; maxLevel: number; color: string; stats: Record<string, number> | null; levels: string[] };
-export type TreeNode = { t: string; x: number; y: number; base?: number; ba?: [number, number]; r: string };
+export type SkillType = { name: string; cost: number; maxLevel: number; color: string; stats: Record<string, number> | null; levels: string[]; root?: boolean };
+export type TreeNode = { t: string; x: number; y: number; base?: number; ba?: [number, number]; r: string; root?: number };
 export type Selection = Record<string, number>;
 
 export const TREE = data as unknown as {
-  source: { gameBuild: string; branch: string; exportedAtUtc: string; contentHash: string };
+  source: { gameBuild: string; branch: string; exportedAtUtc: string; contentHash: string; sparks?: number; patch?: { gameBuild: string; released: string; source: string } };
   leveling: { playerLevelCap: number; skillPointsPerLevel: number };
   biomePoints: Record<string, number>;
   regions: Record<string, string>;
@@ -13,6 +13,19 @@ export const TREE = data as unknown as {
   nodes: Record<string, TreeNode>;
   edges: [string, string][];
 };
+
+/** Types that are real skills (the free ✦ Spark entry points are not skills). */
+export const SKILL_TYPES = Object.keys(TREE.types).filter((t) => !TREE.types[t].root);
+export const SKILL_TYPE_COUNT = SKILL_TYPES.length;
+export const SPARK_COUNT = Object.keys(TREE.nodes).filter((id) => TREE.nodes[id].root).length;
+
+/** Legal starting nodes: the 12 free Sparks. Older data without them falls back to the base ring. */
+const ROOTS = new Set(
+  Object.keys(TREE.nodes).some((id) => TREE.nodes[id].root)
+    ? Object.keys(TREE.nodes).filter((id) => TREE.nodes[id].root)
+    : Object.keys(TREE.nodes).filter((id) => TREE.nodes[id].base),
+);
+export const ROOT_NODES = [...ROOTS];
 
 export const REGION_LABEL: Record<string, string> = {
   core: "Core", trickster: "Trickster", wizard: "Wizard", healer: "Healer", battlemage: "Battlemage",
@@ -74,7 +87,7 @@ export function addSkill(sel: Selection, type: string, level = 1): Selection {
   const dist: Record<string, number> = {}; const prev: Record<string, string | null> = {};
   const queue: string[] = [];
   for (const id of Object.keys(TREE.nodes)) {
-    const reachable = !next[id] && (TREE.nodes[id].base || ADJ[id].some((n) => next[n]));
+    const reachable = !next[id] && (ROOTS.has(id) || ADJ[id].some((n) => next[n]));
     if (reachable) { dist[id] = skill(TREE.nodes[id].t).cost; prev[id] = null; queue.push(id); }
   }
   while (queue.length) {
