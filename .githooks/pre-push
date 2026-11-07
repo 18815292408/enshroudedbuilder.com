@@ -1,52 +1,79 @@
 #!/bin/sh
-# main 分支推送守卫（2026-11-06）：只允许合并提交进 main。
+# main 分支推送守卫（2026-11-06 起；2026-11-08 加合并标记检查）
 #
 # 为什么：2026-11-05 loadoutvault 的 63e1147「更正 WZStats 来源日期」是 PR 审核任务
 # 临时在 main 上 cherry-pick 出来的非合并提交，绕过了 zyseo/* 分支和发布节奏门。
-# 线上内容一律走 zyseo/* 分支 → PR 审核合并（合并提交 = 一次真实上线，节奏门按它计数）。
+# 2026-11-07 又出现两次手写合并（loadoutvault e018432、enshroudedbuilder a66ba7b9f）：
+# 钩子只拦非合并提交，合并提交能直接推上去，节奏门（滚动 24h ≤2 次、间隔 ≥6h）照样被绕过。
 #
-# 例外：部署脚本自动回滚产生的 `Revert "..."` 提交（上线检查失败时要把坏合并撤回）。
-# 关掉或改规则请改这个文件，不要在仓库里 -c core.hooksPath= 绕过。
+# 所以游戏站 main 上只允许两种提交：
+#   1) 合并提交，且提交信息里有 [publish:data|code|fix|fact_fix] 标记 —— 标记只有
+#      zyseo.py pr-merge 合并时会打上，等于「这次上线过了节奏门」的凭证；
+#   2) 部署脚本自动回滚产生的 Revert "..." 提交。
+# 别的（直推、cherry-pick、手写 git merge）一律拒。
+#
+# 这是源头：references/pre-push。装到仓库用
+#   python3 scripts/install_pre_push.py --site <站点>
+# 不要在仓库里 -c core.hooksPath= 绕过。
 set -u
 
 zero=0000000000000000000000000000000000000000
 bad=""
-checked=0
+unmarked=""
 
 while read -r local_ref local_sha remote_ref remote_sha; do
-  [ "$remote_ref" = "refs/heads/main" ] || continue
-  [ "$local_sha" = "$zero" ] && continue            # 删分支，放行
+  [ "${remote_ref}" = "refs/heads/main" ] || continue
+  [ "${local_sha}" = "${zero}" ] && continue            # 删分支，放行
 
-  if [ "$remote_sha" = "$zero" ]; then
+  if [ "${remote_sha}" = "${zero}" ]; then
     # main 还不存在（首次推送）：没有可比的基线，只提醒不拦
-    echo "pre-push: 远端 main 还不存在，跳过直推检查" >&2
+    echo "pre-push: 远端 main 还不存在，跳过检查" >&2
     continue
   fi
-  checked=1
 
   # 这次要推上去的、不是合并提交的提交（第一父链上）
-  commits=$(git rev-list --first-parent --no-merges "$remote_sha..$local_sha" 2>/dev/null)
-  for sha in $commits; do
-    subject=$(git log -1 --format=%s "$sha" 2>/dev/null)
-    case "$subject" in
-      Revert\ \"*) continue ;;                       # 部署失败自动回滚：允许
+  for sha in $(git rev-list --first-parent --no-merges "${remote_sha}..${local_sha}" 2>/dev/null); do
+    subject=$(git log -1 --format=%s "${sha}" 2>/dev/null)
+    case "${subject}" in
+      Revert\ \"*) continue ;;                          # 部署失败自动回滚：允许
     esac
-    bad="$bad
-  $sha $(printf '%s' "$subject" | cut -c1-90)"
+    bad="${bad}
+  ${sha} $(printf '%s' "${subject}" | cut -c1-90)"
+  done
+
+  # 合并提交必须有 pr-merge 打的标记，否则就是手写合并，绕过了节奏门
+  for sha in $(git rev-list --first-parent --merges "${remote_sha}..${local_sha}" 2>/dev/null); do
+    subject=$(git log -1 --format=%s "${sha}" 2>/dev/null)
+    case "${subject}" in
+      *"[publish:data]"*|*"[publish:fact_fix]"*|*"[publish:code]"*|*"[publish:fix]"*) continue ;;
+    esac
+    unmarked="${unmarked}
+  ${sha} $(printf '%s' "${subject}" | cut -c1-90)"
   done
 done
 
-if [ -n "$bad" ]; then
+if [ -n "${bad}" ]; then
   cat >&2 <<EOF
 ✋ 拒绝直推 main：这些提交不是合并提交，绕过了 zyseo/* 分支和发布节奏门。
-$bad
+${bad}
 
-正确做法：
-  1) git checkout -b zyseo/<主题>   （内容/数据改动推 zyseo/data-updates）
-  2) git push origin zyseo/<主题>
-  3) 「zyseo PR 审核合并」任务审核后 git merge --no-ff 再推 main
-内容改动同时要过 zyseo 的发布节奏门（publish_cadence：滚动 24h ≤2 次、间隔 ≥6h）。
+正确做法：所有改动先推 zyseo/* 分支，再用 zyseo.py pr-merge 合并。
 只有部署脚本自动回滚的 Revert 提交可以直接推。
+EOF
+  exit 1
+fi
+
+if [ -n "${unmarked}" ]; then
+  cat >&2 <<EOF
+✋ 拒绝手写合并：这些合并提交没有 [publish:…] 标记，绕过了发布节奏门。
+${unmarked}
+
+正确做法：用 zyseo.py pr-merge 合并，它会先过节奏门（游戏站滚动 24h ≤2 次、间隔 ≥6h），
+再打上标记合并：
+  cd ~/.agents/skills/zyseo && python3 scripts/zyseo.py pr-merge --site <站点> --branch <分支>
+代码分支（zyseo/fix-*、zyseo/code-*）带 [publish:code]；线上真坏了的紧急修复用
+--kind fix --reason "坏在哪" 带 [publish:fix]（每站每天额外 1 次）。
+被节奏门挡住就等下一个窗口，不要手工合并。
 EOF
   exit 1
 fi
