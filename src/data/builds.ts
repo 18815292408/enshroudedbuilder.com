@@ -256,6 +256,8 @@ export const BUILDS: Build[] = [
       { q: "What changed for Rangers in Enshrouded 1.0?", a: "Three new skills (Puncture, Barrage, Survival Instinct), rebalanced arrows, new upgradeable Eternal Ember, Voltaic and Bone arrows, and new aim-assist settings for ranged combat." },
       { q: "Should a Ranger use daggers?", a: "As a backup, yes. Dexterity boosts both Bow and Dagger damage, and Slice and Dice (Assassin area) gives your next bow attack +50% base damage after a dagger critical strike." },
       { q: "Is Multi Shot worth it?", a: "Multi Shot gives regular arrows a 20% chance to fire a flurry. Multi Shot Trigger lets special arrows trigger it too. It is a late-game investment of 7–10 points, so take it after your core damage nodes." },
+      { q: "Is the Enshrouded ranger build good for solo play?", a: "Yes. The ranger build is rated A-tier for solo and co-op: Runner and Rebound keep enemies at bow range, Survival Instinct gives Shroud time back whenever you kill a Shroud enemy with a bow or dagger, and the Eternal arrows remove ammo runs at level 50. The trade-off is accuracy — damage drops sharply when you miss weak points, so it is less forgiving than the Summoner or Tank." },
+      { q: "How many skill points does the Enshrouded ranger build need?", a: "The core is ten nodes: Marksman, Skill Shot, Sniper, Puncture, Fatal Precision, Bow Specialization, Multi Shot, Barrage, Ranger and Graceful Stride. They are spread across the three level blocks (1–15, 16–35, 36–50), so the bow damage and crit nodes come online before the Multi Shot investment at the end." },
     ],
     related: ["assassin", "battlemage", "warrior"],
   },
