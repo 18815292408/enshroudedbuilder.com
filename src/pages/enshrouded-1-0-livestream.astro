@@ -1,0 +1,135 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../lib/site";
+
+const patches = [
+  { version: "1.0", type: "Full release", build: "—", date: "October 15, 2026", note: "Early Access ends; level cap 50, Cinder's Cradle, skill tree reset on first load." },
+  { version: "1.0.0.1", type: "Hotfix", build: "1267041", date: "October 15, 2026", note: "Fire Wisp scroll fixed to level 27, indoor lighting, crashes." },
+  { version: "1.0.0.2", type: "Hotfix", build: "1269579", date: "October 16, 2026", note: "Translated skill descriptions, world settings, crashes." },
+  { version: "1.0.0.3", type: "Hotfix", build: "1273043", date: "October 21, 2026", note: "Save migration, Early Access rewards, crashes." },
+  { version: "1.0.1.0", type: "Patch #1", build: "1283531", date: "November 2, 2026", note: "Ability costs: Aerial Wand Attack 40 mana, wand block-cancel fix, loot and crafting." },
+  { version: "1.0.1.1", type: "Hotfix #4", build: "1285601", date: "November 3, 2026", note: "Voice-over volume, multiplayer loot sounds, voxel wall textures, water crash." },
+  { version: "1.0.1.2", type: "Hotfix #5", build: "1287369", date: "November 4, 2026", note: "Pinned recipes stay pinned, deprecated item and blueprint crashes, black screen." },
+];
+
+const drops = [
+  ["30 min", "Artificer Boots & Trousers"],
+  ["60 min", "Artificer Gloves"],
+  ["90 min", "Artificer Hope Chest"],
+  ["120 min", "Star Map prop"],
+  ["180 min", "Artificer Helmet"],
+  ["240 min", "Animated Ancient Globe prop"],
+];
+
+const faq = [
+  {
+    q: "Is the Enshrouded 1.0 livestream still running?",
+    a: "Keen Games lists it as a live Steam broadcast that started on November 10, 2026 and is scheduled to end on April 1, 2027. The event page is on Enshrouded's Steam news feed and switches to a live state while it is broadcasting.",
+  },
+  {
+    q: "Does the livestream include patch notes or announcements?",
+    a: "No. The event post only says the footage was provided by the creator JuiceHead and thanks them. Patch notes live in separate posts on the same Steam news feed, which is why this page collects them instead.",
+  },
+  {
+    q: "Which version is Enshrouded on right now?",
+    a: "Hotfix #5, version 1.0.1.2, game build 1287369, published on November 4, 2026. It is the newest post on the official Steam news feed at the time of writing.",
+  },
+  {
+    q: "Do I need to change my build after hotfixes 1.0.1.1 and 1.0.1.2?",
+    a: "No. Neither hotfix lists a skill cost, damage or combat change, so the values on our 1.0 changes page still apply. The item that matters for builders is the pinned-recipe fix in 1.0.1.2: recipes you pin now stay pinned at the crafting station.",
+  },
+  {
+    q: "How much does Enshrouded cost and when did 1.0 come out?",
+    a: "Enshrouded left Early Access with version 1.0 on October 15, 2026. The Steam store lists it at $39.99.",
+  },
+];
+
+const sources = [
+  { label: "Keen Games – “Enshrouded: 1.0 Livestream” Steam event (November 10, 2026)", url: "https://store.steampowered.com/news/app/1203620/view/694277269707817959" },
+  { label: "Keen Games – Changelog for Hotfix #4, v1.0.1.1, build 1285601 (Steam, November 3, 2026)", url: "https://store.steampowered.com/news/app/1203620/view/694276363007298785" },
+  { label: "Keen Games – Changelog for Hotfix #5, v1.0.1.2, build 1287369 (Steam, November 4, 2026)", url: "https://store.steampowered.com/news/app/1203620/view/694277000588690058" },
+  { label: "Keen Games – Changelog for Patch #1, v1.0.1.0, build 1283531 (Steam, November 2, 2026)", url: "https://store.steampowered.com/news/app/1203620/view/694276363007298066" },
+  { label: "Keen Games – “New Drops – Through Adversity, to the Stars” (Steam, November 3, 2026)", url: "https://store.steampowered.com/news/app/1203620/view/694276363007298573" },
+  { label: "Enshrouded on Steam – store page, released October 15, 2026, $39.99", url: "https://store.steampowered.com/app/1203620/Enshrouded/" },
+];
+---
+
+<Base
+  title="Enshrouded 1.0 Livestream: What It Shows and Your Patch Level"
+  description="The official Enshrouded 1.0 livestream on Steam, what the footage actually covers, and the full patch and build timeline from 1.0 through hotfix 1.0.1.2."
+  type="article"
+  jsonLd={[
+    { "@context": "https://schema.org", "@type": "Article", headline: "Enshrouded 1.0 livestream: what it shows and which patch you are on", datePublished: "2026-11-16", dateModified: "2026-11-16", author: { "@type": "Organization", name: SITE.name }, publisher: { "@type": "Organization", name: SITE.name } },
+    { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+  ]}
+>
+  <article class="wrap pt-14 prose-game max-w-3xl" data-page-kind="version">
+    <p class="eyebrow">Livestream and patch state</p>
+    <h1 class="text-4xl md:text-5xl !mt-2">Enshrouded 1.0 livestream: what the stream shows, and which patch you are on</h1>
+    <p class="text-lg">
+      Keen Games put a livestream on the Enshrouded Steam page for the 1.0 release on <strong>November 10, 2026</strong>. The stream is gameplay footage, not a developer Q&amp;A, so it does not answer the question most players actually have after it: <em>which patch is the game on, and does my build still work?</em> This page answers that with the official version and build numbers, checked on November 16, 2026.
+    </p>
+
+    <h2>What the 1.0 livestream actually is</h2>
+    <p>The event is called <strong>“Enshrouded: 1.0 Livestream”</strong> and Keen Games lists it as a Live-Stream / Broadcast on the game's Steam news feed. The event page opened on November 10, 2026 and carries an end date of April 1, 2027, so the entry stays on the Steam page long after the broadcast itself. The description is the 1.0 launch line — “After a long and exciting early access journey, it's finally time for you to take back Embervale, Flameborn… Enshrouded 1.0 is out now!”</p>
+    <p>The post body credits the footage to the creator <strong>JuiceHead</strong> (<span class="whitespace-nowrap">@JuiceHead3</span> on YouTube) and thanks them for it. That is the only production detail in the post: there is no roadmap, no patch list and no balance discussion in it. If you are looking for what changed in a specific version, the changelog posts on the same Steam feed are the source, and we summarise the build-relevant parts of them below and on our <a href="/enshrouded-1-0-changes/">1.0 changes page</a>.</p>
+
+    <h2>Which patch you are on: full version and build timeline</h2>
+    <p>Enshrouded ships hotfixes as separate Steam posts, each with a version string and a five-to-seven digit build number. The build number is what actually tells you whether two clients are on the same code. Here is the whole line since 1.0, from the official posts:</p>
+    <div class="panel overflow-x-auto not-prose my-5">
+      <table class="table-game min-w-[40rem]">
+        <thead><tr><th>Version</th><th>Type</th><th>Build</th><th>Date</th><th>What it touched</th></tr></thead>
+        <tbody>
+          {patches.map((p) => (
+            <tr>
+              <td class="text-parchment whitespace-nowrap">{p.version}</td>
+              <td class="whitespace-nowrap">{p.type}</td>
+              <td class="whitespace-nowrap">{p.build}</td>
+              <td class="whitespace-nowrap">{p.date}</td>
+              <td>{p.note}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-sm text-mist">Build numbers come from the “Version is:” line of each official Steam changelog post. The 1.0.0.x hotfix builds are the values we recorded on this site when we verified the 1.0 game data.</p>
+
+    <h2>What hotfixes 1.0.1.1 and 1.0.1.2 changed — and what they did not</h2>
+    <p><strong>Hotfix #4 (v1.0.1.1, build 1285601, November 3, 2026)</strong> was almost entirely audio, texture and crash work: it fixed the voice-over playing quieter than intended after patch 1.0.1, stopped loot pickup and harvesting sound effects from playing for everyone in a multiplayer session, fixed melting-looking textures on voxel walls, fixed a crash connected to water simulation, and stopped an error message that was flooding the log file and costing performance. The only other line updates the Discord invite link for Japanese, Korean and Traditional Chinese.</p>
+    <p><strong>Hotfix #5 (v1.0.1.2, build 1287369, November 4, 2026)</strong> is the one builders will notice: <strong>recipes that are pinned now stay pinned</strong>. It also fixes a rare water crash, a crash when a deprecated item is taken into a world, a very rare endless black screen when logging into certain worlds, and a crash when a deprecated blueprint is used. Keen Games notes that most of these came from player bug reports sent with the in-game F1 reporter.</p>
+    <p>Neither hotfix lists a skill cost, damage number, spell or equipment change. That matters: it means the ability costs and skill values we published after <a href="/enshrouded-1-0-1-0-patch-notes/">patch 1.0.1.0</a> are still current, and you do not need to respec or re-read the whole tree because of a hotfix. The one workflow change is the pinned-recipe fix, which is a quality-of-life gain at the crafting station rather than a balance change.</p>
+
+    <h2>New cosmetic content that shipped alongside the stream</h2>
+    <p>On November 3, 2026 Keen Games also posted “New Drops – Through Adversity, to the Stars”, which is where the current rewards live:</p>
+    <ul>
+      <li><strong>The Artificer set</strong> — five parts hidden in Embervale. Speak to Mei-Yin Chen to unlock the hints in your journal. Keen Games added a note to that post: the first hint requires Mei unlocked, Loraine Crim unlocked, all Beacon Dungeons completed, and the set not started or finished yet.</li>
+      <li><strong>Two new buildable props</strong> — the <strong>Star Map</strong> and the <strong>Ancient Globe</strong>, whose recipes unlock through the side quest “Find the Orrery Rings”. For base builders these are the practical part of the update.</li>
+      <li><strong>Twitch Drops</strong> started November 3, 2026 at 3pm CET for players who would rather watch than hunt:</li>
+    </ul>
+    <div class="panel overflow-x-auto not-prose my-5">
+      <table class="table-game">
+        <thead><tr><th>Watch time</th><th>Reward</th></tr></thead>
+        <tbody>{drops.map(([t, r]) => <tr><td class="text-parchment whitespace-nowrap">{t}</td><td>{r}</td></tr>)}</tbody>
+      </table>
+    </div>
+    <p>The full schedule and countdown are on Keen Games' own page at <a href="https://twitch.enshrouded.com/en-US" rel="noopener">twitch.enshrouded.com</a>. Keen Games also announced on October 23, 2026 that Enshrouded 1.0 is Steam Deck Verified.</p>
+
+    <h2>What this means for your build, in practice</h2>
+    <ul>
+      <li><strong>No re-check needed for damage or skill costs.</strong> If your numbers came from our <a href="/enshrouded-1-0-changes/">1.0 changes page</a> or the <a href="/enshrouded-1-0-1-0-patch-notes/">1.0.1.0 notes</a>, they survived 1.0.1.1 and 1.0.1.2 unchanged.</li>
+      <li><strong>Re-pin your crafting recipes once.</strong> After 1.0.1.2 the pins persist, so the station stops resetting to the default list.</li>
+      <li><strong>Rebuild a wall if it looked wrong.</strong> The voxel texture fix in 1.0.1.1 corrects the “melting wall” look, so an old screenshot may no longer match what the game renders.</li>
+      <li><strong>Watch the Artificer hunt if you build for looks.</strong> The Star Map and Ancient Globe are craftable decorations, and the set is a vanity outfit — neither changes stats.</li>
+    </ul>
+    <p>If you are planning a character around the 1.0 changes rather than the cosmetics, start from the <a href="/builder/">skill planner</a> (it already uses the 1.0.1.0 costs) and then pick a build from the <a href="/builds/">builds list</a>; each build page says which 1.0 change it depends on.</p>
+
+    <h2>FAQ</h2>
+    {faq.map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
+
+    <h2>Sources</h2>
+    <ul class="text-sm">
+      {sources.map((s) => <li><a href={s.url} rel="noopener">{s.label}</a></li>)}
+    </ul>
+    <p class="text-sm text-mist">All version numbers, build numbers and dates above were read from these official pages on November 16, 2026. This site is unofficial and not affiliated with Keen Games.</p>
+  </article>
+</Base>
