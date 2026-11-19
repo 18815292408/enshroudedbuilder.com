@@ -94,6 +94,7 @@ const jsonLd = [
 
       <h2 id="overview">{b.name} build overview</h2>
       {b.intro.map((p) => <p>{p}</p>)}
+      {b.crossLink && <p class="not-prose text-sm text-ash">{b.crossLink.before}<a href={b.crossLink.href} class="text-flame no-underline hover:underline">{b.crossLink.anchor}</a>{b.crossLink.after}</p>}
       {b.slug === "wizard" && <p class="not-prose text-sm text-ash">Trying to choose between the two Intelligence casters? The <a href="/builds/battlemage/#versus" class="text-flame no-underline hover:underline">Battlemage vs Wizard comparison</a> sets the two level 50 plans side by side.</p>}
 
       <h2 id="how-to-play">How to play the {b.name}</h2>
@@ -212,6 +213,20 @@ const jsonLd = [
         <>
           <h2 id="when-not">When not to pick the {b.name}</h2>
           <ul>{b.whenNot.map((p) => <li>{p}</li>)}</ul>
+        </>
+      )}
+
+      {b.deepDive && (
+        <>
+          <h2 id="deep-dive">{b.deepDive.heading}</h2>
+          <p>{b.deepDive.intro}</p>
+          {b.deepDive.blocks.map((blk) => (
+            <>
+              <h3>{blk.h3}</h3>
+              <p>{blk.text}</p>
+              {blk.bullets && <ul>{blk.bullets.map((x) => <li>{x}</li>)}</ul>}
+            </>
+          ))}
         </>
       )}
 
