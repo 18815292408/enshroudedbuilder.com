@@ -40,6 +40,14 @@ export type Build = {
   };
   /** Cases where a different build is the better pick. */
   whenNot?: string[];
+  /** Optional extra section rendered just before the FAQ: progression, gear swaps, sticking points. */
+  deepDive?: {
+    heading: string;
+    intro: string;
+    blocks: { h3: string; text: string; bullets?: string[] }[];
+  };
+  /** Optional one-line link to a sibling guide, rendered under the overview. */
+  crossLink?: { href: string; anchor: string; before: string; after: string };
 };
 
 export const BUILDS: Build[] = [
@@ -259,6 +267,12 @@ export const BUILDS: Build[] = [
       { q: "Is the Enshrouded ranger build good for solo play?", a: "Yes. The ranger build is rated A-tier for solo and co-op: Runner and Rebound keep enemies at bow range, Survival Instinct gives Shroud time back whenever you kill a Shroud enemy with a bow or dagger, and the Eternal arrows remove ammo runs at level 50. The trade-off is accuracy — damage drops sharply when you miss weak points, so it is less forgiving than the Summoner or Tank." },
       { q: "How many skill points does the Enshrouded ranger build need?", a: "The core is ten nodes: Marksman, Skill Shot, Sniper, Puncture, Fatal Precision, Bow Specialization, Multi Shot, Barrage, Ranger and Graceful Stride. They are spread across the three level blocks (1–15, 16–35, 36–50), so the bow damage and crit nodes come online before the Multi Shot investment at the end." },
     ],
+    crossLink: {
+      href: "/builds/assassin/",
+      anchor: "Enshrouded assassin build",
+      before: "Want the dagger side of the same tree? The ",
+      after: " guide covers the sneak opener, Expose Weakness and the poison skills, and shows where Slice and Dice fits into a bow rotation.",
+    },
     related: ["assassin", "battlemage", "warrior"],
   },
   {
@@ -449,7 +463,38 @@ export const BUILDS: Build[] = [
       { q: "Where did the dagger skills go in 1.0?", a: "The 1.0 changelog says dagger-related skills were moved from the warrior area of the skill tree to the assassin tree." },
       { q: "Does Venomous Blades need a special dagger?", a: "Yes. The skill says it raises the chance to poison 'when using Daggers with the Venomous Blades perk', so look for that perk on your daggers." },
       { q: "Assassin or Ranger?", a: "Both scale with Dexterity, so many players mix them. Pick Assassin if you like getting close and sneaking, and Ranger if you prefer staying at range." },
+      { q: "Is the enshrouded assassin build good in 1.0?", a: "It is the highest-risk build on this site, which is why it is rated B-tier. The opener is the biggest single hit any build here gets — Sneak Attack at +900% with Cutthroat adding up to +300% on top — and Expose Weakness makes whatever you hit next take +25% more physical damage. The costs are just as real: light ranged armor, openers that lose most of their value once a fight has started, and no documented 1.0 dagger to build around. If you want Dexterity without the melee risk, read the Ranger guide first." },
+      { q: "What gear does the enshrouded assassin build need?", a: "A dagger you loot, a bow as the swap, and the three ranged chests listed above. Nothing in the 1.0 dagger slot is documented on the wiki yet, so the only hard requirement on the weapon is the Venomous Blades perk if you want Poisoned Blades and Poison Mastery to do anything. Ashwind Strider Chest is the highest-armor option on this page at +168 physical / +168 magical; Sky Specter Chest and Vorgoth's Soulbound Chest both list +98 / +98, and Vorgoth's perks are not documented yet. For arrows, Celestium Arrows cover normal pulls and the Eternal Giant Bone Arrow never runs out." },
+      { q: "Can the assassin build solo in Enshrouded 1.0?", a: "Yes, and solo suits it: you decide when a fight starts, so you get the unaware window for the Sneak Attack. Bosses are the weak spot. All of the build's damage is front-loaded into an opener you get once at most, and after that you are fighting with dagger crits, Expose Weakness, poison stacks and the Slice and Dice bow shot. Keep the bow equipped as the swap, use Strategic Maneuver to roll sideways out of wind-up attacks, and expect longer boss fights than a Ranger or Battlemage gets." },
+      { q: "How do you level an enshrouded assassin build from 1 to 50?", a: "Sneak Attack first, then Dagger Mastery and Backstab Mastery, with the three Dexterity points as early as the Flame allows. Levels 16–35 add Dagger Specialization, Expose Weakness and the poison pair; 36–50 add Cutthroat, Slice and Dice and the survival tools (Quick Reflex Block, Strategic Maneuver, Vitality Surge). Pull with the bow whenever an enemy is already alert — an opener you cannot land is worth nothing, and the Dexterity you buy for daggers is the same stat that makes the bow hit." },
     ],
+    deepDive: {
+      heading: "Enshrouded assassin build: early game, gear swaps and the level 50 transition",
+      intro: "The skill order above is the plan; this section is what changes while you play it. It covers what to buy first, which pieces you can swap without breaking the build, and when the dagger kit starts paying for itself. Point costs are the same ones the three level blocks use.",
+      blocks: [
+        {
+          h3: "Levels 1–15: the opener carries the build",
+          text: "Sneak Attack is the first point for a reason: at +900% damage it is the only thing that makes a low-level dagger hit hard. Dagger Mastery and Backstab Mastery come next, then Silent Stride and Veiled Vigor for the approach and the recovery, with the three Dexterity points as soon as the Flame allows them. Until Expose Weakness arrives in the level 16–35 block, everything depends on starting the fight unseen. Pull with the bow when an enemy is already alert and save the dagger opener for targets that have not noticed you.",
+        },
+        {
+          h3: "Levels 16–35: crits, armor break and poison",
+          text: "This block is where the build stops being a one-trick opener. Dagger Specialization, Expose Weakness, Poisoned Blades, Poison Mastery and Thrust all land here. Expose Weakness is the important one: dagger crits make the target take +25% more physical damage, so every hit after the first crit is worth more than the one before it. Poisoned Blades and Poison Mastery only pay off on daggers that carry the Venomous Blades perk, so this is the level range to start checking dagger drops instead of selling them.",
+        },
+        {
+          h3: "Levels 36–50: where the damage really comes from",
+          text: "The last block finishes the multipliers and adds the survival tools: Cutthroat (+300% to sneak damage), Slice and Dice, Quick Reflex Block, Strategic Maneuver, Vitality Surge and Fatal Precision, then three more Dexterity. From here the loop is opener, crit, Expose Weakness window, bow shot. Slice and Dice is what makes the bow swap worth carrying — after a dagger critical strike your next bow attack gets +50% base damage.",
+        },
+        {
+          h3: "Gear swaps that keep the build intact",
+          text: "There is no dagger with documented 1.0 stats on the wiki yet, so the weapon slot is whatever you loot; the only hard requirement is the Venomous Blades perk if you want the poison skills to do anything. The rest of the kit is easier to plan:",
+          bullets: [
+            "Armor: Ashwind Strider Chest lists +168 physical / +168 magical. Sky Specter Chest and Vorgoth's Soulbound Chest both list +98 / +98, and the wiki does not document Vorgoth's perks yet, so craft Ashwind first and treat the legendary as a sidegrade until those perks are known.",
+            "Bow: the Breaching Bow and the Spearfisher Bow share the same Celestium recipe, so either one works as the backup that Slice and Dice pays for.",
+            "Food: Taro Root Curry (+21% ranged and dagger damage) and Pumpkin Soup (+18%) are the two damage slots. Swap Coconut Milk for Chicken Soup (+160 health, +6% ranged and dagger damage) on fights where you die to the second hit rather than running out of Stamina.",
+          ],
+        },
+      ],
+    },
     related: ["ranger", "warrior", "tank"],
   },
 ];
